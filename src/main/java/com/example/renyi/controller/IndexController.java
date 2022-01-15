@@ -1,187 +1,140 @@
 package com.example.renyi.controller;
 
 
+import ch.qos.logback.core.util.FileUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.entity.Ptt;
+import com.example.renyi.entity.Putian;
+import com.example.renyi.entity.TData;
 import com.example.renyi.entity.User;
-import org.apache.poi.sl.usermodel.Sheet;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/xkk")
 public class IndexController {
 
-
-    /*@RequestMapping(value="/user", method = RequestMethod.GET) //网址
-    public String Info(Model model, File file) {
-
-
-        try {
-            //获取文件名
-            String filename = file.getName();
-            //获取文件流
-            InputStream inputStream = new FileInputStream(file);
-            //实例化实现了AnalysisEventListener接口的类
-            ExcelListener listener = new ExcelListener();
-            //传入参数
-            ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
-            //读取信息
-            //excelReader.read(new Sheet(1, 0, User.class));
-            //获取数据
-            List<Object> list = listener.getDatas();
-            if (list.size() > 1) {
-                for (int i = 0; i < list.size(); i++) {
-                    //Testobj = (User) list.get(i);
-                    JSONObject jo = new JSONObject();
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-
-
-        return "user"; //返回user.html
-    }*/
-
-
     @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         String req = request.getParameter("sky");
-
-        System.out.println("1111111!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------");
         ModelAndView mav = new ModelAndView();
         mav.addObject("result",req);
         mav.setViewName("user");
-
         return mav; //返回user.html
     }
 
 
-    @RequestMapping(value="/daochu", method = RequestMethod.GET) //网址
-    public String daochu(HttpServletRequest request, HttpServletResponse response) {
+    // 导入。转换下载
+    @RequestMapping(value="/upload", method = {RequestMethod.GET,RequestMethod.POST})
+    public void upload(@RequestParam(value = "file")MultipartFile file,HttpServletResponse response) throws IOException {
+        Map<String,Ptt> pttMapp = new HashMap<String, Ptt>();// 名字 关系 MAP
         try {
-            List<User> userList = new ArrayList<User>();
-            String filenames = "111111";
-            String userAgent = request.getHeader("User-Agent");
-            if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
-                filenames = URLEncoder.encode(filenames, "UTF-8");
-            } else {
-                filenames = new String(filenames.getBytes("UTF-8"), "ISO-8859-1");
-            }
-            response.setContentType("application/vnd.ms-exce");
-            response.setCharacterEncoding("utf-8");
-            response.addHeader("Content-Disposition", "filename=" + filenames + ".xlsx");
-            EasyExcel.write(response.getOutputStream(), User.class).sheet("sheet").doWrite(userList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "user"; //返回user.html
-    }
-
-    /*@RequestMapping(value="/excel", method = RequestMethod.GET) //网址
-    public ModelAndView excel(HttpServletRequest request, HttpServletResponse response) {
-        String req = request.getParameter("sky");
-        List<User> testList = new ArrayList<User>();
-        try {
-            String strUrl = "C:\\Users\\Administrator\\Desktop\\json.xlsx";
-            File multipartFile = new File(strUrl);
-            InputStream inputStream = new FileInputStream(multipartFile);
-            //实例化实现了AnalysisEventListener接口的类
-            ExcelListener listener = new ExcelListener();
-            //传入参数
-            ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
-            //读取信息
-            //excelReader.read(new Sheet(1, 0, User.class));
-            //获取数据
-            *//*List<Object> list = listener.getDatas();
-            if (list.size() > 1) {
-                for (int i = 0; i < list.size(); i++) {
-                    User user = (User) list.get(i);
-                    System.out.println("user == " + user.toString());
+            ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
+            if(classPathResource.exists()){
+                InputStream inputStream = classPathResource.getInputStream();
+                ExcelListener listener = new ExcelListener();
+                ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
+                com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,0, Ptt.class);
+                excelReader.read(sheet);
+                //获取数据
+                List<Object> list = listener.getDatas();
+                System.out.println("list.size() == " + list.size());
+                for(Object oo : list){
+                    Ptt ptt = (Ptt)oo;
+                    pttMapp.put(ptt.getPtmc(),ptt);
                 }
-            }*//*
-        } catch (Exception e) {
+            }
+        }catch (Exception e){
             e.printStackTrace();
         }
 
+
+        InputStream inputStream = file.getInputStream();
+        //实例化实现了AnalysisEventListener接口的类
+        ExcelListener listener = new ExcelListener();
+        //传入参数
+        ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
+        //读取信息
+        com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,3,Putian.class);
+        excelReader.read(sheet);
+
+        //获取数据
+        List<Object> list = listener.getDatas();
+        List<Map<String,String>> ptlist = new ArrayList<Map<String,String>>();
+        for(Object oo : list){
+            Map<String,String> reobject = new HashMap<String,String>();
+            reobject.put("today","2022-01-15");
+            reobject.put("djcode","SA-XJJ-0000001");
+            reobject.put("merchantcode","020101004");
+            reobject.put("departmentCode","HW-SC-CD-CPB");
+            reobject.put("userCode","CD-036");
+            reobject.put("taxflag","1");//含税
+
+            Putian pt = (Putian)oo;
+            String ptmdmc = pt.getMdmc();//普天门店名称
+            String tmdcode = Utils.getCKbyName(ptmdmc);//T+门店编码
+            reobject.put("tmdcode",tmdcode);
+
+            String ptmc = pt.getJx()+pt.getYs();
+            System.out.println("ptmc == " + ptmc );
+            String tcode = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTcode();//对应的 T+ 的 名称编码
+            reobject.put("tcode",tcode);
+            reobject.put("danwei",pttMapp.get(ptmc)==null?"个":pttMapp.get(ptmc).getTdw());
+
+            reobject.put("spdj",pt.getSpdj());//商品单价（含税 13%）
+            reobject.put("fhsl",pt.getFhsl());//数量
+            ptlist.add(reobject);
+        }
+        System.out.println("一共读取了 " + ptlist.size() + " 行数据！");//ptlist 包含了所有门店的下货内容。
+
+
+        //----------------------------------读取标准的T+excel，写数据，然后下载--------------------------------------//
+
+        OutputStream out = null;
+        BufferedOutputStream bos = null;
         try {
-            String strUrl = "C:\\Users\\Administrator\\Desktop\\json"+System.currentTimeMillis()+".xlsx";
-            EasyExcel.write(strUrl,User.class).sheet("sheet").doWrite(testList);
+            //String templateFileName = "/excel/tcgdd.xlsx";
+            String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+File.separator + "tcgdd.xls";
+            response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("下载后的名称.xls", "utf-8");
+            response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1"));
+            out = response.getOutputStream();
+            bos = new BufferedOutputStream(out);
+            //读取Excel
+            ExcelWriter excelWriter = EasyExcel.write(bos).withTemplate(templateFileName).build();
+            WriteSheet writeSheet = EasyExcel.writerSheet().build();
+
+            //list map 是查询并需导出的数据，并且里面的字段和excel需要导出的字段对应
+            // 直接写入Excel数据
+            excelWriter.fill(ptlist, writeSheet);
+            excelWriter.finish();
+            bos.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("user");
-        return mav; //返回user.html
-    }*/
-
-
-    // 导出
-    @RequestMapping(value="/download", method = RequestMethod.GET)
-    public void download(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
-        response.setContentType("application/vnd.ms-excel");
-        response.setCharacterEncoding("utf-8");// 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-        String fileName = URLEncoder.encode("测试", "UTF-8");
-        response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
-        List<User> data = new ArrayList<User>();
-        for (int i = 0; i < 10; i++) {
-            User user = new User();
-            user.setName("张四" + i);
-            user.setId(18 + i);
-            data.add(user);
-        }
-        EasyExcel.write(response.getOutputStream(), User.class).sheet("模板").doWrite(data);
-    }
-
-
-    // 导入
-    @RequestMapping(value="/upload", method = RequestMethod.GET)
-    public void upload(MultipartFile file,HttpServletResponse response) throws IOException {
-        //写法一
-        User user = new User();
-        // sheet里面可以传参 根据sheet下标读取或者根据名字读取 不传默认读取第一个
-        EasyExcel.read(file.getInputStream(), User.class, new ExcelListener(user)).sheet().doRead();
-
-        // 写法2：
-        /*ExcelReader excelReader = EasyExcel.read(file.getInputStream(), Student.class, new StudentListener(studentDao)).build();
-        ReadSheet readSheet = EasyExcel.readSheet(0).build();
-        excelReader.read(readSheet);
-        // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
-        excelReader.finish();*/
-
-
-
-        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
-        response.setContentType("application/vnd.ms-excel");
-        response.setCharacterEncoding("utf-8");// 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-        String fileName = URLEncoder.encode("测试", "UTF-8");
-        response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
-        List<User> data = new ArrayList<User>();
-        for (int i = 0; i < 10; i++) {
-            User uu = new User();
-            uu.setName("张四" + i);
-            uu.setId(18 + i);
-            data.add(uu);
-        }
-        EasyExcel.write(response.getOutputStream(), User.class).sheet("模板").doWrite(data);
     }
 }

@@ -6,33 +6,37 @@ import com.alibaba.fastjson.JSON;
 import com.example.renyi.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExcelListener extends AnalysisEventListener<User> {
+@Component
+public class ExcelListener extends AnalysisEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(com.example.renyi.controller.ExcelListener.class);
 
-    private User user;
-
-    public ExcelListener(User user){
-        this.user = user;
+    //可以通过实例获取该值
+    private List<Object> datas = new ArrayList<Object>();
+    public void invoke(Object o, AnalysisContext analysisContext) {
+        //LOGGER.info("导入数据{}", JSON.toJSONString(o));
+        datas.add(o);//数据存储到list，供批量处理，或后续自己业务逻辑处理。
+        // doSomething(o);//根据自己业务做处理
     }
 
-    @Override
-    public void invoke(User user, AnalysisContext analysisContext) {
-        System.out.println("invoke方法被调用");
-        LOGGER.info("解析到一条数据:{}", JSON.toJSONString(user));
-        doSomething(user);
+    private void doSomething(Object object) {
+        //1、入库调用接口，可在这里写，也可在业务层写
     }
 
-    private void doSomething(User user) {
-        //1、入库调用接口
+    public List<Object> getDatas() {
+        return datas;
     }
 
-    @Override
+    public void setDatas(List<Object> datas) {
+        this.datas = datas;
+    }
+
     public void doAfterAllAnalysed(AnalysisContext analysisContext) {
-        // datas.clear();//解析结束销毁不用的资源
+         //atas.clear();//解析结束销毁不用的资源
     }
 }

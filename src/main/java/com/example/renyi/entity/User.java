@@ -1,29 +1,28 @@
 package com.example.renyi.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.metadata.BaseRowModel;
 import lombok.Data;
 
 @Data
-public class User {
+public class User extends BaseRowModel {
 
-    //@ExcelProperty(index = 1)  或者从某一列开始
+    @ExcelProperty(index = 0)
+    private String id;
 
-    @ExcelProperty("编码")
-    private int id;
-
-    @ExcelProperty("姓名")
+    @ExcelProperty(index = 1)
     private String name;
 
-    public int getId() {
+    public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setName(String name) {
@@ -33,7 +32,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }
