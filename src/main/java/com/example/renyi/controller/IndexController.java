@@ -15,6 +15,8 @@ import com.example.renyi.entity.Putian;
 import com.example.renyi.entity.TData;
 import com.example.renyi.entity.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +30,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/xkk")
 public class IndexController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(com.example.renyi.controller.IndexController.class);
 
     @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
@@ -50,7 +52,8 @@ public class IndexController {
     // 导入。转换下载
     @RequestMapping(value="/upload", method = {RequestMethod.GET,RequestMethod.POST})
     public void upload(@RequestParam(value = "file")MultipartFile file,HttpServletResponse response) throws IOException {
-        Map<String,Ptt> pttMapp = new HashMap<String, Ptt>();// 名字 关系 MAP
+        // ------------  先解析出 名称匹配的 关系表 --------------------------------//
+        Map<String,Ptt> pttMapp = new HashMap<String, Ptt>();
         try {
             ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
             if(classPathResource.exists()){
@@ -61,78 +64,78 @@ public class IndexController {
                 excelReader.read(sheet);
                 //获取数据
                 List<Object> list = listener.getDatas();
-                System.out.println("list.size() == " + list.size());
                 for(Object oo : list){
                     Ptt ptt = (Ptt)oo;
                     pttMapp.put(ptt.getPtmc(),ptt);
                 }
+                LOGGER.error("----------------------------- 名称匹配关系表解析成功！-------------------------------------");
             }
         }catch (Exception e){
             e.printStackTrace();
         }
 
-
+        // 解析上传的 excel 文件到 list 里面，并转换成对应的T+ list 数据
         InputStream inputStream = file.getInputStream();
-        //实例化实现了AnalysisEventListener接口的类
         ExcelListener listener = new ExcelListener();
-        //传入参数
         ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
-        //读取信息
         com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,3,Putian.class);
         excelReader.read(sheet);
-
-        //获取数据
         List<Object> list = listener.getDatas();
+
         List<Map<String,String>> ptlist = new ArrayList<Map<String,String>>();
         for(Object oo : list){
             Map<String,String> reobject = new HashMap<String,String>();
-            reobject.put("today","2022-01-15");
-            reobject.put("djcode","SA-XJJ-0000001");
-            reobject.put("merchantcode","020101004");
-            reobject.put("departmentCode","HW-SC-CD-CPB");
-            reobject.put("userCode","CD-036");
-            reobject.put("taxflag","1");//含税
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+            reobject.put("today",sdf.format(new Date()));//默认是 今天
+            reobject.put("djcode","SA-XJJ-0000001");//单号
+            reobject.put("merchantcode","020101004");// 成都-普天太力 code
+            reobject.put("departmentCode","HW-SC-CD-CPB");//成都华为产品部
+            reobject.put("userCode","CD-036");//王洪田
+            reobject.put("taxflag","是");//含税
 
             Putian pt = (Putian)oo;
             String ptmdmc = pt.getMdmc();//普天门店名称
-            String tmdcode = Utils.getCKbyName(ptmdmc);//T+门店编码
-            reobject.put("tmdcode",tmdcode);
+            String ckcode = Utils.getCKbyName(ptmdmc);//T+仓库编码
+            reobject.put("ckcode",ckcode);
 
             String ptmc = pt.getJx()+pt.getYs();
-            System.out.println("ptmc == " + ptmc );
+            if(pttMapp.get(ptmc)==null){
+                LOGGER.error("---------------- 普天名称："+ptmc+" 对应的 T+ 名称没找到！--------------------");
+            }
             String tcode = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTcode();//对应的 T+ 的 名称编码
             reobject.put("tcode",tcode);
-            reobject.put("danwei",pttMapp.get(ptmc)==null?"个":pttMapp.get(ptmc).getTdw());
+            reobject.put("danwei",pttMapp.get(ptmc)==null?"个":pttMapp.get(ptmc).getTdw());// 对应的T+ 单位
 
             reobject.put("spdj",pt.getSpdj());//商品单价（含税 13%）
+            reobject.put("tax","0.13");//税率
             reobject.put("fhsl",pt.getFhsl());//数量
+            reobject.put("taxAcount",""+Float.valueOf(pt.getFhsl())*Float.valueOf(pt.getSpdj()));// 含税金额
             ptlist.add(reobject);
         }
-        System.out.println("一共读取了 " + ptlist.size() + " 行数据！");//ptlist 包含了所有门店的下货内容。
-
+        LOGGER.error("--------------------上传的excel一共解析出了 " + ptlist.size() + " 行数据！开始写入 T+ 标准模板-----------------------");
 
         //----------------------------------读取标准的T+excel，写数据，然后下载--------------------------------------//
-
         OutputStream out = null;
         BufferedOutputStream bos = null;
         try {
             //String templateFileName = "/excel/tcgdd.xlsx";
-            String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+File.separator + "tcgdd.xls";
+            String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+File.separator + "tcgdd.xlsx";
+            LOGGER.error("---------------------T+的标准订单导入模板路径：" + templateFileName + "-----------------------------");
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
-            String fileName = URLEncoder.encode("下载后的名称.xls", "utf-8");
+            String fileName = URLEncoder.encode("xjj.xls", "utf-8");
             response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1"));
             out = response.getOutputStream();
             bos = new BufferedOutputStream(out);
             //读取Excel
             ExcelWriter excelWriter = EasyExcel.write(bos).withTemplate(templateFileName).build();
             WriteSheet writeSheet = EasyExcel.writerSheet().build();
-
             //list map 是查询并需导出的数据，并且里面的字段和excel需要导出的字段对应
             // 直接写入Excel数据
             excelWriter.fill(ptlist, writeSheet);
             excelWriter.finish();
             bos.flush();
+            LOGGER.error("-----------------------------写入完成，请下载江哥的爱------------------------");
         } catch (Exception e) {
             e.printStackTrace();
         }
