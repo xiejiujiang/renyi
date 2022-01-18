@@ -22,23 +22,4 @@ class RenyiApplicationTests {
     @Test
     void contextLoads() {
     }
-
-    @Test
-    public void tt() throws  Exception{
-        String filepath = "C:\\Users\\mexjj\\Desktop\\111\\tcgdd.xlsx";
-        Sheet sheet = new Sheet(1,0, TData.class);
-        List<TData> TDatalist = new ArrayList<TData>();
-        for(int i=0;i<4;i++){
-            TData tData = new TData();
-            tData.setVoucherDate("2022-01-15");
-            tData.setCode("xxxxx9999");
-            tData.setPartner("putiantaili");
-            tData.setPartnerName("putiantaili111");
-            TDatalist.add(tData);
-        }
-        OutputStream out = new FileOutputStream(filepath);
-        ExcelWriter writer = EasyExcelFactory.getWriter(out, ExcelTypeEnum.XLS, false);
-        writer.write(TDatalist,sheet);
-        writer.finish();
-    }
 }
