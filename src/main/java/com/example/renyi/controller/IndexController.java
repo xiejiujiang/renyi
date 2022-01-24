@@ -49,6 +49,9 @@ public class IndexController {
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getParameter("sky");
         ModelAndView mav = new ModelAndView();
+        if(code == null || "".equals(code)){
+            code = "666";
+        }
         String name = OrderService.getTnameByCode(code);
         mav.addObject("result",name);
         mav.setViewName("user");
