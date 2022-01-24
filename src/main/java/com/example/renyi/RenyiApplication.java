@@ -6,6 +6,7 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.example.renyi.controller.ExcelListener;
 import com.example.renyi.controller.Utils;
 import com.example.renyi.entity.Ptt;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
+@MapperScan(value = "com.example.renyi.mapper")
 public class RenyiApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

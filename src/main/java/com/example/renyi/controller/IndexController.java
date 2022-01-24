@@ -15,10 +15,13 @@ import com.example.renyi.entity.Putian;
 import com.example.renyi.entity.TData;
 import com.example.renyi.entity.User;
 
+import com.example.renyi.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ResourceUtils;
@@ -39,12 +42,17 @@ public class IndexController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(com.example.renyi.controller.IndexController.class);
 
+    @Autowired
+    private OrderService OrderService;
+
     @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
-        String req = request.getParameter("sky");
+        String code = request.getParameter("sky");
         ModelAndView mav = new ModelAndView();
-        mav.addObject("result",req);
+        String name = OrderService.getTnameByCode(code);
+        mav.addObject("result",name);
         mav.setViewName("user");
+        LOGGER.error("----------------------------------是谁打开了江哥的页面！--------------------------------------------");
         return mav; //返回user.html
     }
 
