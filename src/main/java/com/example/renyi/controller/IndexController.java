@@ -96,7 +96,7 @@ public class IndexController {
         List<Map<String,String>> ptlist = new ArrayList<Map<String,String>>();
         for(Object oo : list){
             Map<String,String> reobject = new HashMap<String,String>();
-            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             reobject.put("today",sdf.format(new Date()));//默认是 今天
             reobject.put("djcode","SA-XJJ-0000001");//单号
             reobject.put("merchantcode","020101004");// 成都-普天太力 code
