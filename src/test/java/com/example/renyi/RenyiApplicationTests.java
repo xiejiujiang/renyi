@@ -11,6 +11,7 @@ import com.chanjet.openapi.sdk.java.exception.ChanjetApiException;
 import com.chanjet.openapi.sdk.java.request.CreateTenantRequest;
 import com.chanjet.openapi.sdk.java.response.CreateTenantResponse;
 import com.example.renyi.entity.TData;
+import com.example.renyi.utils.HttpClients;
 import org.apache.commons.collections4.functors.FalsePredicate;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,10 +28,17 @@ import java.util.List;
 class RenyiApplicationTests {
 
     @Test
-    void gg(){
+    void test(){
+        try {
+            String result = HttpClients.HttpPost("https://openapi.chanjet.com/tplus/api/v2/warehouse/Query","{\n" +
+                    "  \"param\": {\n" +
+                    "    \"Code\": \"0101010101\"\n" +
+                    "  }\n" +
+                    "}","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1MzM5NDA4IiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ0ODA0NDM3LCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiZGM5NjhmNDMtOTQ5My00ZTNkLWEwNmMtOGY5ZjdkMjVjODA5IiwiZXhwIjoxNjQ1MzIyODM3LCJpYXQiOjE2NDQ4MDQ0MzcsIm9yZ0FjY291bnQiOiJ1cXk2aG5wcnIyYWoifQ.2HsiaSdoj2sUXrnybZQHPqa4tON2pupphkvYLibJ28k");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String today = sdf.format(new Date());
-        System.out.println("today == " + today);
+            System.out.println("result : " + result);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
