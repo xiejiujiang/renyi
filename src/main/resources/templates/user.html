@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<div style="color: YELLOW;font-size: 66px" th:text="${result}"></div>
+<div style="color: RED;font-size: 66px" th:text="${result}"></div>
 <h1>这里是江哥的测试页面，用来测试 excel 的表格转换功能！ </h1>
 
 <!--<input type="file" name="上传" th:value="上传" >
@@ -15,7 +15,8 @@
 <input id="myDiv" type="button" value="弹框 + 访问" onclick="onclick:test()">-->
 
 
-<form method="POST" enctype="multipart/form-data" action="http://172.0.0.1:9998/xkk/upload">
+<form method="POST" enctype="multipart/form-data" action="http://mexjj.xyz/renyi/xkk/upload">
+  <input type="hidden" id="idperson" value='${result}'>
   <table>
     <tr><td>第一步:先上传excel文件</td><td>
       <input type="file" name="file" /></td></tr>

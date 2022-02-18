@@ -8,60 +8,94 @@ import lombok.Data;
 public class Putian extends BaseRowModel {
 
     @ExcelProperty(index = 0)
-    private String mdmc;
+    private String ordernmb;//订单编号
 
     @ExcelProperty(index = 1)
-    private String pl;
+    private String fgs;//分公司
 
     @ExcelProperty(index = 2)
-    private String cpmc;
+    private String orderctm;//订单创建时间
 
     @ExcelProperty(index = 3)
-    private String pp;
+    private String orderstate;//订单状态
 
     @ExcelProperty(index = 4)
-    private String jx;
+    private String lb;//类别
 
     @ExcelProperty(index = 5)
-    private String ys;
+    private String pp;//品牌
 
     @ExcelProperty(index = 6)
-    private String fgs;
+    private String xm;//项目
 
     @ExcelProperty(index = 7)
-    private String xm;
+    private String jx;//机型
 
     @ExcelProperty(index = 8)
-    private String spdj;
+    private String ys;//颜色
 
     @ExcelProperty(index = 9)
-    private String fhsl;
+    private String spdj;//商品单价
 
     @ExcelProperty(index = 10)
-    private String pc;
+    private String spsl;//商品数量
 
-    public String getMdmc() {
-        return mdmc;
+    @ExcelProperty(index = 11)
+    private String hjje;//合计金额
+
+    @ExcelProperty(index = 12)
+    private String cksl;//出库数量
+
+    @ExcelProperty(index = 13)
+    private String shsl;//收货数量
+
+    @ExcelProperty(index = 14)
+    private String jssl;//拒收数量
+
+    @ExcelProperty(index = 15)
+    private String address;//收获地址
+
+    @ExcelProperty(index = 16)
+    private String beizhu;//备注
+
+    public String getOrdernmb() {
+        return ordernmb;
     }
 
-    public void setMdmc(String mdmc) {
-        this.mdmc = mdmc;
+    public void setOrdernmb(String ordernmb) {
+        this.ordernmb = ordernmb;
     }
 
-    public String getPl() {
-        return pl;
+    public String getFgs() {
+        return fgs;
     }
 
-    public void setPl(String pl) {
-        this.pl = pl;
+    public void setFgs(String fgs) {
+        this.fgs = fgs;
     }
 
-    public String getCpmc() {
-        return cpmc;
+    public String getOrderctm() {
+        return orderctm;
     }
 
-    public void setCpmc(String cpmc) {
-        this.cpmc = cpmc;
+    public void setOrderctm(String orderctm) {
+        this.orderctm = orderctm;
+    }
+
+    public String getOrderstate() {
+        return orderstate;
+    }
+
+    public void setOrderstate(String orderstate) {
+        this.orderstate = orderstate;
+    }
+
+    public String getLb() {
+        return lb;
+    }
+
+    public void setLb(String lb) {
+        this.lb = lb;
     }
 
     public String getPp() {
@@ -70,6 +104,14 @@ public class Putian extends BaseRowModel {
 
     public void setPp(String pp) {
         this.pp = pp;
+    }
+
+    public String getXm() {
+        return xm;
+    }
+
+    public void setXm(String xm) {
+        this.xm = xm;
     }
 
     public String getJx() {
@@ -88,22 +130,6 @@ public class Putian extends BaseRowModel {
         this.ys = ys;
     }
 
-    public String getFgs() {
-        return fgs;
-    }
-
-    public void setFgs(String fgs) {
-        this.fgs = fgs;
-    }
-
-    public String getXm() {
-        return xm;
-    }
-
-    public void setXm(String xm) {
-        this.xm = xm;
-    }
-
     public String getSpdj() {
         return spdj;
     }
@@ -112,36 +138,82 @@ public class Putian extends BaseRowModel {
         this.spdj = spdj;
     }
 
-    public String getFhsl() {
-        return fhsl;
+    public String getSpsl() {
+        return spsl;
     }
 
-    public void setFhsl(String fhsl) {
-        this.fhsl = fhsl;
+    public void setSpsl(String spsl) {
+        this.spsl = spsl;
     }
 
-    public String getPc() {
-        return pc;
+    public String getHjje() {
+        return hjje;
     }
 
-    public void setPc(String pc) {
-        this.pc = pc;
+    public void setHjje(String hjje) {
+        this.hjje = hjje;
+    }
+
+    public String getCksl() {
+        return cksl;
+    }
+
+    public void setCksl(String cksl) {
+        this.cksl = cksl;
+    }
+
+    public String getShsl() {
+        return shsl;
+    }
+
+    public void setShsl(String shsl) {
+        this.shsl = shsl;
+    }
+
+    public String getJssl() {
+        return jssl;
+    }
+
+    public void setJssl(String jssl) {
+        this.jssl = jssl;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getBeizhu() {
+        return beizhu;
+    }
+
+    public void setBeizhu(String beizhu) {
+        this.beizhu = beizhu;
     }
 
     @Override
     public String toString() {
-        return "putian{" +
-                "mdmc='" + mdmc + '\'' +
-                ", pl='" + pl + '\'' +
-                ", cpmc='" + cpmc + '\'' +
+        return "Putian{" +
+                "ordernmb='" + ordernmb + '\'' +
+                ", fgs='" + fgs + '\'' +
+                ", orderctm='" + orderctm + '\'' +
+                ", orderstate='" + orderstate + '\'' +
+                ", lb='" + lb + '\'' +
                 ", pp='" + pp + '\'' +
+                ", xm='" + xm + '\'' +
                 ", jx='" + jx + '\'' +
                 ", ys='" + ys + '\'' +
-                ", fgs='" + fgs + '\'' +
-                ", xm='" + xm + '\'' +
                 ", spdj='" + spdj + '\'' +
-                ", fhsl='" + fhsl + '\'' +
-                ", pc='" + pc + '\'' +
+                ", spsl='" + spsl + '\'' +
+                ", hjje='" + hjje + '\'' +
+                ", cksl='" + cksl + '\'' +
+                ", shsl='" + shsl + '\'' +
+                ", jssl='" + jssl + '\'' +
+                ", address='" + address + '\'' +
+                ", beizhu='" + beizhu + '\'' +
                 '}';
     }
 }
