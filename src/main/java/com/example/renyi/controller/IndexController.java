@@ -49,10 +49,10 @@ public class IndexController {
     @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
-        String userid = "";
-        Cookie[] cookies = request.getCookies();
+        //String userid = "";
+        //Cookie[] cookies = request.getCookies();
         LOGGER.error("----------------------------------开始！--------------------------------------------");
-        try{
+        /*try{
             for(int i=0;i<cookies.length;i++){
                 Cookie cookie = cookies[i];
                 //  name == AIPortal_Res_Account,value == 1_23,comment == null ,其中 23 是 eap_user（用户权限里面的用户ID）
@@ -68,7 +68,7 @@ public class IndexController {
             mav.addObject("result",idperson);// 员工ID
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
         mav.setViewName("user");
         LOGGER.error("----------------------------------是谁打开了江哥的页面！--------------------------------------------");
         return mav; //返回user.html
@@ -83,8 +83,8 @@ public class IndexController {
         try {
             //String idperson = request.getParameter("idperson");
             //LOGGER.error("------------------- 传进来的idperson === " + idperson + "--------------------------");
-            String idperson1 = (String) request.getSession().getValue("idperson");
-            LOGGER.error("------------------- Session中的idperson === " + idperson1 + "--------------------------");
+            //String idperson1 = (String) request.getSession().getValue("idperson");
+            //LOGGER.error("------------------- Session中的idperson === " + idperson1 + "--------------------------");
 
             ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
             if(classPathResource.exists()){
@@ -101,6 +101,8 @@ public class IndexController {
                 }
                 LOGGER.error("----------------------------- 名称匹配关系表解析成功！-------------------------------------");
             }
+
+
             // 解析上传的 excel 文件到 list 里面，并转换成对应的T+ list 数据
             InputStream inputStream = file.getInputStream();
             ExcelListener listener = new ExcelListener();
@@ -118,17 +120,24 @@ public class IndexController {
 
                 Putian pt = (Putian)oo;
                 String ptmdmc = pt.getAddress();//普天门店地址，返回门店名称
-                String ckcode = Utils.getCKbyName(ptmdmc);//T+仓库编码
-                reobject.put("ckcode",ckcode);
+                Map<String,String> ckmap = Utils.getCKbyName(ptmdmc);//T+仓库编码
+                if(ckmap == null || "".equals(ckmap.get("ckcode"))){
+                    LOGGER.error("------------------  地址名称是：" + ptmdmc + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
+                }
+                reobject.put("ckcode",ckmap.get("ckcode"));
+                reobject.put("ckname",ckmap.get("ckname"));//T+ 仓库名称
 
                 // ---- 注意！ 这里根据 ptmdmc 普天系统里的门店名称 来 判断出 地区：往来单位：部门：业务员。 且！ 每个仓库 需要 不同的 订单号 -----//
                 reobject.put("djcode",pt.getOrdernmb());//单号
                 // 供应商 code
                 reobject.put("merchantcode",Utils.getResultMap(ptmdmc,pt.getXm()).get("merchantcode"));
+                reobject.put("merchantname",Utils.getResultMap(ptmdmc,pt.getXm()).get("merchantname"));
                 // 部门 code
                 reobject.put("departmentCode",Utils.getResultMap(ptmdmc,pt.getXm()).get("departmentCode"));
+                reobject.put("departmentName",Utils.getResultMap(ptmdmc,pt.getXm()).get("departmentName"));
                 // 业务员 code
                 reobject.put("userCode",Utils.getResultMap(ptmdmc,pt.getXm()).get("userCode"));
+                reobject.put("userName",Utils.getResultMap(ptmdmc,pt.getXm()).get("userName"));
                 //含税
                 reobject.put("taxflag","是");
 
@@ -136,8 +145,10 @@ public class IndexController {
                 if(pttMapp.get(ptmc) == null || "".equals(pttMapp.get(ptmc))){
                     LOGGER.error("---------------- 普天名称："+ptmc+" 对应的 T+ 名称没找到！请及时更新excel匹配表 --------------------");
                 }
-                String tcode = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTcode();//对应的 T+ 的 名称编码
-                reobject.put("tcode",tcode);
+                String tcode = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTcode();//对应的 T+ 的 编码
+                String tname = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTname();//对应的 T+ 的 名称
+                reobject.put("tcode",tcode);//对应的 T+ 的 编码
+                reobject.put("tname",tname);//对应的 T+ 的 名称
                 reobject.put("danwei",pttMapp.get(ptmc)==null?"个":pttMapp.get(ptmc).getTdw());// 对应的T+ 单位
 
                 reobject.put("spdj",pt.getSpdj());//商品单价（含税 13%）
