@@ -11,7 +11,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
+@EnableScheduling
 @MapperScan(value = "com.example.renyi.mapper")
 public class RenyiApplication extends SpringBootServletInitializer {
 
