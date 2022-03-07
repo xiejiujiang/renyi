@@ -127,6 +127,12 @@ public class Utils {
             map.put("ckname", "昆明瑞鼎城MSC库");
             return map;
         }
+        if(mendian.contains("昆明市五华区宜家家居宝略华为授权体验店")) {
+            map.put("ckcode", "0201012001");
+            map.put("ckname", "昆明宜家库");
+            return map;
+        }
+
 
         // -----------------------  苏州 ----------------------------------//
         if(mendian.contains("苏州市吴江万象汇爀苒华为授权体验店")) {

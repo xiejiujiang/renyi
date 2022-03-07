@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
-@EnableScheduling
 @MapperScan(value = "com.example.renyi.mapper")
 public class RenyiApplication extends SpringBootServletInitializer {
 

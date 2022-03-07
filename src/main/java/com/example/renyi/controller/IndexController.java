@@ -99,7 +99,7 @@ public class IndexController {
                     Ptt ptt = (Ptt)oo;
                     pttMapp.put(ptt.getPtmc(),ptt);
                 }
-                LOGGER.error("----------------------------- 名称匹配关系表解析成功！-------------------------------------");
+                LOGGER.error("-------------------- 名称匹配关系表解析成功！--------------------");
             }
 
 
@@ -122,7 +122,7 @@ public class IndexController {
                 String ptmdmc = pt.getAddress();//普天门店地址，返回门店名称
                 Map<String,String> ckmap = Utils.getCKbyName(ptmdmc);//T+仓库编码
                 if(ckmap == null || "".equals(ckmap.get("ckcode"))){
-                    LOGGER.error("------------------  地址名称是：" + ptmdmc + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
+                    LOGGER.error("-------------------- 地址名称是：" + ptmdmc + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
                 }
                 reobject.put("ckcode",ckmap.get("ckcode"));
                 reobject.put("ckname",ckmap.get("ckname"));//T+ 仓库名称
@@ -143,7 +143,7 @@ public class IndexController {
 
                 String ptmc = pt.getJx()+pt.getYs();
                 if(pttMapp.get(ptmc) == null || "".equals(pttMapp.get(ptmc))){
-                    LOGGER.error("---------------- 普天名称："+ptmc+" 对应的 T+ 名称没找到！请及时更新excel匹配表 --------------------");
+                    LOGGER.error("-------------------- 普天名称："+ptmc+" 对应的 T+ 名称没找到！请及时更新excel匹配表");
                 }
                 String tcode = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTcode();//对应的 T+ 的 编码
                 String tname = pttMapp.get(ptmc)==null?"":pttMapp.get(ptmc).getTname();//对应的 T+ 的 名称
@@ -157,14 +157,14 @@ public class IndexController {
                 reobject.put("taxAcount",""+Float.valueOf(pt.getSpsl())*Float.valueOf(pt.getSpdj()));// 含税金额
                 ptlist.add(reobject);
             }
-            LOGGER.error("--------------------上传的excel一共解析出了 " + ptlist.size() + " 行数据！开始写入 T+ 标准模板-----------------------");
+            LOGGER.error("-------------------- 上传的excel一共解析出了 " + ptlist.size() + " 行数据！开始写入 T+ 标准模板");
 
             //----------------------------------读取标准的T+excel，写数据，然后下载--------------------------------------//
             OutputStream out = null;
             BufferedOutputStream bos = null;
             //String templateFileName = "/excel/tcgdd.xlsx";
             String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+File.separator + "tcgdd.xlsx";
-            LOGGER.error("---------------------T+的标准订单导入模板路径：" + templateFileName + "-----------------------------");
+            LOGGER.error("-------------------- T+的标准订单导入模板路径：" + templateFileName + "");
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
             String fileName = URLEncoder.encode("whoami.xls", "utf-8");
@@ -179,7 +179,7 @@ public class IndexController {
             excelWriter.fill(ptlist, writeSheet);
             excelWriter.finish();
             bos.flush();
-            LOGGER.error("-----------------------------写入完成，请下载江哥的爱------------------------");
+            LOGGER.error("-------------------- 写入完成，请下载江哥的爱 --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         }
