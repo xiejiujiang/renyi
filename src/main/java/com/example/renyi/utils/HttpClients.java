@@ -11,15 +11,17 @@ import java.util.Map;
 
 public class HttpClients {
 
+    public final static String openurl = "https://openapi.chanjet.com";
+
     /** POST请求 */
     public static String HttpPost(String Url,String json,String Token) throws Exception{
         String result = "";
-        URL realUrl = new URL(Url);
+        URL realUrl = new URL(openurl+Url);
         URLConnection conn = realUrl.openConnection();
         conn.setRequestProperty("user-agent","Mozilla/4.0(compatible;MSIE 6.0;Windows NT 5.1;SV1)");
         conn.setRequestProperty("Charset", "UTF-8");
-        conn.setRequestProperty("appKey", "58jNuL4M");
-        conn.setRequestProperty("AppSecret", "423E90F07754E6B803E316A1DF7A848D");
+        conn.setRequestProperty("appKey", "A9A9WH1i");
+        conn.setRequestProperty("AppSecret", "C69A8CD150DA721BCB2DF5176D31E97E");
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("openToken", Token);
         conn.setDoOutput(true);

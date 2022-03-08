@@ -23,6 +23,9 @@ public class TokenController {
     public @ResponseBody String recode(HttpServletRequest request, HttpServletResponse response) {
         LOGGER.error("------------------------------- 正式OAuth回调地址  ------------------------------------------");
         String code = request.getParameter("code");
+        //第一次授权后，会有这个code,立刻调用 一次 授权码换token接口 ，拿到完整的 token 相关信息，并写入数据库。
+
+
         return code;
     }
 
@@ -32,5 +35,6 @@ public class TokenController {
         LOGGER.error("------------------------------- 正式消息接收地址  ------------------------------------------");
         return "heheda";
     }
+
 
 }

@@ -181,7 +181,7 @@ public class Utils {
             result.put("userName","雍聪");
             return result;
         }
-        if(mendian.contains("成都") && xm.contains("MSC供货")){
+        if(mendian.contains("成都市锦江区锦华万达") && (xm.contains("MSC供货") || mendian.contains("样机"))){
             result.put("merchantcode","020102064");
             result.put("merchantname","成都-MSC(普天太力)");
             result.put("departmentCode","HW-MSCSYB-DM-CDMSCJH");
