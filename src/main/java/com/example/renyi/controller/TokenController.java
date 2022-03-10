@@ -1,5 +1,6 @@
 package com.example.renyi.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 @Controller
 @RequestMapping(value = "/token")
@@ -36,5 +39,25 @@ public class TokenController {
         return "heheda";
     }
 
+
+    //消息订阅验证接口
+    @RequestMapping(value="/dy2kai", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String dy2kai(HttpServletRequest request, HttpServletResponse response) throws  Exception{
+        String echostr = request.getParameter("echostr");
+        String nonce = request.getParameter("nonce");
+        String signature = request.getParameter("signature");
+        String timestamp = request.getParameter("timestamp");
+
+        InputStreamReader reader=new InputStreamReader(request.getInputStream(),"utf-8");
+        BufferedReader buffer=new BufferedReader(reader);
+        String params=buffer.readLine();
+        LOGGER.error("请求参数: "+params);
+        JSONObject jsonObject = JSONObject.parseObject(params);
+        LOGGER.error("Code =============== " + jsonObject.getString("Code"));
+        LOGGER.error("当前操作，0 保存，1 审核，2 弃审，3 删除，4 取消中止，5 中止");
+        LOGGER.error("SendState =============== " + jsonObject.getString("SendState"));
+        LOGGER.error("-----------------------------------操作结束-----------------------------------");
+        return echostr;
+    }
 
 }

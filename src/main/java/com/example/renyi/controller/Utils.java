@@ -172,7 +172,7 @@ public class Utils {
     public static Map<String, String> getResultMap(String mendian,String xm){
         //根据 普天的门店名称：返回 部门code，业务员code，供应商code
         Map<String, String> result = new HashMap<String, String>();
-        if(mendian.contains("成都") && xm.contains("华为体验店供货平台")){
+        if(mendian.contains("成都") && xm.contains("华为体验店供货平台") && !mendian.contains("成都市锦江区锦华万达")){
             result.put("merchantcode","020101004");//成都-普天太力
             result.put("merchantname","成都-普天太力");
             result.put("departmentCode","HW-SC-CD-CPB");//成都华为产品部
