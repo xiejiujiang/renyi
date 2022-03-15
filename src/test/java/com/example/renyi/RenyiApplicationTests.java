@@ -12,32 +12,32 @@ import com.chanjet.openapi.sdk.java.exception.ChanjetApiException;
 import com.chanjet.openapi.sdk.java.request.CreateTenantRequest;
 import com.chanjet.openapi.sdk.java.response.CreateTenantResponse;
 import com.example.renyi.entity.TData;
-import com.example.renyi.utils.Des;
-import com.example.renyi.utils.HttpClients;
-import com.example.renyi.utils.Md5;
+import com.example.renyi.utils.*;
 import org.apache.commons.collections4.functors.FalsePredicate;
 import org.junit.jupiter.api.Test;
+import org.omg.DynamicAny.NameValuePair;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.util.UriBuilder;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @SpringBootTest
 class RenyiApplicationTests {
 
+
     /*@Test
     void test(){
         try {
-            String result = HttpClients.HttpPost("/tplus/api/v2/warehouse/Query","{\n" +
+            String result = HttpClients.HttpPost("/tplus/api/v2/warehouse/Query",
+                    "{\n" +
                     "  \"param\": {\n" +
                     "    \"Code\": \"0101010102\"\n" +
                     "  }\n" +
-                    "}","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ2NjQ4NDc2LCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiMjNhOTUzMjgtNjI3Mi00NTgwLWI5ZGYtOGY3YzE5YTAwZTY2IiwiZXhwIjoxNjQ3MTY2ODc2LCJpYXQiOjE2NDY2NDg0NzYsIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.FcLytiJeEy1_PP-9COuQsSQUB6t3a4OwJu4CjT_P2n8");
+                    "}","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ2OTgzMTAzLCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiNjc2M2JhYTAtYTY2OS00YjNlLWJmYTEtMzBhNTY4MTNiNDIzIiwiZXhwIjoxNjQ3NTAxNTAzLCJpYXQiOjE2NDY5ODMxMDMsIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.q2LKmN8YfJHwgJabHCQaXVFfTvvHkHVeQ7Zx5jwBF7I");
 
             System.out.println("result : " + result);
         }catch (Exception e){
@@ -47,50 +47,26 @@ class RenyiApplicationTests {
 
 
     @Test
-    void test1(){
-        /*String ss = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ2NjQ4NDc2LCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiMjNhOTUzMjgtNjI3Mi00NTgwLWI5ZGYtOGY3YzE5YTAwZTY2IiwiZXhwIjoxNjQ3MTY2ODc2LCJpYXQiOjE2NDY2NDg0NzYsIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.FcLytiJeEy1_PP-9COuQsSQUB6t3a4OwJu4CjT_P2n8";
-        System.out.println("ss.length == " + ss.length());
-
-        String xm = "华为体验店供货平台";
-        String s1 = "四川省 成都市 锦江区 四川省成都市锦江区锦华万达广场仁肄华为授权体验店（样机专用）——四川省成都市锦江区锦华路一段68号1幢1层1011-1";
-        if(s1.contains("成都市锦江区锦华万达") && (xm.contains("MSC供货") || s1.contains("样机"))){
-            System.out.println("s1.length == " + s1.length());
-        }*/
-
-        String param = "{\"VoucherId\":\"1708\",\"MenuCode\":\"SA04\"}";
-        JSONObject jsonObject = JSONObject.parseObject(param);
-        System.out.println("VoucherId === " + jsonObject.getString("VoucherId"));
-
+    void testXHD(){ //测试创建 销货单
+        try {
+            String json = MapToJson.getSAparamsJson();
+            String result = HttpClients.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ2OTgzMTAzLCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiNjc2M2JhYTAtYTY2OS00YjNlLWJmYTEtMzBhNTY4MTNiNDIzIiwiZXhwIjoxNjQ3NTAxNTAzLCJpYXQiOjE2NDY5ODMxMDMsIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.q2LKmN8YfJHwgJabHCQaXVFfTvvHkHVeQ7Zx5jwBF7I");
+            System.out.println("result : " + result);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
     @Test
-    public void getTokenByCode() throws Exception{
-        /*String result = "";
-        String json = "";
-        URL realUrl = new URL("https://openapi.chanjet.com/auth/getToken");
-        URLConnection conn = realUrl.openConnection();
-        conn.setRequestProperty("user-agent","Mozilla/4.0(compatible;MSIE 6.0;Windows NT 5.1;SV1)");
-        conn.setRequestProperty("Charset", "UTF-8");
-        conn.setRequestProperty("redirectUri", "http://mexjj.natapp1.cc/renyi/token/recode");
-        conn.setRequestProperty("code", "c-cf72d37f715b4565b105113e9f76dae6");
-        conn.setRequestProperty("appKey", "A9A9WH1i");
-        conn.setRequestProperty("grantType", "authorization_code");
-        //conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        //PrintWriter out = new PrintWriter(conn.getOutputStream());
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), "utf-8"));
-        out.print(json);
-        out.flush();
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
-        String line;
-        while ((line = in.readLine()) != null) {
-            result += line;
-        }
-        out.close();
-        in.close();
-        System.out.println("result == " + result);*/
+    public void testRefreshToken() throws Exception{
+        Map<String,String> params = new HashMap<String,String>();
+        params.put("grantType","refresh_token");
+        params.put("appKey","A9A9WH1i");
+        params.put("refreshToken","84b5dccf757a4a0c82bf843874d64f39");
+        String result = HttpClient.doGeturlparams("https://openapi.chanjet.com/auth/refreshToken", params);
+        System.out.println("result == " + result);
     }
 
 
@@ -145,6 +121,4 @@ class RenyiApplicationTests {
         in.close();
         System.out.println(" result ========= " +  Des.desDecrypt("8aue2u3q",result) );*/
     }
-
-
 }
