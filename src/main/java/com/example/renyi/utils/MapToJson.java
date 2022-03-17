@@ -10,8 +10,27 @@ import java.util.Map;
 public class MapToJson {
 
     public static void main(String[] args) {
-        System.out.println(getSAparamsJson());
+        //System.out.println(getSAparamsJson());
+        Map<String,String> param = new HashMap<String,String>();
+        param.put("code","001");
+        param.put("name","分类1");
+        param.put("projectclass","01");
+        System.out.println(getXMStrByMap(param));
     }
+
+    public static String getXMStrByMap(Map<String,String> param){
+        Map<String,Object> dto = new HashMap<String,Object>();
+        Map<String,Object> xm = new HashMap<String,Object>();
+        xm.put("Code",param.get("code"));
+        xm.put("Name",param.get("name"));
+        Map<String,Object> ProjectClass = new HashMap<String,Object>();
+        ProjectClass.put("Code",param.get("projectclass"));
+        xm.put("ProjectClass",ProjectClass);
+        dto.put("dto",xm);
+        String json = JSONObject.toJSONString(dto);
+        return json;
+    }
+
 
     // 这是一个模板，创建销货单的 请求参数 body 的 模板，其他API 可以参考
     public static String getSAparamsJson(){

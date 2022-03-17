@@ -8,4 +8,7 @@ public interface BasicService {
 
     //创建项目
     public String createXM(Map<String,String> params);
+
+    //查询项目
+    public String getXM(Map<String,String> params);
 }

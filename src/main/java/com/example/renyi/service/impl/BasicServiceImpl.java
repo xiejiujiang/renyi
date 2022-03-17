@@ -23,7 +23,7 @@ public class BasicServiceImpl implements BasicService {
     public String createXM(Map<String, String> params) {
         String result = "";
         try {
-            String json = MapToJson.getSAparamsJson();//这个是 根据 map 封装成 参数？？
+            String json = MapToJson.getXMStrByMap(params);//这个参数只能 单独来 设置 生成。
             result = HttpClient.HttpPost("/tplus/api/v2/Project/Create",json,params.get("AppKey"),params.get("AppSecret"),
                     orderMapper.getTokenByAppKey(params.get("AppKey")));
         }catch (Exception e){
@@ -31,4 +31,22 @@ public class BasicServiceImpl implements BasicService {
         }
         return result;
     }
+
+
+    @Override
+    public String getXM(Map<String, String> params) {
+        String result = "";
+        try {
+            String json = MapToJson.getXMStrByMap(params);//这个参数只能 单独来 设置 生成。
+            result = HttpClient.HttpPost("/tplus/api/v2/Project/Query2",json,params.get("AppKey"),params.get("AppSecret"),
+                    orderMapper.getTokenByAppKey(params.get("AppKey")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+
+
 }
