@@ -10,12 +10,10 @@ import java.util.Map;
 public class MapToJson {
 
     public static void main(String[] args) {
-        //System.out.println(getSAparamsJson());
-
-        String ss = "aa=11&bb=22&cc=33&";
-        System.out.println("ss == " + ss.substring(0,ss.length()-1));
+        System.out.println(getSAparamsJson());
     }
 
+    // 这是一个模板，创建销货单的 请求参数 body 的 模板，其他API 可以参考
     public static String getSAparamsJson(){
         Map<String,Object> dto = new HashMap<String,Object>();
         Map<String,Object> sa = new HashMap<String,Object>();

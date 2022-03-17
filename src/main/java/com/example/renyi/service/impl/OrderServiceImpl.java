@@ -13,6 +13,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String getTnameByCode(String code) {
-        return orderMapper.getTnameByCode(code);
+        return "";
     }
 }

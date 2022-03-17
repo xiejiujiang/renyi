@@ -1,11 +1,25 @@
 package com.example.renyi.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
 public interface orderMapper {
 
-    public String getTnameByCode(String code);
+    //返回数据库中 XXX_code_token 所有记录的 企业信息
+    public List<Map<String,String>> getDBAllOrgList();
+
+    //调用refreshtoken 后更新数据库
+    public void updateOrgToken(Map<String,String> updateMap);
+
+
+    //根据appkey 获取 当前的 token
+
+    public String getTokenByAppKey(@Param("AppKey") String AppKey);
 }

@@ -18,15 +18,15 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class HttpClient {
+
+    public final static String openurl = "https://openapi.chanjet.com";
 
 
     /**
@@ -463,8 +463,32 @@ public class HttpClient {
         }
     }
 
-    public static void main(String[] args) {
-        HttpClient httpClient = new HttpClient();
-        httpClient.doPostTestFour();
+
+
+    /** POST请求 */
+    public static String HttpPost(String Url,String json,String appKey,String AppSecret,String Token) throws Exception{
+        String result = "";
+        URL realUrl = new URL(openurl+Url);
+        URLConnection conn = realUrl.openConnection();
+        conn.setRequestProperty("user-agent","Mozilla/4.0(compatible;MSIE 6.0;Windows NT 5.1;SV1)");
+        conn.setRequestProperty("Charset", "UTF-8");
+        conn.setRequestProperty("appKey", appKey);
+        conn.setRequestProperty("AppSecret", AppSecret);
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("openToken", Token);
+        conn.setDoOutput(true);
+        conn.setDoInput(true);
+        //PrintWriter out = new PrintWriter(conn.getOutputStream());
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), "utf-8"));
+        out.print(json);
+        out.flush();
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
+        String line;
+        while ((line = in.readLine()) != null) {
+            result += line;
+        }
+        out.close();
+        in.close();
+        return result;
     }
 }

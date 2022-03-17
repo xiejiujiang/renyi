@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Configuration      //1.主要用于标记配置类，兼备Component的效果。
-@EnableScheduling   // 2.开启定时任务
+@Configuration
+@EnableScheduling
 @Controller
 public class SaticScheduleTask {
 
     @Autowired
     private TokenService tokenService;
 
-    //@Scheduled(cron = "0 0 1 * * ?")//3.添加定时任务
-
-    @Scheduled(cron = "0 */2 * * * ?")//每隔 2 分钟
+    //每天凌晨3点执行
+    @Scheduled(cron = "0 0 3 * * ?")
     private void configureTasks() {
-        System.err.println("-------------------- 执行静态定时任务时间: " + LocalDateTime.now() + "--------------------");
-        //去数据库里面  更新 token
-        tokenService.testService();
+        System.err.println("-------------------- 执行静态定时任务开始: " + LocalDateTime.now() + "--------------------");
+        //去数据库里面  更新 token ,每天凌晨3点
+        tokenService.refreshToken();
+        System.err.println("-------------------- 执行静态定时任务结束: " + LocalDateTime.now() + "--------------------");
     }
 }

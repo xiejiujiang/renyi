@@ -2,8 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.renyi.mapper.orderMapper">
 
-    <select id="getTnameByCode" resultType="java.lang.String" parameterType="java.lang.String">
-        select idperson from eap_user where id = #{code}
+    <select id="getDBAllOrgList" resultType="java.util.Map">
+        select id_num,code,AppKey,AppSecret,access_token,refresh_token,user_id,org_id,app_name,update_time from XXX_code_token
     </select>
 
+
+    <update id="updateOrgToken" parameterType="java.util.Map">
+        update XXX_code_token set access_token = #{access_token},refresh_token = #{refresh_token},update_time = GETDATE() where org_id = #{org_id}
+    </update>
+
+    <select id="getTokenByAppKey" parameterType="java.lang.String" resultType="java.lang.String">
+        select access_token from XXX_code_token where AppKey = #{AppKey}
+    </select>
 </mapper>

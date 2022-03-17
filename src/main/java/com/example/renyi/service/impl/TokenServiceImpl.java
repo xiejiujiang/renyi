@@ -1,11 +1,16 @@
 package com.example.renyi.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.service.TokenService;
+import com.example.renyi.utils.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -15,8 +20,37 @@ public class TokenServiceImpl implements TokenService {
     @Autowired
     private orderMapper orderMapper;
 
-    public void testService(){
-        LOGGER.error("-------------------------------service调用成功！-------------------------------");
+    public String refreshToken(){
+        try {
+            List<Map<String,String>> orgList = new ArrayList<Map<String,String>>();
+            orgList = orderMapper.getDBAllOrgList();
+            if(orgList != null && orgList.size() != 0){
+                for(Map<String,String> org : orgList){
+                    Map<String,String> parma = new HashMap<String,String>();
+                    parma.put("grantType","refresh_token");
+                    parma.put("appKey",org.get("AppKey"));
+                    parma.put("refreshToken",org.get("refresh_token"));
+                    String result = HttpClient.doGeturlparams("https://openapi.chanjet.com/auth/refreshToken", parma);
+                    //将返回的 result 解析出来，写回数据库！,并一定更新 最后的 更新时间 ,其实 只有 refresh_token,token,和 更新时间会变。
+                    JSONObject jso = JSONObject.parseObject(result);
+                    if("200".equals(jso.get("code").toString())){//调用成功，更新数据库！
+                        JSONObject detail = JSONObject.parseObject(jso.get("result").toString());
+                        String access_token = detail.get("access_token").toString();
+                        String refresh_token = detail.get("refresh_token").toString();
+                        String org_id = detail.get("org_id").toString();
+                        Map<String,String> updateMap = new HashMap<String,String>();
+                        updateMap.put("org_id",org_id);
+                        updateMap.put("refresh_token",refresh_token);
+                        updateMap.put("access_token",access_token);
+                        orderMapper.updateOrgToken(updateMap);
+                    }else{
+                        LOGGER.error("----------------更新失败，检擦！！！---------------------- " + org.get("org_id").toString());
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "success";
     }
-
 }
