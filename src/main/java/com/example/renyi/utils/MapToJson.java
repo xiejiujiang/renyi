@@ -1,5 +1,7 @@
 package com.example.renyi.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
@@ -9,13 +11,8 @@ import java.util.Map;
 
 public class MapToJson {
 
-    public static void main(String[] args) {
-        //System.out.println(getSAparamsJson());
-        Map<String,String> param = new HashMap<String,String>();
-        param.put("code","001");
-        param.put("name","分类1");
-        param.put("projectclass","01");
-        System.out.println(getXMStrByMap(param));
+    public static void main(String[] args) throws Exception{
+
     }
 
     public static String getXMStrByMap(Map<String,String> param){

@@ -17,6 +17,7 @@ public class SaticScheduleTask {
 
     @Autowired
     private TokenService tokenService;
+    //@Scheduled(cron = "0 */2 * * * ?")
 
     //每天凌晨3点执行
     @Scheduled(cron = "0 0 3 * * ?")

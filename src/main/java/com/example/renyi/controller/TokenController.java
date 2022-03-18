@@ -40,7 +40,7 @@ public class TokenController {
     }
 
 
-    //消息订阅验证接口
+    //系统管理里面  的 消息订阅验证接口
     @RequestMapping(value="/dy2kai", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String dy2kai(HttpServletRequest request, HttpServletResponse response) throws  Exception{
         String echostr = request.getParameter("echostr");

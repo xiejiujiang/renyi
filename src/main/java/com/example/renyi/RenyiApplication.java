@@ -9,16 +9,15 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication
 @MapperScan(value = "com.example.renyi.mapper")
-public class RenyiApplication extends SpringBootServletInitializer {
+public class RenyiApplication{
 
     public static void main(String[] args) {
         // 启动！
         SpringApplication.run(RenyiApplication.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+    /*protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         // 注意这里要指向原先用main方法执行的Application启动类
         return builder.sources(RenyiApplication.class);
-    }
+    }*/
 }

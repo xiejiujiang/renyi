@@ -11,4 +11,16 @@ public interface BasicService {
 
     //查询项目
     public String getXM(Map<String,String> params);
+
+    //创建项目分类
+    public String createXMClass(Map<String,String> params);
+
+    //查询项目分类
+    public String getXMClass(Map<String,String> params);
+
+    //查询仓库
+    public String getWarehouse(Map<String,String> params);
+
+    //创建仓库
+    public String createWarehouse(Map<String,String> params);
 }
