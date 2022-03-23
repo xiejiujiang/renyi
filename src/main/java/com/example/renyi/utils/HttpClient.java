@@ -1,5 +1,7 @@
 package com.example.renyi.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.example.renyi.entity.User;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -249,28 +251,24 @@ public class HttpClient {
      *
      * @date
      */
-    public void doPostTestFour() {
-
+    public static String doPostTestFour(String url,Map<String,String> map) {
+        String result = "";
         // 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-
         // 参数
         StringBuilder params = new StringBuilder();
         try {
             // 字符数据最好encoding以下;这样一来，某些特殊字符才能传过去(如:某人的名字就是“&”,不encoding的话,传不过去)
-            params.append("phone=").append(URLEncoder.encode("admin", "utf-8"));
-            params.append("&");
-            params.append("password=admin");
+            params.append("json=").append(URLEncoder.encode(map.get("json"), "utf-8"));
+            //params.append("&");
+            //params.append("json=admin");
         } catch (UnsupportedEncodingException e1) {
             e1.printStackTrace();
         }
-
         // 创建Post请求
-        HttpPost httpPost = new HttpPost("http://localhost:12345/index.html/" + "?" + params);
-
+        HttpPost httpPost = new HttpPost(url + "&" + params);
         // 设置ContentType(注:如果只是传普通参数的话,ContentType不一定非要用application/json)
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-
         // 响应模型
         CloseableHttpResponse response = null;
         try {
@@ -278,11 +276,11 @@ public class HttpClient {
             response = httpClient.execute(httpPost);
             // 从响应模型中获取响应实体
             HttpEntity responseEntity = response.getEntity();
-
             System.out.println("响应状态为:" + response.getStatusLine());
             if (responseEntity != null) {
                 System.out.println("响应内容长度为:" + responseEntity.getContentLength());
-                System.out.println("响应内容为:" + EntityUtils.toString(responseEntity));
+                result = EntityUtils.toString(responseEntity);
+                System.out.println("响应内容为:" + result);
             }
         } catch (ParseException | IOException e) {
             e.printStackTrace();
@@ -299,6 +297,7 @@ public class HttpClient {
                 e.printStackTrace();
             }
         }
+        return result;
     }
 
     /**
@@ -310,23 +309,18 @@ public class HttpClient {
 
         // 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-
         // 创建Post请求
         HttpPost httpPost = new HttpPost("http://localhost:12345/doPostControllerTwo");
-        //User user = new User();
-        //user.setName("潘晓婷");
-        //user.setAge(18);
-        //user.setGender("女");
-        //user.setMotto("姿势要优雅~");
-        // 我这里利用阿里的fastjson，将Object转换为json字符串;
-        // (需要导入com.alibaba.fastjson.JSON包)
-        //String jsonString = JSON.toJSONString(user);
-        String jsonString = "";
+        User user = new User();
+        /*user.setName("潘晓婷");
+        user.setAge(18);
+        user.setGender("女");
+        user.setMotto("姿势要优雅~");*/
+        // 我这里利用阿里的fastjson，将Object转换为json字符串;(需要导入com.alibaba.fastjson.JSON包)
+        String jsonString = JSON.toJSONString(user);
         StringEntity entity = new StringEntity(jsonString, "UTF-8");
-
         // post请求是将参数放在请求体里面传过去的;这里将entity放入post请求体中
         httpPost.setEntity(entity);
-
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
 
         // 响应模型
@@ -336,7 +330,6 @@ public class HttpClient {
             response = httpClient.execute(httpPost);
             // 从响应模型中获取响应实体
             HttpEntity responseEntity = response.getEntity();
-
             System.out.println("响应状态为:" + response.getStatusLine());
             if (responseEntity != null) {
                 System.out.println("响应内容长度为:" + responseEntity.getContentLength());
@@ -465,7 +458,7 @@ public class HttpClient {
 
 
 
-    /** POST请求 */
+    /**  畅捷通的 API， POST请求 */
     public static String HttpPost(String Url,String json,String appKey,String AppSecret,String Token) throws Exception{
         String result = "";
         URL realUrl = new URL(openurl+Url);

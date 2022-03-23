@@ -123,4 +123,3 @@ public class BasicServiceImpl implements BasicService {
         return result;// result:"3"     其中3代表新创建的仓库ID
     }
 }
-

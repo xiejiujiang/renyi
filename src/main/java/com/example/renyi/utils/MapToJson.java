@@ -74,11 +74,12 @@ public class MapToJson {
         Map<String,Object> DetailM1Unit = new HashMap<String,Object>();
         DetailM1Unit.put("Name","台");//明细1 的 存货计量单位
         DetailM1.put("Unit",DetailM1Unit);
+        //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
         DetailM1.put("Quantity","3");//明细1 的 数量
         DetailM1.put("TaxRate","13");//明细1 的 税率
         DetailM1.put("OrigTaxPrice","6666.00");//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
 
-        Map<String,Object> SNObject = new HashMap<String,Object>();
+        /*Map<String,Object> SNObject = new HashMap<String,Object>();
         List<Map<String,Object>> SnAccountDetails = new ArrayList<Map<String,Object>>();
         Map<String,Object> snmap1 = new HashMap<String,Object>();
         snmap1.put("SNCode","999006");
@@ -90,7 +91,7 @@ public class MapToJson {
         snmap3.put("SNCode","999001");
         SnAccountDetails.add(snmap3);
         SNObject.put("SnAccountDetails",SnAccountDetails);
-        DetailM1.put("SNObject",SNObject);
+        DetailM1.put("SNObject",SNObject);*/
 
         DetailM1.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
         DetailM1.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
@@ -98,30 +99,24 @@ public class MapToJson {
         SaleDeliveryDetailsList.add(DetailM1);
 
         // 表 明细里面的 第二行
-        /*Map<String,Object> DetailM2 = new HashMap<String,Object>();
+        Map<String,Object> DetailM2 = new HashMap<String,Object>();
         Map<String,Object> DetailM2Warehouse = new HashMap<String,Object>();
-        DetailM2Warehouse.put("code","0101010101");//明细1 的 仓库编码
+        DetailM2Warehouse.put("code","0101010101");//明细2 的 仓库编码
         DetailM2.put("Warehouse",DetailM2Warehouse);
         Map<String,Object> DetailM2Inventory = new HashMap<String,Object>();
-        DetailM2Inventory.put("code","test1231");//明细1 的 存货编码
+        DetailM2Inventory.put("code","test1231");//明细2 的 存货编码
         DetailM2.put("Inventory",DetailM2Inventory);
         Map<String,Object> DetailM2Unit = new HashMap<String,Object>();
-        DetailM2Unit.put("Name","个");//明细1 的 存货计量单位
+        DetailM2Unit.put("Name","个");//明细2 的 存货计量单位
         DetailM2.put("Unit",DetailM2Unit);
-        DetailM2.put("Quantity","3");//明细1 的 数量
-        DetailM2.put("TaxRate","13");//明细1 的 税率
-        DetailM2.put("OrigTaxAmount","9999.00");//明细1 的 含税金额(实际上 在传入 来源单据之后，只会用销售订单 上的 金额)
-
-        *//*List<Map<String,Object>> snlist = new ArrayList<Map<String,Object>>();
-        Map<String,Object> snmap1 = new HashMap<String,Object>();
-        snmap1.put("SNCode","序列号编码");
-        snlist.add(snmap1);
-        DetailM1.put("SNObject",snlist);*//*
-
-        DetailM2.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
-        DetailM2.put("sourceVoucherCode","SO-2022-03-0004");//明细1 的 来源单据单据编号
-        DetailM2.put("sourceVoucherDetailId","8");//明细1 的 来源单据单据对应的明细行ID
-        SaleDeliveryDetailsList.add(DetailM2);*/
+        //DetailM2.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
+        DetailM2.put("Quantity","3");//明细2 的 数量
+        DetailM2.put("TaxRate","13");//明细2 的 税率
+        DetailM2.put("OrigTaxAmount","9999.00");//明细2 的 含税金额(实际上 在传入 来源单据之后，只会用销售订单 上的 金额)
+        DetailM2.put("idsourcevouchertype","43");//明细2 的 来源单据类型ID
+        DetailM2.put("sourceVoucherCode","SO-2022-03-0004");//明细2 的 来源单据单据编号
+        DetailM2.put("sourceVoucherDetailId","8");//明细2 的 来源单据单据对应的明细行ID
+        SaleDeliveryDetailsList.add(DetailM2);
 
         sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
         dto.put("dto",sa);
