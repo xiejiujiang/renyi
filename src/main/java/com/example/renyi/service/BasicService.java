@@ -23,4 +23,7 @@ public interface BasicService {
 
     //创建仓库
     public String createWarehouse(Map<String,String> params);
+
+    //创建凭证
+    public String createPZ(Map<String,String> params);
 }
