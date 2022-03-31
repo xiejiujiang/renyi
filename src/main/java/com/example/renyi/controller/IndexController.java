@@ -49,10 +49,11 @@ public class IndexController {
     @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
-        //String userid = "";
-        //Cookie[] cookies = request.getCookies();
         LOGGER.error("----------------------------------开始！--------------------------------------------");
-        /*try{
+        /* 这部分代码是我之前测试 获取用户登录信心的，只要 你的 T+ 和 你这个自定义页面 在 相同的域名下，就可以 这样获取。
+        String userid = "";
+        Cookie[] cookies = request.getCookies();
+        try{
             for(int i=0;i<cookies.length;i++){
                 Cookie cookie = cookies[i];
                 //  name == AIPortal_Res_Account,value == 1_23,comment == null ,其中 23 是 eap_user（用户权限里面的用户ID）
@@ -111,7 +112,6 @@ public class IndexController {
             excelReader.read(sheet);
 
             List<Map<String,String>> ptlist = new ArrayList<Map<String,String>>();
-            //String timeflag = System.currentTimeMillis()+"";//时间戳，用来标记单号，以后应该会换成普天系统的单号
             List<Object> list = listener.getDatas();
             for(Object oo : list){
                 Map<String,String> reobject = new HashMap<String,String>();
@@ -162,9 +162,7 @@ public class IndexController {
             //----------------------------------读取标准的T+excel，写数据，然后下载--------------------------------------//
             OutputStream out = null;
             BufferedOutputStream bos = null;
-            //String templateFileName = "/excel/tcgdd.xlsx";
             String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+File.separator + "tcgdd.xlsx";
-            LOGGER.error("-------------------- T+的标准订单导入模板路径：" + templateFileName + "");
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
             String fileName = URLEncoder.encode("whoami.xls", "utf-8");
@@ -183,5 +181,43 @@ public class IndexController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    // 只能让 叶庆 导入 做好的 普天T+ 名称匹配表
+    @RequestMapping(value="/updatePTT", method = {RequestMethod.GET,RequestMethod.POST})
+    public void updatePTT(@RequestParam(value = "file")MultipartFile file,HttpServletRequest request,HttpServletResponse response) throws IOException {
+        //思路： 1. 叶庆上传做好的 普天T+ 名称匹配表
+        //      2. 解析除结果之后。放入LIST<Ptt>
+        //      3. 删掉之前的excel，重新创建写入一个新的即可
+        // 解析上传的 excel 文件到 list 里面，并转换成对应的T+ list 数据
+        InputStream inputStream = file.getInputStream();
+        ExcelListener listener = new ExcelListener();
+        ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
+        com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,0,Ptt.class);//已经做好的 普天T+名称匹配表是 从 第一个sheet 的 第一行 开始获取数据
+        excelReader.read(sheet);
+
+        List<Ptt> ptlist = new ArrayList<Ptt>();//最终用来写入的数据
+        List<Object> list = listener.getDatas();//当前从上传的excel中获取的数据
+        for(Object oo : list){
+            Ptt ptt = (Ptt)oo;
+            ptlist.add(ptt);
+        }
+
+        //ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
+        //String templateFileName ="excel/ptT.xlsx";
+        // pttexcel = new File(templateFileName);
+        // 正式环境的时候 需要修改 此路径
+        File pttexcel = new File("D:\\renyi\\renyi\\src\\main\\resources\\excel\\ptT.xlsx");
+        if(pttexcel.exists()){
+            pttexcel.delete();
+        }
+        pttexcel.createNewFile();
+
+        ExcelWriter excelWriter = EasyExcel.write(pttexcel).build();
+        WriteSheet writeSheet = EasyExcel.writerSheet("Sheet1").build();
+        excelWriter.write(ptlist, writeSheet);
+        excelWriter.finish();
+
     }
 }

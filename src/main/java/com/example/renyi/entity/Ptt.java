@@ -2,8 +2,11 @@ package com.example.renyi.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.BaseRowModel;
+import lombok.Data;
 
+@Data
 public class Ptt extends BaseRowModel {
+
     @ExcelProperty(index = 0)
     private String ptmc;
 
@@ -15,6 +18,13 @@ public class Ptt extends BaseRowModel {
 
     @ExcelProperty(index = 3)
     private String tdw;
+
+    public Ptt(String ptmc, String tcode, String tname, String tdw) {
+        this.ptmc = ptmc;
+        this.tcode = tcode;
+        this.tname = tname;
+        this.tdw = tdw;
+    }
 
     public String getPtmc() {
         return ptmc;

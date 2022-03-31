@@ -1,37 +1,56 @@
 package com.example.renyi;
 
-import ch.qos.logback.core.util.FileUtil;
-import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.metadata.Sheet;
-import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSONObject;
-import com.chanjet.openapi.sdk.java.DefaultChanjetClient;
-import com.chanjet.openapi.sdk.java.domain.CreateTenantContent;
-import com.chanjet.openapi.sdk.java.exception.ChanjetApiException;
-import com.chanjet.openapi.sdk.java.request.CreateTenantRequest;
-import com.chanjet.openapi.sdk.java.response.CreateTenantResponse;
-import com.example.renyi.entity.TData;
 import com.example.renyi.utils.*;
-import org.apache.commons.collections4.functors.FalsePredicate;
 import org.junit.jupiter.api.Test;
-import org.omg.DynamicAny.NameValuePair;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.util.UriBuilder;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.*;
 
 @SpringBootTest
 class RenyiApplicationTests {
 
+    @Test
+    void testExcel(){
+        try {
+            /*Pttt p1 = new Pttt("111",123.0,"d3223","23dse");
+            Pttt p2 = new Pttt("222",321.0,"5tgerg","6yhtj");
+            Pttt p3 = new Pttt("333",213.123,"gth6h","j776j");
+            List<Pttt> ptlist = new ArrayList<Pttt>();//最终用来写入的数据
+            ptlist.add(p1);
+            ptlist.add(p2);
+            ptlist.add(p3);
+
+            File pttexcel = new File("D:\\renyi\\renyi\\src\\main\\resources\\excel\\123.xlsx");
+
+            *//*if(pttexcel.exists()){
+                pttexcel.delete();
+            }
+            pttexcel.createNewFile();*//*
+
+            ExcelWriter excelWriter = EasyExcel.write(pttexcel).build();
+
+            // writeSheet1 = EasyExcel.writerSheet(1,"BBB").build();
+            WriteSheet writeSheet2 = EasyExcel.writerSheet(2,"AAA").build();
+            //excelWriter.write(ptlist, writeSheet1);
+            excelWriter.write(ptlist, writeSheet2);
+            excelWriter.finish();*/
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     //测试一下 凭证
-    @Test
-    void test(){
+    //@Test
+    /*void test(){
         try {
             Map<String,Object> dto = new HashMap<String,Object>();
             Map<String,Object> sa = new HashMap<String,Object>();
@@ -106,7 +125,7 @@ class RenyiApplicationTests {
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     @Test
@@ -133,8 +152,8 @@ class RenyiApplicationTests {
     }
 
 
-    @Test
-    public void testHQ() throws Exception{
+    //@Test
+   /* public void testHQ() throws Exception{
         Map<String,String> map = new HashMap<String,String>();
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("method","uploadOrder");
@@ -176,7 +195,7 @@ class RenyiApplicationTests {
         map.put("json",json1);
         String reslut = HttpClient.doPostTestFour("https://www.hqwg.com.cn:9993/?OAH024",map);
         System.out.println("reslut == " + reslut);
-    }
+    }*/
 }
 
 
