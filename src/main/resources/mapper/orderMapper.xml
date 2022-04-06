@@ -8,7 +8,8 @@
 
 
     <update id="updateOrgToken" parameterType="java.util.Map">
-        update XXX_code_token set access_token = #{access_token},refresh_token = #{refresh_token},update_time = GETDATE() where org_id = #{org_id}
+        update XXX_code_token set access_token = #{access_token},refresh_token = #{refresh_token},update_time = GETDATE()
+        where org_id = #{org_id}
     </update>
 
     <select id="getTokenByAppKey" parameterType="java.lang.String" resultType="java.lang.String">

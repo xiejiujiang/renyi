@@ -152,9 +152,9 @@ class RenyiApplicationTests {
     }
 
 
-    //@Test
-   /* public void testHQ() throws Exception{
-        Map<String,String> map = new HashMap<String,String>();
+    @Test
+    public void testHQ() throws Exception{
+        /*Map<String,String> map = new HashMap<String,String>();
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("method","uploadOrder");
         params.put("Request_Channel","WEB");
@@ -174,7 +174,7 @@ class RenyiApplicationTests {
         //orderMap1.put("sndusr","送货人（可为空，11位手机号。详见1.7注3）");
         orderMap1.put("snddat","20210721");
         //orderMap1.put("brief","备注（可为空，最长为40位）");
-        orderMap1.put("sign",Md5.md5(JSONObject.toJSONString(orderMap1)));//这段代码的位置 可能会有影响！
+
         List<Map<String,Object>> itemsList = new ArrayList<Map<String,Object>>();//代表一个订单里面的商品明细
         Map<String,Object> sp1 = new HashMap<String,Object>();//第一个商品
         sp1.put("gdsid","00001");
@@ -187,6 +187,7 @@ class RenyiApplicationTests {
         sp1.put("crtdat","20210721");
         itemsList.add(sp1);
         orderMap1.put("items",itemsList);
+        orderMap1.put("sign",Md5.md5(JSONObject.toJSONString(orderMap1)));//这段代码的位置 可能会有影响！
         datalist.add(orderMap1);
         params.put("datas",datalist);
         String jsondata = JSONObject.toJSONString(params);
@@ -194,8 +195,8 @@ class RenyiApplicationTests {
         System.out.println("json1 == " + json1);
         map.put("json",json1);
         String reslut = HttpClient.doPostTestFour("https://www.hqwg.com.cn:9993/?OAH024",map);
-        System.out.println("reslut == " + reslut);
-    }*/
+        System.out.println("reslut == " + reslut);*/
+    }
 }
 
 

@@ -266,6 +266,7 @@ public class HttpClient {
             e1.printStackTrace();
         }
         // 创建Post请求
+        System.out.println("请求 URL == " + url+ "&" + params);
         HttpPost httpPost = new HttpPost(url + "&" + params);
         // 设置ContentType(注:如果只是传普通参数的话,ContentType不一定非要用application/json)
         httpPost.setHeader("Content-Type", "application/json;charset=utf8");
