@@ -46,7 +46,7 @@ public class IndexController {
     @Autowired
     private OrderService OrderService;
 
-    @RequestMapping(value="/mav", method = RequestMethod.GET) //网址
+    @RequestMapping(value="/mav", method = {RequestMethod.GET,RequestMethod.POST}) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
         LOGGER.error("----------------------------------开始！--------------------------------------------");
@@ -186,7 +186,7 @@ public class IndexController {
 
     // 只能让 叶庆 导入 做好的 普天T+ 名称匹配表
     @RequestMapping(value="/updatePTT", method = {RequestMethod.GET,RequestMethod.POST})
-    public void updatePTT(@RequestParam(value = "file")MultipartFile file,HttpServletRequest request,HttpServletResponse response) throws IOException {
+    public @ResponseBody String updatePTT(@RequestParam(value = "file")MultipartFile file,HttpServletRequest request,HttpServletResponse response) throws IOException {
         //思路： 1. 叶庆上传做好的 普天T+ 名称匹配表
         //      2. 解析除结果之后。放入LIST<Ptt>
         //      3. 删掉之前的excel，重新创建写入一个新的即可
@@ -215,52 +215,52 @@ public class IndexController {
         WriteSheet writeSheet = EasyExcel.writerSheet("Sheet1").build();
         excelWriter.write(ptlist, writeSheet);
         excelWriter.finish();
+
+        return "0000";
     }
 
 
 
-    // 导入。转换下载
+    //下载excel
     @RequestMapping(value="/downloadexcel", method = {RequestMethod.GET,RequestMethod.POST})
     public void downloadexcel(HttpServletRequest request,HttpServletResponse response) throws Exception {
-        ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+
+        //ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
+        //File pttexcel = new File("C:\\apache-tomcat-9.0.56\\webapps\\renyi\\WEB-INF\\classes\\excel\\ptT.xlsx");
+
+        // 下载本地文件
+        String fileName = "ptT.xlsx".toString(); // 文件的默认保存名
+        // 读到流中
+        InputStream inStream = new FileInputStream("C:\\apache-tomcat-9.0.56\\webapps\\renyi\\WEB-INF\\classes\\excel\\ptT.xlsx");
+        // 设置输出的格式
+        response.reset();
+        response.setContentType("bin");
+        response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        // 循环取出流中的数据
+        byte[] b = new byte[100];
+        int len;
         try {
-            inputStream = classPathResource.getInputStream();
-            outputStream = response.getOutputStream();
-            int BUFFER_SIZE = 1024 * 4;
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int reader = 0;
-            while ((reader = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, reader);
-            }
-            response.setContentType("application/octet-stream");
-            response.setCharacterEncoding("utf-8");
-            String newFileName = URLEncoder.encode(classPathResource.getFilename(), "UTF-8");
-            response.setHeader("Content-disposition", "attachment;filename=" + newFileName);
+            while ((len = inStream.read(b)) > 0)
+                response.getOutputStream().write(b, 0, len);
+                inStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (outputStream != null) {
-                    /**flush():仅仅刷新缓冲区(一般写字符时要用,因为字符时先进入缓冲区),然后将内存中的数据立刻写出(因为缓冲区是装满之后才会写出
-                     ,用flush()就不必等到缓冲区满,立刻写出,流对象还可以继续使用) */
-                    outputStream.flush();
-                    /**close():关闭流对象. 也会先刷新一次缓冲区,再关闭. 关闭之后,流对象不可以继续使用 */
-                    outputStream.close();
-                    inputStream.close();
-                }
-            } catch (IOException e) {
                 e.printStackTrace();
-            }
         }
     }
 
 
-    @RequestMapping(value="/testEecel", method = RequestMethod.GET)
-    public ModelAndView testEecel(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value="/testexcel", method = {RequestMethod.GET,RequestMethod.POST})
+    public ModelAndView testexcel(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("excel");
+        return mav;
+    }
+
+
+    @RequestMapping(value="/ptdesc", method = {RequestMethod.GET,RequestMethod.POST})
+    public ModelAndView ptdesc(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("ptdesc");
         return mav;
     }
 }

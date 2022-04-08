@@ -19,6 +19,10 @@ public class Ptt extends BaseRowModel {
     @ExcelProperty(index = 3)
     private String tdw;
 
+
+    public Ptt() {
+    }
+
     public Ptt(String ptmc, String tcode, String tname, String tdw) {
         this.ptmc = ptmc;
         this.tcode = tcode;

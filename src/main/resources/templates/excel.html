@@ -4,75 +4,144 @@
 <head>
   <meta charset="UTF-8">
   <title>商务订单系统</title>
+  <style type="text/css">
+    #dd:hover{
+      background-color: #D9D9D9;
+    }
+  </style>
 </head>
 <body>
   <div style="width: 100%;height: 300px;box-shadow: 2px 2px 10px #666;border-left: 2px solid #5B9BD5;border-right: 2px solid #5B9BD5;border-top: 2px solid #5B9BD5">
-    <div style="width: 100%;height: 12%;background-color: #BDD7EE;text-align: center;padding-top: 1%;border-bottom: 2px solid #5B9BD5;font-weight: bold">采购转换单</div>
+    <div style="width: 100%;height: 12%;background-color: #BDD7EE;text-align: center;padding-top: 1%;border-bottom: 2px solid #5B9BD5;font-weight: bold">采购订单转换</div>
     <div style="position: absolute;margin-top: 10px;margin-left: 20px;width: 150px;height: 100px;border: 1px solid #CCC">
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px">转换数据路径</div>
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 33px">转换数据格式</div>
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 66px">转换数据上传</div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;">数据路径</div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 33px"></div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 66px">订单转换</div>
     </div>
-    <div style="position: absolute;margin-top: 10px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px"></div>
+    <div id="ptttext" style="position: absolute;margin-top: 10px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px;text-align: center;line-height: 30px;color: #5B9BD5"></div>
     <div style="position: absolute;margin-top: 44px;margin-left: 200px;width: 300px;height: 30px;text-align: center;line-height: 30px">
       导入订单无需修改直接上传即可
     </div>
     <div style="position: absolute;margin-top: 79px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px"></div>
     <form method="POST" enctype="multipart/form-data" action="http://mexjj.natapp1.cc/renyi/xkk/upload">
       <input type="file" name="file" style="display: none" id="upload"></input>
-      <input type="button" value="选择文件" style="height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 550px" onclick="test1();">
-      <input type="button" value="取消" style="height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 670px" onclick="clear1();">
-      <input type="submit" value="开始转换" style="height: 30px;width: 200px;position: absolute;margin-top: 79px;margin-left: 550px">
+      <input type="button" value="选择文件" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 550px" onclick="test1();">
+      <input type="button" value="取消" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 670px" onclick="clear1();">
+      <div  style="height: 30px;width: 198px;position: absolute;margin-top: 44px;margin-left: 550px;line-height: 30px;text-align: center;color:red"></div>
+      <input type="submit" value="开始转换" style="cursor: pointer;height: 30px;width: 200px;position: absolute;margin-top: 79px;margin-left: 550px">
     </form>
-    <div style="position: absolute;margin-top: 10px;margin-left: 800px;background-color: #D9D9D9;width: 200px;height: 100px;text-align: center;line-height: 100px">
-      上传转换模板说明
+    <div style="cursor:pointer;position: absolute;margin-top: 10px;margin-left: 800px;background-color: #D9D9D9;width: 200px;height: 100px;text-align: center;line-height: 100px;" onclick="ptdesc();">
+      订单转换说明
     </div>
   </div>
 
   <div style="width: 100%;height: 300px;box-shadow: 2px 2px 10px #666;border: 2px solid #5B9BD5">
-    <div style="width: 100%;height: 12%;background-color: #BDD7EE;text-align: center;padding-top: 1%;border-bottom: 2px solid #5B9BD5;font-weight: bold">数据匹配单</div>
+    <div style="width: 100%;height: 12%;background-color: #BDD7EE;text-align: center;padding-top: 1%;border-bottom: 2px solid #5B9BD5;font-weight: bold">数据转换管理</div>
 
     <div style="position: absolute;margin-top: 10px;margin-left: 20px;width: 150px;height: 100px;border: 1px solid #CCC">
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px">数据匹配路径</div>
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 33px">数据匹配格式</div>
-      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 66px">数据匹配上传</div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px">数据路径</div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 33px"></div>
+      <div style="position: absolute;text-align: center;height: 30px;width: 150px;line-height: 30px;margin-top: 66px">数据转换</div>
     </div>
-    <div style="position: absolute;margin-top: 10px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px"></div>
+    <div id="pptext" style="position: absolute;margin-top: 10px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px;text-align: center;line-height: 30px;color: #5B9BD5"></div>
     <div style="position: absolute;margin-top: 44px;margin-left: 200px;width: 300px;height: 30px;text-align: center;line-height: 30px">
       数据格式保持与模板一致，不可更改
     </div>
     <div style="position: absolute;margin-top: 79px;margin-left: 200px;background-color: #D9D9D9;width: 300px;height: 30px"></div>
-    <form method="POST" enctype="multipart/form-data" action="http://mexjj.natapp1.cc/renyi/xkk/updatePTT">
+    <form id="form2" name="fileinfo" method="POST" enctype="multipart/form-data" action="http://mexjj.natapp1.cc/renyi/xkk/updatePTT">
       <input type="file" name="file" style="display: none" id="updatePTT">
-      <input type="button" value="选择文件" style="height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 550px" onclick="test2();">
-      <input type="button" value="取消" style="height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 670px" onclick="clear2();">
-      <input type="submit" value="开始转换" style="height: 30px;width: 200px;position: absolute;margin-top: 79px;margin-left: 550px">
+      <input type="button" value="选择文件" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 550px" onclick="test2();">
+      <input type="button" value="取消" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 670px" onclick="clear2();">
+      <div style="height: 30px;width: 198px;position: absolute;margin-top: 44px;margin-left: 550px;line-height: 30px;text-align: center;color: red"></div>
+      <div id="gx" style="cursor: pointer;height: 30px;width: 200px;position: absolute;margin-top: 79px;margin-left: 550px;text-align: center;line-height: 30px;border: 1px solid #999;background-color: #EEE" onclick="sumbitform2();">开始更新</div>
     </form>
-    <div style="position: absolute;margin-top: 10px;margin-left: 800px;background-color: #D9D9D9;width: 200px;height: 100px;text-align: center;line-height: 100px">
-      上传数据匹配说明
+    <div style="cursor:pointer;position: absolute;margin-top: 10px;margin-left: 800px;background-color: #D9D9D9;width: 200px;height: 100px;text-align: center;line-height: 100px">
+      数据转换说明
     </div>
 
-    <div style="position: absolute;width: 150px;height: 50px;margin-top: 150px;border: 1px solid #CCC;margin-left: 20px;text-align: center;line-height: 50px">数据匹配模板</div>
+    <div style="position: absolute;width: 150px;height: 50px;margin-top: 150px;border: 1px solid #CCC;margin-left: 20px;text-align: center;line-height: 50px">转换模板</div>
     <div style="position: absolute;width: 300px;height: 50px;margin-top: 150px;background-color: #D9D9D9;margin-left: 200px"></div>
-    <div style="position: absolute;width: 200px;height: 50px;margin-top: 150px;margin-left: 550px;border: 1px solid #CCC;text-align: center;line-height: 50px" onclick="downloadexcel();">下载</div>
+    <div id="dd" style="cursor: pointer;position: absolute;width: 200px;height: 50px;margin-top: 150px;margin-left: 550px;border: 1px solid #CCC;text-align: center;line-height: 50px" onclick="downloadexcel();">下载</div>
   </div>
 
   <div style="height: 20px;width: 100%;border: 1px solid #CCC;margin-top: 20px;background-color: #D9D9D9"></div>
 </body>
 <script>
+  $(function (){
+    //订单excel选择框
+    $("#upload").on("change",function () {
+      var file = $("#upload")[0].files[0];
+      var filename = file.name;
+      if(filename != '' && filename.length > 20){
+        filename = filename.substring(0,12)+'....';
+        $("#ptttext").text(filename);
+      }else{
+        $("#ptttext").text(filename);
+      }
+    });
+
+    //匹配表选择框
+    $("#updatePTT").on("change",function () {
+      var file = $("#updatePTT")[0].files[0];
+      var filename = file.name;
+      if(filename != '' && filename.length > 20){
+        filename = filename.substring(0,12)+'....';
+        $("#pptext").text(filename);
+      }else{
+        $("#pptext").text(filename);
+      }
+    });
+  });
+
   function test1(){
     $("#upload").click();
   }
 
   function clear1(){
-    $("#upload").clear();
+    var test1 = document.getElementById("upload");
+    test1.value = '';
+    $("#ptttext").text("");
   }
 
   function test2(){
     $("#updatePTT").click();
   }
+
   function clear2(){
-    $("#updatePTT").clear();
+    var test2 = document.getElementById("updatePTT");
+    test2.value = '';
+    $("#pptext").text("");
+  }
+
+  function sumbitform2(){
+    //ajax 提交 form2 表单的内容
+    var test2 = document.getElementById("updatePTT");
+    if(test2.value == ''){
+      alert('必选要先选择更新的excel匹配表');
+    }else{
+      //提交form表单
+      var formData = new FormData($( "#form2")[0]);
+      $.ajax({
+        url: 'http://mexjj.natapp1.cc/renyi/xkk/updatePTT' ,
+        type: 'POST',
+        data: formData,
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (returndata) {
+           var restr = returndata;
+           if(restr == '0000'){
+             alert('更新成功！');
+           }else{
+             alert('更新失败！');
+           }
+        },
+        error: function (returndata) {
+          alert('提交失败，请重试！');
+        }
+      });
+    }
   }
 
 /*
@@ -91,14 +160,20 @@
       dataType: "JSON",
       success: function(result) {
         var data = result.data;
-
       }
     });
-
   */
 
   function downloadexcel(){
-    location.href = 'http://mexjj.natapp1.cc/xkk/downloadexcel';
+    location.href = 'http://mexjj.natapp1.cc/renyi/xkk/downloadexcel';
+  }
+
+  //跳转至 普天的订单下载介绍页面
+  function ptdesc(){
+    //location.href = 'http://mexjj.natapp1.cc/renyi/xkk/ptdesc';//访问后台跳转
+    //window.location.href = "../templates/ptdesc.html"; //打开当前页面
+    //window.open("../templates/ptdesc.html");//打开新页面
+    window.open("http://mexjj.natapp1.cc/renyi/xkk/ptdesc");//打开新页面
   }
 </script>
 </html>
