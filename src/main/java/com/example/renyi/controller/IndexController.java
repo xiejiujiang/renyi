@@ -263,4 +263,11 @@ public class IndexController {
         mav.setViewName("ptdesc");
         return mav;
     }
+
+    @RequestMapping(value="/testpp", method = {RequestMethod.GET,RequestMethod.POST})
+    public ModelAndView testpp(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("testpp");
+        return mav;
+    }
 }

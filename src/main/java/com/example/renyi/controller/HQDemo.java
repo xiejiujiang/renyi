@@ -22,41 +22,35 @@ public class HQDemo {
     public static void main(String[] args) {
 
         StringBuffer json = new StringBuffer();
-
         String prvid="05192";
         String tel="18428394131";
         String prvkey="syfapvrg1pkwNKIwLIpOTAOB131iHT";
-
         String ts = (System.currentTimeMillis() / 1000L)+"";
+        //可以多单 同时 传，但 这里 只要 测试 一单
         json.append("{\"prvid\":\""+prvid+"\",\"tel\":\""+tel+"\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + md5(prvkey+prvid+tel + ts) + "\",\"datas\":[");
         Random rdm = new Random();
-        for (int i = 0; i < 1; i++) {
-
-            StringBuilder item = new StringBuilder();
-            item.append("{\"lnkshpno\":\"真实送货单单号\",\"hndno\":\"手工单号\",\"prvid\":\""+prvid+"\",\"dptid\":\"688\",\"mkdat\":\"20210525\",\"snddat\":\"202100909\",\"sndusr\":\"13888888888\",\"brief\":\"直送单备注\"");
-            item.append(",\"items\":[");
-
-            for (int j = 0; j < 3; j++) {
-                item.append("{\"gdsid\":\"" + rdm.nextInt(99999999) + "\",\"prvgdsid\":\"\",\"qty\":\"9\",\"bsepkg\":\"支\",\"prvprc\":\"2\",\"prvamt\":\"" + rdm.nextFloat() + "\",\"bthno\":\"20210525\",\"vlddat\":\"30\",\"crtdat\":\"20210525\"},");
-
-            }
-            item.setLength(item.length() - 1);
-            item.append("]}");
-            String sign = md5(item.toString());
-            item.insert(1, "\"sign\":\"" + sign + "\",");
-            json.append(item.toString());
-            json.append(",");
-
+        //for (int i = 0; i < 1; i++) {
+        StringBuilder item = new StringBuilder();
+        item.append("{\"lnkshpno\":\"05192112233445561234\",\"hndno\":\"0519211223344556\",\"prvid\":\""+prvid+"\",\"dptid\":\"688\",\"mkdat\":\"20210525\",\"snddat\":\"20220408\",\"sndusr\":\"13888888888\",\"brief\":\"直送单备注\"");
+        item.append(",\"items\":[");
+        for (int j = 0; j < 1; j++) {//具体的商品明细
+            item.append("{\"gdsid\":\"" + 18002335 + "\",\"prvgdsid\":\"10001\",\"qty\":\"9\",\"bsepkg\":\"支\",\"prvprc\":\"2\",\"prvamt\":\"" + rdm.nextFloat() + "\",\"bthno\":\"20210525\",\"vlddat\":\"30\",\"crtdat\":\"20210525\"},");
         }
+        item.setLength(item.length() - 1);
+        item.append("]}");
+        String sign = md5(item.toString());
+        item.insert(1, "\"sign\":\"" + sign + "\",");
+        json.append(item.toString());
+        json.append(",");
+        //}
         json.setLength(json.length() - 1);
         json.append("]}");
 
-
         System.out.println("json == " + json);
 
-        //String result = request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
-        //String decryptData = desDecrypt("8aue2u3q", result);
-        //System.out.println("请求结果："+decryptData);
+        String result = request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
+        String decryptData = desDecrypt("8aue2u3q", result);
+        System.out.println("请求结果："+decryptData);
     }
 
     private static String request(String url, String key, String postData) {

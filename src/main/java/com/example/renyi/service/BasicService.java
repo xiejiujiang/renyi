@@ -26,4 +26,11 @@ public interface BasicService {
 
     //创建凭证
     public String createPZ(Map<String,String> params);
+
+
+    //查询销货单详情接口
+    public String getSaOrder(Map<String,String> params);
+
+    //根据 销货单str 访问 HQ 的
+    public String  HQsaorder(String reslut);
 }

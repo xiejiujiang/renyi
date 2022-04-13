@@ -204,4 +204,32 @@ public class BasicServiceImpl implements BasicService {
         }
         return result;
     }
+
+    @Override
+    public String getSaOrder(Map<String, String> params) {
+        String result = "";
+        String code = params.get("code");
+        try {
+            String json = "{param:{voucherCode:\""+code+"\"}}"; //{param:{}} 查所有
+            result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",
+                    json,
+                    params.get("AppKey"),
+                    params.get("AppSecret"),
+                    orderMapper.getTokenByAppKey(params.get("AppKey")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public String HQsaorder(String reslut) {
+        //解析 T+ 的 销货单 reslut 转成 实体DTO。 再转成 HQ 的参数，然后调用API 。
+
+
+
+
+
+        return null;
+    }
 }

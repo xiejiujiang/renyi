@@ -1,8 +1,10 @@
 package com.example.renyi.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.service.BasicService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,12 +15,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/token")
 public class TokenController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(com.example.renyi.controller.TokenController.class);
+
+
+    @Autowired
+    private BasicService basicService;
 
     //这个里面 主要 用来 接受 code ,刷新 token ，更新对应的数据库
 
@@ -33,10 +41,19 @@ public class TokenController {
     }
 
 
+    //测试消息订阅的接口。
     @RequestMapping(value="/ticket", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String reticket(HttpServletRequest request, HttpServletResponse response) {
         LOGGER.error("------------------------------- 正式消息接收地址  ------------------------------------------");
-        return "heheda";
+
+
+
+
+
+        return "\n" +
+                "{\n" +
+                "    \"result\":\"success\"\n" +
+                "}";
     }
 
 
@@ -54,10 +71,28 @@ public class TokenController {
             String params=buffer.readLine();
             LOGGER.error("请求参数: "+params);
             JSONObject jsonObject = JSONObject.parseObject(params);
-            LOGGER.error("Code =============== " + jsonObject.getString("Code"));
+            String code = jsonObject.getString("Code");
+            LOGGER.error("Code =============== " + code);
             LOGGER.error("当前操作，0 保存，1 审核，2 弃审，3 删除，4 取消中止，5 中止");
-            LOGGER.error("SendState =============== " + jsonObject.getString("SendState"));
+            String state = jsonObject.getString("SendState");
+            LOGGER.error("SendState =============== " + state);
             LOGGER.error("-----------------------------------操作结束-----------------------------------");
+            String OrgId = jsonObject.getString("OrgId");
+            //如果是销货单，并且是 审核 条件，
+            if(code.contains("SA") && state.equals("1")){
+                //查询对应的这个订单明细。并调用services，访问 红旗
+                Map<String,String> pas = new HashMap<String,String>();
+                pas.put("OrgId",OrgId);
+                pas.put("code",code);
+                // 通过 OrgId 来获取 AppKey 和 AppSecret
+                pas.put("AppKey",code);
+                pas.put("AppSecret",code);
+                String reslut = basicService.getSaOrder(pas);
+                LOGGER.error("result == " + reslut);//这个销货单 的 明细 内容。
+                //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
+                String HQresult = basicService.HQsaorder(reslut);
+
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
