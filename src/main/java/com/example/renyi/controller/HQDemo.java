@@ -19,13 +19,18 @@ import java.util.Random;
 
 public class HQDemo {
 
-    public static void main(String[] args) {
+    //测试环境
+    public static String prvid = "05192";
+    public static String tel = "18428394131";
+    public static String prvkey = "syfapvrg1pkwNKIwLIpOTAOB131iHT";
 
+    public static void main(String[] args) {
         StringBuffer json = new StringBuffer();
-        String prvid="05192";
-        String tel="18428394131";
-        String prvkey="syfapvrg1pkwNKIwLIpOTAOB131iHT";
+        //String prvid="05192";
+        //String tel="18428394131";
+        //String prvkey="syfapvrg1pkwNKIwLIpOTAOB131iHT";
         String ts = (System.currentTimeMillis() / 1000L)+"";
+
         //可以多单 同时 传，但 这里 只要 测试 一单
         json.append("{\"prvid\":\""+prvid+"\",\"tel\":\""+tel+"\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + md5(prvkey+prvid+tel + ts) + "\",\"datas\":[");
         Random rdm = new Random();
@@ -53,7 +58,7 @@ public class HQDemo {
         System.out.println("请求结果："+decryptData);
     }
 
-    private static String request(String url, String key, String postData) {
+    public static String request(String url, String key, String postData) {
         try {
             HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
             conn.setDoOutput(true);
@@ -82,7 +87,7 @@ public class HQDemo {
         return "";
     }
 
-    private static String desEncrypt(String key, String data) {
+    public static String desEncrypt(String key, String data) {
         byte[] retVal = null;
         try {
             byte[] key_byte = key.getBytes("UTF-8");
@@ -101,7 +106,7 @@ public class HQDemo {
     }
 
 
-    private static String desDecrypt(String key, String data) {
+    public static String desDecrypt(String key, String data) {
         byte[] retVal = null;
         try {
             byte[] key_byte = key.getBytes("UTF-8");
@@ -120,7 +125,7 @@ public class HQDemo {
     }
 
 
-    private static String md5(String data) {
+    public static String md5(String data) {
         StringBuilder sb = new StringBuilder();
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

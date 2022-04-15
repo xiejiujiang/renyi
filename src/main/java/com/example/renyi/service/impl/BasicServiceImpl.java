@@ -2,8 +2,13 @@ package com.example.renyi.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.controller.HQDemo;
 import com.example.renyi.mapper.orderMapper;
+import com.example.renyi.saentity.Clerk;
+import com.example.renyi.saentity.JsonRootBean;
+import com.example.renyi.saentity.SaleDeliveryDetails;
 import com.example.renyi.service.BasicService;
+import com.example.renyi.utils.Des;
 import com.example.renyi.utils.HttpClient;
 import com.example.renyi.utils.MapToJson;
 import com.example.renyi.utils.Md5;
@@ -206,30 +211,132 @@ public class BasicServiceImpl implements BasicService {
     }
 
     @Override
-    public String getSaOrder(Map<String, String> params) {
-        String result = "";
+    public JsonRootBean getSaOrder(Map<String, String> params) {
+        JsonRootBean jrb = new JsonRootBean();
         String code = params.get("code");
         try {
             String json = "{param:{voucherCode:\""+code+"\"}}"; //{param:{}} 查所有
-            result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",
+            String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",
                     json,
                     params.get("AppKey"),
                     params.get("AppSecret"),
                     orderMapper.getTokenByAppKey(params.get("AppKey")));
+            JSONObject job = JSONObject.parseObject(result);
+            jrb =  job.toJavaObject(JsonRootBean.class);
         }catch (Exception e){
             e.printStackTrace();
         }
-        return result;
+        return jrb;
     }
 
     @Override
-    public String HQsaorder(String reslut) {
-        //解析 T+ 的 销货单 reslut 转成 实体DTO。 再转成 HQ 的参数，然后调用API 。
+    public String HQsaorder(JsonRootBean jrb) {
+        //解析 T+ 的 销货单 DTO。 转成 HQ 的参数，然后调用API 。
+        String prvid = HQDemo.prvid;
+        String tel= HQDemo.tel;
+        String prvkey= HQDemo.prvkey;
 
+        String rand = "" + Math.random();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
+        String hndno = rand.substring(rand.length()-11,rand.length() );
+        String lnkshpno = "05192" + rand.substring(rand.length()-15,rand.length() );//真实送货单号（最长20位）
+        String dptid = "688";//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
+        //dptid = jrb.getData().getCustomer().getCode();
+        String mkdat = (""+jrb.getData().getVoucherDate()).replaceAll("-","");//制单时间
 
+        Clerk clerk = jrb.getData().getClerk();//业务员
+        String sndusr = clerk.getCode();//送货人 可为空，11位手机号   只能调接口去查了哦
 
+        String snddat = (""+jrb.getData().getVoucherDate()).replaceAll("-","");//送货时间（可能是表头的自定义项）
+        String brief = jrb.getData().getMemo();//销货单上的备注
 
+        String ts = (System.currentTimeMillis() / 1000L)+"";
+
+        StringBuffer json = new StringBuffer();
+        json.append("{\"prvid\":\""+prvid+"\",\"tel\":\""+tel+"\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey+prvid+tel + ts) + "\",\"datas\":[");
+        StringBuilder item = new StringBuilder();
+        item.append("{\"lnkshpno\":\""+lnkshpno+"\",\"hndno\":\""+hndno+"\",\"prvid\":\""+prvid+"\",\"dptid\":\""+dptid+"\",\"mkdat\":\""+mkdat+"\",\"snddat\":\""+snddat+"\",\"sndusr\":\""+sndusr+"\",\"brief\":\""+brief+"\"");
+        item.append(",\"items\":[");
+
+        List<SaleDeliveryDetails> saleDeliveryDetails = jrb.getData().getSaleDeliveryDetails();//具体的商品明细
+        if(saleDeliveryDetails != null && saleDeliveryDetails.size() != 0 ){
+            for (int j = 0; j < saleDeliveryDetails.size(); j++) {//具体的商品明细
+                SaleDeliveryDetails saleDeliveryDetail = saleDeliveryDetails.get(j);
+                String gdsid = saleDeliveryDetail.getInventory().getCode();//T+商品编码
+                String prvgdsid = saleDeliveryDetail.getInventory().getCode();//T+商品编码
+                String qty = saleDeliveryDetail.getQuantity();//数量
+                String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
+                String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
+                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\""+prvgdsid+"\",\"qty\":\""+qty+"\",\"prvprc\":\""+prvprc+"\",\"prvamt\":\"" + prvamt + "\"},");
+            }
+        }
+        item.setLength(item.length() - 1);
+        item.append("]}");
+        String sign = Md5.md5(item.toString());
+        item.insert(1, "\"sign\":\"" + sign + "\",");
+        json.append(item.toString());
+        json.append(",");
+        json.setLength(json.length() - 1);
+        json.append("]}");
+        LOGGER.info("红旗 json == " + json);
+        String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
+        String decryptData = Des.desDecrypt("8aue2u3q", result);
+        LOGGER.info("请求红旗结果："+decryptData);
 
         return null;
+    }
+
+
+    public String  HQsabackorder(JsonRootBean jrb){
+        //解析 T+ 的 销货单 DTO。 转成 HQ 的参数，然后调用API 。
+        String prvid = HQDemo.prvid;
+        String tel= HQDemo.tel;
+        String prvkey= HQDemo.prvkey;
+
+        String rand = "" + Math.random();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
+        String hndno = rand.substring(rand.length()-11,rand.length() );
+        String lnkshpno = "05192" + rand.substring(rand.length()-15,rand.length() );//真实送货单号（最长20位）
+        String dptid = "688";//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
+        //dptid = jrb.getData().getCustomer().getCode();
+        String mkdat = (""+jrb.getData().getVoucherDate()).replaceAll("-","");//制单时间
+
+        Clerk clerk = jrb.getData().getClerk();//业务员
+        String sndusr = clerk.getCode();//送货人 可为空，11位手机号   只能调接口去查了哦
+
+        String snddat = (""+jrb.getData().getVoucherDate()).replaceAll("-","");//送货时间（可能是表头的自定义项）
+        String brief = jrb.getData().getMemo();//销货单上的备注
+
+        String ts = (System.currentTimeMillis() / 1000L)+"";
+
+        StringBuffer json = new StringBuffer();
+        json.append("{\"prvid\":\""+prvid+"\",\"tel\":\""+tel+"\",\"Request_Channel\":\"WEB\",\"method\":\"\tuploadSndbllBackOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey+prvid+tel + ts) + "\",\"datas\":[");
+        StringBuilder item = new StringBuilder();
+        item.append("{\"lnkshpno\":\""+lnkshpno+"\",\"hndno\":\""+hndno+"\",\"prvid\":\""+prvid+"\",\"dptid\":\""+dptid+"\",\"mkdat\":\""+mkdat+"\",\"snddat\":\""+snddat+"\",\"sndusr\":\""+sndusr+"\",\"brief\":\""+brief+"\"");
+        item.append(",\"items\":[");
+
+        List<SaleDeliveryDetails> saleDeliveryDetails = jrb.getData().getSaleDeliveryDetails();//具体的商品明细
+        if(saleDeliveryDetails != null && saleDeliveryDetails.size() != 0 ){
+            for (int j = 0; j < saleDeliveryDetails.size(); j++) {//具体的商品明细
+                SaleDeliveryDetails saleDeliveryDetail = saleDeliveryDetails.get(j);
+                String gdsid = saleDeliveryDetail.getInventory().getCode();//T+商品编码
+                String prvgdsid = saleDeliveryDetail.getInventory().getCode();//T+商品编码
+                String qty = saleDeliveryDetail.getQuantity();//数量
+                //String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
+                //String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
+                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\""+prvgdsid+"\",\"qty\":\""+qty+"\",\"brief\":\"行备注\"},");
+            }
+        }
+        item.setLength(item.length() - 1);
+        item.append("]}");
+        String sign = Md5.md5(item.toString());
+        item.insert(1, "\"sign\":\"" + sign + "\",");
+        json.append(item.toString());
+        json.append(",");
+        json.setLength(json.length() - 1);
+        json.append("]}");
+        LOGGER.info("红旗 json == " + json);
+        String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
+        String decryptData = Des.desDecrypt("8aue2u3q", result);
+        LOGGER.info("请求红旗结果："+decryptData);
+        return "";
     }
 }

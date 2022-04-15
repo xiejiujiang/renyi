@@ -15,4 +15,8 @@
     <select id="getTokenByAppKey" parameterType="java.lang.String" resultType="java.lang.String">
         select access_token from XXX_code_token where AppKey = #{AppKey}
     </select>
+
+    <select id="getAppKeySecretByAppKey" parameterType="java.lang.String" resultType="java.util.Map">
+        select AppKey,AppSecret from XXX_code_token where OrgId = #{OrgId}
+    </select>
 </mapper>

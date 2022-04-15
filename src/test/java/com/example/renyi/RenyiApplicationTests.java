@@ -4,7 +4,9 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.saentity.JsonRootBean;
 import com.example.renyi.utils.*;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -13,6 +15,29 @@ import java.util.*;
 
 @SpringBootTest
 class RenyiApplicationTests {
+
+    @Test
+    void testgetXHD(){ //测试 查询 销货单
+        try {
+            /*String json = "{\n" +
+                    "  \"param\": {\n" +
+                    "    \"voucherCode\": \"SA-2022-04-0009\"\n" +
+                    "  }\n" +
+                    "}";
+            String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",json,
+                    "A9A9WH1i",
+                    "C69A8CD150DA721BCB2DF5176D31E97E",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ5OTE0MTM5LCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiZmQ3MjI2YWYtYjgyOC00ZDQ5LTkzN2QtZjg4YmM5NDc4ZTczIiwiZXhwIjoxNjUwNDMyNTM5LCJpYXQiOjE2NDk5MTQxMzksIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.V1N3MDpzH1CuTNcjW6fYHcT_A-FqF-TucMRCIHeROH4");
+            System.out.println("result : " + result);
+
+            JSONObject job = JSONObject.parseObject(result);
+            JsonRootBean jrb =  job.toJavaObject(JsonRootBean.class);
+            System.out.println("jrb : " + jrb.getData().getCode());*/
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     @Test
     void testExcel(){

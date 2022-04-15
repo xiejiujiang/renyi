@@ -1,4 +1,4 @@
-package com.example.renyi.controller;
+package com.example.renyi.utils;
 
 import org.apache.commons.codec.binary.Base64;
 

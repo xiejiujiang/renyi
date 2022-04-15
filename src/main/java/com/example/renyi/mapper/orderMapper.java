@@ -20,6 +20,8 @@ public interface orderMapper {
 
 
     //根据appkey 获取 当前的 token
-
     public String getTokenByAppKey(@Param("AppKey") String AppKey);
+
+    //根据 OrgId 获取 当前的 AppKey 和 AppSecret
+    public Map<String,String> getAppKeySecretByAppKey(@Param("OrgId") String OrgId);
 }

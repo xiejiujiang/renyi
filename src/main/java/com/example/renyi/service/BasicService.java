@@ -1,5 +1,7 @@
 package com.example.renyi.service;
 
+import com.example.renyi.saentity.JsonRootBean;
+
 import java.util.Map;
 
 public interface BasicService {
@@ -29,8 +31,12 @@ public interface BasicService {
 
 
     //查询销货单详情接口
-    public String getSaOrder(Map<String,String> params);
+    public JsonRootBean getSaOrder(Map<String,String> params);
 
-    //根据 销货单str 访问 HQ 的
-    public String  HQsaorder(String reslut);
+    //根据 销货单str 访问 HQ 的  上传直配送货单
+    public String  HQsaorder(JsonRootBean jrb);
+
+
+    //根据 销货单str 访问 HQ 的  上传直配 退货单
+    public String  HQsabackorder(JsonRootBean jrb);
 }
