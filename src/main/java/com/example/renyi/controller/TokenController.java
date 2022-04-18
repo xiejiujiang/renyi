@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -162,6 +163,8 @@ public class TokenController {
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("decryptData == " + decryptData);
+
+            //URLEncoder.encode("","UTF-8");
         }catch (Exception e){
             e.printStackTrace();
         }
