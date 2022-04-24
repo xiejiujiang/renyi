@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin
 @Controller
 @RequestMapping(value = "/token")
 public class TokenController {
@@ -53,7 +55,7 @@ public class TokenController {
     //T+ 的 消息订阅的接口。
     @RequestMapping(value="/ticket", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String reticket(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 正式消息接收地址  ------------------------------------------");
+        LOGGER.error("------------------------------- 正式消息接收地址，包含 ticket，消息订阅，授权 ------------------------------------------");
         try{
             InputStreamReader reader=new InputStreamReader(request.getInputStream(),"utf-8");
             BufferedReader buffer=new BufferedReader(reader);
@@ -61,29 +63,32 @@ public class TokenController {
             JSONObject jsonObject = JSONObject.parseObject(params);
             String encryptMsg = jsonObject.getString("encryptMsg");
             String destr = AESUtils.aesDecrypt(encryptMsg,"123456789012345x");
-            JSONObject job = JSONObject.parseObject(destr);
             // {"id":"AC1C04B100013301500B4A9B012DB2EC","appKey":"A9A9WH1i","appId":"58","msgType":"SaleDelivery_Audit","time":"1649994072443","bizContent":{"externalCode":"","voucherID":"23","voucherDate":"2022/4/15 0:00:00","voucherCode":"SA-2022-04-0011"},"orgId":"90015999132","requestId":"86231b63-f0c2-4de1-86e9-70557ba9cd62"}
-            SACsubJsonRootBean jrb =  job.toJavaObject(SACsubJsonRootBean.class);//销货单的订阅信息DTO
-            String voucherCode = jrb.getBizContent().getVoucherCode();
-            String OrgId = jrb.getOrgId();
-            //根据 voucherCode 查询 此 销货单的明细内容
-            Map<String,String> pas = new HashMap<String,String>();
-            pas.put("OrgId",OrgId);
-            pas.put("code",voucherCode);//销货单的单号
-            // 通过 OrgId 来获取 AppKey 和 AppSecret
-            Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
-            pas.put("AppKey",apk.get("AppKey"));
-            pas.put("AppSecret",apk.get("AppSecret"));
-            JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
-            LOGGER.error("这个销货单 的 明细 内容 " + jrb.toString());//这个销货单 的 明细 内容。
-            //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
-            if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
-                String HQresult = basicService.HQsaorder(sajrb); //红旗文档1.1
-            }else{
-                String HQresult = basicService.HQsabackorder(sajrb);//销售退货  红旗文档1.2
+            JSONObject job = JSONObject.parseObject(destr);
+            if(job.getString("msgType").equals("SaleDelivery_Audit")){
+                //销货单的审核
+                // 由于  我已经 通过扩展JS 进行 了 审核后的接口调用，故 此处可以 不要了。
+                /*SACsubJsonRootBean jrb =  job.toJavaObject(SACsubJsonRootBean.class);//销货单的订阅信息DTO
+                String voucherCode = jrb.getBizContent().getVoucherCode();
+
+                String OrgId = jrb.getOrgId();
+                //根据 voucherCode 查询 此 销货单的明细内容
+                Map<String,String> pas = new HashMap<String,String>();
+                pas.put("OrgId",OrgId);
+                pas.put("code",voucherCode);//销货单的单号
+                // 通过 OrgId 来获取 AppKey 和 AppSecret
+                Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
+                pas.put("AppKey",apk.get("AppKey"));
+                pas.put("AppSecret",apk.get("AppSecret"));
+                JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
+                //LOGGER.error("这个销货单 的 明细 内容 " + sajrb.toString());//这个销货单 的 明细 内容。
+                //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
+                if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
+                    String HQresult = basicService.HQsaorder(sajrb); //红旗文档1.1
+                }else{
+                    String HQresult = basicService.HQsabackorder(sajrb);//销售退货  红旗文档1.2
+                }*/
             }
-
-
         }catch (Exception e){
             e.printStackTrace();
         }

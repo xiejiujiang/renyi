@@ -14,7 +14,7 @@ public class BizContent {
 
     private String externalCode;
     private String voucherID;
-    private Date voucherDate;
+    private String voucherDate;
     private String voucherCode;
     public void setExternalCode(String externalCode) {
          this.externalCode = externalCode;
@@ -30,10 +30,10 @@ public class BizContent {
          return voucherID;
      }
 
-    public void setVoucherDate(Date voucherDate) {
+    public void setVoucherDate(String voucherDate) {
          this.voucherDate = voucherDate;
      }
-     public Date getVoucherDate() {
+     public String getVoucherDate() {
          return voucherDate;
      }
 

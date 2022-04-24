@@ -2,6 +2,7 @@ package com.example.renyi.service;
 
 import com.example.renyi.saentity.JsonRootBean;
 
+import java.util.List;
 import java.util.Map;
 
 public interface BasicService {
@@ -39,4 +40,10 @@ public interface BasicService {
 
     //根据 销货单str 访问 HQ 的  上传直配 退货单
     public String  HQsabackorder(JsonRootBean jrb);
+
+    //根据 单据编号 返回 附件 ID
+    public List<Map<String,String>> getfjidByCode(String code);
+
+    //根据 base64的图片编码 和 code 调用红旗的上传图片
+    public String  HQimage(String code,String base64img);
 }

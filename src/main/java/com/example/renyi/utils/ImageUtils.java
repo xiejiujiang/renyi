@@ -36,7 +36,7 @@ public class ImageUtils {
 
 
     /**
-     * 将本地图片进行Base64位编码,图片的url路径，如http://.....xx.jpg
+     * 将本地图片进行Base64位编码
      */
     public static String encodeImgageToBase64(File imageFile) {
         // 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
@@ -73,9 +73,9 @@ public class ImageUtils {
 
 
     public static void main(String[] args) throws  Exception{
-        String st1 = ImageUtils.encodeImgageToBase64(new URL("https://prod-oss-r-bj-tplus-customer.oss-cn-beijing.aliyuncs.com/perm/attachment/sa/sa04/pic/90015999132/745abd62-992c-4c27-87cf-361bddff0715.png"));
+        String st1 = ImageUtils.encodeImgageToBase64(new URL("http://ra03a3vjl.hn-bkt.clouddn.com/1.png"));
         System.out.println("st1 == " + st1);
-        int ss = ImageUtils.getimageSize(st1);
-        System.out.println("ss == " + ss);
+        //int ss = ImageUtils.getimageSize(st1);
+        //System.out.println("ss == " + ss);
     }
 }

@@ -15,6 +15,8 @@ import com.example.renyi.entity.Putian;
 import com.example.renyi.entity.TData;
 import com.example.renyi.entity.User;
 
+import com.example.renyi.saentity.JsonRootBean;
+import com.example.renyi.service.BasicService;
 import com.example.renyi.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +30,18 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@CrossOrigin
 @Controller
 @RequestMapping(value = "/xkk")
 public class IndexController {
@@ -46,11 +51,14 @@ public class IndexController {
     @Autowired
     private OrderService OrderService;
 
+    @Autowired
+    private BasicService basicService;
+
     @RequestMapping(value="/mav", method = {RequestMethod.GET,RequestMethod.POST}) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
         LOGGER.error("----------------------------------开始！--------------------------------------------");
-        /* 这部分代码是我之前测试 获取用户登录信心的，只要 你的 T+ 和 你这个自定义页面 在 相同的域名下，就可以 这样获取。
+        /* 这部分代码是我之前测试 获取用户登录信息的，只要 你的 T+ 和 你这个自定义页面 在 相同的域名下，就可以 这样获取。
         String userid = "";
         Cookie[] cookies = request.getCookies();
         try{
@@ -269,5 +277,78 @@ public class IndexController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("testpp");
         return mav;
+    }
+
+
+    @RequestMapping(value="/doBase64", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String doBase64(HttpServletRequest request, HttpServletResponse response) throws  Exception{
+        String imgNameFlag = request.getParameter("imgNameFlag");
+        String code = request.getParameter("code");//单据编号
+        //System.out.println("前台传入的 code ： " + code);
+        String base64Img = request.getParameter("base64Img");
+        String debase64Img = URLDecoder.decode(base64Img);// 哈哈，这个就是 解码之后的
+        System.out.println("前台传入的 base64编码 解码之后 ： " + debase64Img);
+        String headstr = debase64Img.substring(0,debase64Img.indexOf(",")+1);
+        //System.out.println("保留base64字符串的开头部分 ： " + headstr);
+        //去掉base64字符串的开头部分
+        String r3 = debase64Img.substring(debase64Img.indexOf(",")+1);
+        //System.out.println("去掉base64字符串的开头部分 ： " + r3);
+
+        //先上传 配货单，后 调用 红旗的 图片上传接口，根据 voucherCode 查询 此 销货单的明细内容
+        Map<String,String> pas = new HashMap<String,String>();
+        pas.put("OrgId","OrgId");
+        pas.put("code",code);//销货单的单号
+        // 通过 OrgId 来获取 AppKey 和 AppSecret
+        //Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
+        // 直接 写 死 ！
+        pas.put("AppKey","");
+        pas.put("AppSecret","");
+        JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
+        LOGGER.error("这个销货单 的 明细 内容 " + sajrb.toString());//这个销货单 的 明细 内容。
+        //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
+        if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
+            String HQresult = basicService.HQsaorder(sajrb); //红旗文档1.1
+        }else{
+            String HQresult = basicService.HQsabackorder(sajrb);//销售退货  红旗文档1.2
+        }
+
+        // 先上传 配货单，后 调用 红旗的 图片上传接口
+        basicService.HQimage(code,r3);
+
+        //下面这部分代码是 流 转 文件下载 用的。 测试通过后就注销了。
+        /*String filepath = "D:\\new9.jpg";
+        BASE64Decoder decoder = new BASE64Decoder();
+        //Base64解码
+        byte[] b = decoder.decodeBuffer(r3);
+        for(int i=0;i<b.length;i++) {
+            if(b[i]<0) {//调整异常数据
+                b[i]+=256;
+            }
+        }
+        //生成jpeg图片
+        OutputStream out = new FileOutputStream(filepath);
+        out.write(b);
+        out.flush();
+        out.close();*/
+        //System.out.println("图片格式为："+ imgIndex);
+        //System.out.println(base64Img.substring(0,base64Img.indexOf(",")));;
+        //System.out.println(base64Img.substring(base64Img.indexOf(",")+1,base64Img.length()));;
+        return "0000";
+    }
+
+
+    //根据单据编号 获取  附件内容
+    @RequestMapping(value="/getfjidByCode", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String getfjidByCode(HttpServletRequest request, HttpServletResponse response) throws  Exception{
+        String code = request.getParameter("code");//单据编号
+        LOGGER.info("code ============================== "  +  code );
+        List<Map<String,String>> fjs = basicService.getfjidByCode(code);
+        String id = fjs.get(0).get("id");
+        String imagSize = fjs.get(0).get("FileSize");
+        Map<String,Object> imgMap = new HashMap<String,Object>();
+        imgMap.put("id",id);
+        imgMap.put("imagSize",imagSize);
+        JSONObject job = new JSONObject(imgMap);
+        return job.toJSONString();
     }
 }
