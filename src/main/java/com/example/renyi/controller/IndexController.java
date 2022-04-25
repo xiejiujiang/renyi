@@ -341,7 +341,7 @@ public class IndexController {
     @RequestMapping(value="/getfjidByCode", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String getfjidByCode(HttpServletRequest request, HttpServletResponse response) throws  Exception{
         String code = request.getParameter("code");//单据编号
-        LOGGER.info("code ============================== "  +  code );
+        LOGGER.info("点击审核后，根据传入的code，获取附件相关信息 ============================== "  +  code );
         List<Map<String,String>> fjs = basicService.getfjidByCode(code);
         String id = fjs.get(0).get("id");
         String imagSize = fjs.get(0).get("FileSize");

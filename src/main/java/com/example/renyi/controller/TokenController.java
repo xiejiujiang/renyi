@@ -1,9 +1,9 @@
 package com.example.renyi.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.HQorderBack.sa.JsonRootBean;
 import com.example.renyi.SAsubscribe.SACsubJsonRootBean;
 import com.example.renyi.mapper.orderMapper;
-import com.example.renyi.saentity.JsonRootBean;
 import com.example.renyi.service.BasicService;
 import com.example.renyi.utils.AESUtils;
 import com.example.renyi.utils.Des;
@@ -143,7 +143,7 @@ public class TokenController {
 
 
     // 红旗文档1.3
-    //给 红旗 提供的  直配单/退单  的 回传地址
+    //给 红旗 提供的  直配单  的 回传地址
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqordernotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqordernotice(HttpServletRequest request, HttpServletResponse response) {
@@ -151,7 +151,13 @@ public class TokenController {
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            LOGGER.info("decryptData == " + decryptData);
+            LOGGER.info("直配单 的 回调确认：decryptData == " + decryptData);
+            JSONObject job = JSONObject.parseObject(decryptData);
+            // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
+            JsonRootBean jrb = job.toJavaObject(JsonRootBean.class);
+            //jrb.getItems().get(0).getDiffqty()
+
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -159,7 +165,7 @@ public class TokenController {
     }
 
     // 红旗文档1.4
-    //给 红旗 提供的  直配单/退单  的 回传地址
+    //给 红旗 提供的  退单  的 回传地址
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqorderbacknotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqorderbacknotice(HttpServletRequest request, HttpServletResponse response) {
@@ -167,9 +173,12 @@ public class TokenController {
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            LOGGER.info("decryptData == " + decryptData);
+            LOGGER.info("退单  decryptData == " + decryptData);
+            JSONObject job = JSONObject.parseObject(decryptData);
+            com.example.renyi.HQorderBack.ba.JsonRootBean jbr = job.toJavaObject(com.example.renyi.HQorderBack.ba.JsonRootBean.class);
 
-            //URLEncoder.encode("","UTF-8");
+
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -191,6 +200,31 @@ public class TokenController {
             String lnkshpno = job.getString("lnkshpno");//真实送货单号
             String hndno = job.getString("hndno");//手工单号
             // 表示 这个 单据 必须要 重新上传给 红旗 1.1 接口 ， 新传的送货单可以和原单的hndno不同
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "{ \"code\":\"200\" }";
+    }
+
+    // 红旗文档1.6
+    //给 红旗 提供的  图片重传通知接口
+    //测试消息订阅的接口。  key = 8aue2u3q
+    @RequestMapping(value="/imgreupload", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String imgreupload(HttpServletRequest request, HttpServletResponse response) {
+        LOGGER.error("------------------------------- 红旗发起了 图片重传通知  ------------------------------------------");
+        try{
+            String saorder = request.getParameter("saorder");
+            String decryptData = Des.desDecrypt("8aue2u3q", saorder);
+            LOGGER.info("decryptData == " + decryptData);
+            JSONObject job = JSONObject.parseObject(decryptData);
+            String lnkshpno = job.getString("lnkshpno");//真实送货单号
+            String hndno = job.getString("hndno");//手工单号
+            String prvid = job.getString("prvid");//供应商编码
+            String dptid = job.getString("dptid");//退货门店（最少3位，不足3位前面补0）
+            String sndusr = job.getString("sndusr");//送货人
+            String snddat = job.getString("snddat");//送货时间
+            String sign = job.getString("sign");//当前数据完整json字符串的MD5
 
         }catch (Exception e){
             e.printStackTrace();

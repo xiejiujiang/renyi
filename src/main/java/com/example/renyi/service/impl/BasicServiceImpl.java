@@ -309,7 +309,7 @@ public class BasicServiceImpl implements BasicService {
         String ts = (System.currentTimeMillis() / 1000L) + "";
 
         StringBuffer json = new StringBuffer();
-        json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"\tuploadSndbllBackOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[");
+        json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"uploadSndbllBackOrder\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[");
         StringBuilder item = new StringBuilder();
         item.append("{\"lnkshpno\":\"" + lnkshpno + "\",\"hndno\":\"" + hndno + "\",\"prvid\":\"" + prvid + "\",\"dptid\":\"" + dptid + "\",\"mkdat\":\"" + mkdat + "\",\"snddat\":\"" + snddat + "\",\"sndusr\":\"" + sndusr + "\",\"brief\":\"" + brief + "\"");
         item.append(",\"items\":[");
