@@ -238,7 +238,7 @@ public class BasicServiceImpl implements BasicService {
         String prvkey = HQDemo.prvkey;
 
         String rand = "" + Math.random();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
-        String hndno = rand.substring(rand.length() - 11, rand.length());//T+的单号？
+        String hndno = rand.substring(rand.length() - 11, rand.length());//T+的单号？ 跟客户确认 规则
         String lnkshpno = HQDemo.prvid + rand.substring(rand.length() - 15, rand.length());//真实送货单号（最长20位）
         String dptid = "688";//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
         //dptid = jrb.getData().getCustomer().getCode();
@@ -282,6 +282,13 @@ public class BasicServiceImpl implements BasicService {
         String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
         String decryptData = Des.desDecrypt("8aue2u3q", result);
         LOGGER.info("请求红旗结果：" + decryptData);
+        JSONObject resultjob = JSONObject.parseObject(decryptData);
+        String RetCode = resultjob.getString("RetCode");
+        if("200".equals(RetCode)){
+            LOGGER.info("调用红旗的 直配单 接口成功，但是 返回内容 以 上面的 字符串为准");
+        }else{
+            LOGGER.info("调用红旗的 直配单 接口失败，但是 返回内容 以 上面的 字符串为准");
+        }
 
         return null;
     }

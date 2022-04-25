@@ -157,7 +157,7 @@ class RenyiApplicationTests {
     void testXHD(){ //测试创建 销货单
         /*try {
             String json = MapToJson.getSAparamsJson();
-            String result = HttpClients.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
+            String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiNjAwMTM0NTc3ODgiLCJvcmdJZCI6IjkwMDE1OTk5MTMyIiwiYWNjZXNzX3Rva2VuIjoiMjFmOTI3NGMtOTIzNi00ODljLTliOTctZDJiOTAwYTA1YjBjIiwiYXVkIjoiaXN2IiwibmJmIjoxNjQ2OTgzMTAzLCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiNjc2M2JhYTAtYTY2OS00YjNlLWJmYTEtMzBhNTY4MTNiNDIzIiwiZXhwIjoxNjQ3NTAxNTAzLCJpYXQiOjE2NDY5ODMxMDMsIm9yZ0FjY291bnQiOiJ1OTYxaTVnZmVkbTQifQ.q2LKmN8YfJHwgJabHCQaXVFfTvvHkHVeQ7Zx5jwBF7I");
             System.out.println("result : " + result);
         }catch (Exception e){

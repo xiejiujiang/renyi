@@ -3,6 +3,8 @@ package com.example.renyi.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.HQorderBack.sa.Items;
+import com.example.renyi.HQorderBack.sa.JsonRootBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,6 +124,75 @@ public class MapToJson {
         dto.put("dto",sa);
         String js = JSONObject.toJSONString(dto);
 
+        return js;
+    }
+
+    //重载了上一个方法，是为了  给 红旗的 1.3接口，回调信息 转成 T+ 的销货单 参数
+    public static String getSAparamsJson(JsonRootBean jrb,com.example.renyi.saentity.JsonRootBean sajrb){
+        Map<String,Object> dto = new HashMap<String,Object>();
+        Map<String,Object> sa = new HashMap<String,Object>();
+        Map<String,Object> Department = new HashMap<String,Object>();
+        Department.put("Code",sajrb.getData().getDepartment().getCode());//部门编码
+        sa.put("Department",Department);
+
+        Map<String,Object> Clerk = new HashMap<String,Object>();
+        Clerk.put("Code",sajrb.getData().getClerk().getCode());//业务员编码
+        sa.put("Clerk",Clerk);
+
+        String mkdate = jrb.getMkdat();//制单时间
+        sa.put("VoucherDate",mkdate);//单据日期
+        sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
+
+        Map<String,Object> Customer = new HashMap<String,Object>();
+        Customer.put("Code", sajrb.getData().getCustomer().getCode() );//客户编码  注意 和  下面的 结算客户的区别！！！
+        sa.put("Customer",Customer);
+        Map<String,Object> SettleCustomer = new HashMap<String,Object>();
+        SettleCustomer.put("Code",sajrb.getData().getSettleCustomer().getCode());//结算客户编码（一般等同于 客户编码）
+        sa.put("SettleCustomer",SettleCustomer);
+        Map<String,Object> BusinessType = new HashMap<String,Object>();
+
+        BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+        sa.put("BusinessType",BusinessType);
+        Map<String,Object> InvoiceType = new HashMap<String,Object>();
+        InvoiceType.put("Code","01");//票据类型，枚举类型；00--普通发票，01--专用发票，02–收据；为空时，默认按收据处理
+        sa.put("InvoiceType",InvoiceType);
+        Map<String,Object> Warehouse = new HashMap<String,Object>();
+        Warehouse.put("Code", sajrb.getData().getWarehouse().getCode());//表头上的 仓库编码
+        sa.put("Warehouse",Warehouse);
+        Map<String,Object> ReciveType = new HashMap<String,Object>();
+        ReciveType.put("Code","76");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
+        sa.put("ReciveType",ReciveType);
+        Map<String,Object> RdStyle = new HashMap<String,Object>();
+        RdStyle.put("Code",sajrb.getData().getRdStyle().getCode());//出库类别，RdStyleDTO对象，默认为“线上销售”类别； 具体值 我是查的数据库。  201 ?
+        sa.put("RdStyle",RdStyle);
+        sa.put("Memo","这一单是根据红旗返回的差异自动生成的，请注意区别 ！");//备注
+        List<Map<String,Object>> SaleDeliveryDetailsList = new ArrayList<Map<String,Object>>();
+        List<Items> items = jrb.getItems();
+        for(Items item : items){
+            Map<String,Object> DetailM = new HashMap<String,Object>();
+            Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
+            //明细1 的 仓库编码,这里不好取，但是可以用表头的（因为每一个销货单 只 对应了一个 仓库）
+            DetailMWarehouse.put("code",Warehouse.get("Code"));
+            DetailM.put("Warehouse",DetailMWarehouse);
+            Map<String,Object> DetailMInventory = new HashMap<String,Object>();
+            DetailMInventory.put("code",item.getPrvgdsid());//明细1 的 存货编码
+            DetailM.put("Inventory",DetailMInventory);
+            Map<String,Object> DetailMUnit = new HashMap<String,Object>();
+            DetailMUnit.put("Name","台");//明细1 的 存货计量单位 ？？？？？
+            DetailM.put("Unit",DetailMUnit);
+            //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
+            DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
+            DetailM.put("TaxRate","13");//明细1 的 税率
+            DetailM.put("OrigTaxPrice",item.getPrvprc());//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
+            DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
+            //如果要跟 销售订单 关联，则需要传入 下面两个参数。
+            //DetailM.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
+            //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID
+            SaleDeliveryDetailsList.add(DetailM);
+        }
+        sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
+        dto.put("dto",sa);
+        String js = JSONObject.toJSONString(dto);
         return js;
     }
 }

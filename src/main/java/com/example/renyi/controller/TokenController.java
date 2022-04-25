@@ -5,6 +5,7 @@ import com.example.renyi.HQorderBack.sa.JsonRootBean;
 import com.example.renyi.SAsubscribe.SACsubJsonRootBean;
 import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.service.BasicService;
+import com.example.renyi.service.HQservice;
 import com.example.renyi.utils.AESUtils;
 import com.example.renyi.utils.Des;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class TokenController {
 
     @Autowired
     private BasicService basicService;
+
+    @Autowired
+    private HQservice hqService;
 
     @Autowired
     private orderMapper orderMapper;
@@ -155,9 +159,10 @@ public class TokenController {
             JSONObject job = JSONObject.parseObject(decryptData);
             // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
             JsonRootBean jrb = job.toJavaObject(JsonRootBean.class);
-            //jrb.getItems().get(0).getDiffqty()
-
-
+            Map<String,String> params = new HashMap<String,String>();
+            params.put("code",jrb.getHndno());// 这是T+ 的 单据编号，对应 HQ 里面的  手动单号！！！！
+            com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(params);
+            String result = hqService.createTSaOrderByHQ(jrb,sajrb);
         }catch (Exception e){
             e.printStackTrace();
         }

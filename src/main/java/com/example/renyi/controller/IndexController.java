@@ -300,9 +300,8 @@ public class IndexController {
         pas.put("code",code);//销货单的单号
         // 通过 OrgId 来获取 AppKey 和 AppSecret
         //Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
-        // 直接 写 死 ！
-        pas.put("AppKey","");
-        pas.put("AppSecret","");
+        pas.put("AppKey","");// 直接 写 死 ！
+        pas.put("AppSecret","");// 直接 写 死 ！
         JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
         LOGGER.error("这个销货单 的 明细 内容 " + sajrb.toString());//这个销货单 的 明细 内容。
         //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
