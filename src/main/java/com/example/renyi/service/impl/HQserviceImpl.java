@@ -25,10 +25,10 @@ public class HQserviceImpl implements HQservice {
     public String createTSaOrderByHQ(JsonRootBean jrb,com.example.renyi.saentity.JsonRootBean sajrb) {
         try{
             String json = MapToJson.getSAparamsJson(jrb,sajrb);
-            String access_token = orderMapper.getTokenByAppKey("");//appKey
+            String access_token = orderMapper.getTokenByAppKey("J1fLcnic");//appKey
             String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
-                    "",
-                    "",
+                    "J1fLcnic",
+                    "3397185FC8C218C0FEC4004162C730CC",
                     access_token);
             LOGGER.info("调用T+ 创建销货单的接口后返回：" + result);
             JSONObject jon = JSONObject.parseObject(result);
@@ -44,8 +44,8 @@ public class HQserviceImpl implements HQservice {
                         "}";
 
                 String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson,
-                        "",
-                        "",
+                        "J1fLcnic",
+                        "3397185FC8C218C0FEC4004162C730CC",
                         access_token);
             }else{//如果 创建 T+ 销货单 失败！ 应该 怎么办呢？
                 LOGGER.error(" 红旗返回差异后，T+ 根据差异数量 创建 销货单 失败了！ 请检查数据：" + json);

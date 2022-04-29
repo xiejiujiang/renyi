@@ -39,12 +39,12 @@ public class Utils {
             map.put("ckname","成都悠方库");
             return map;
         }
-        if(mendian.contains("科华北路62号力宝大厦南楼17楼05号")){
+        if(mendian.contains("科华北路62号力宝大厦南楼17楼05")){
             map.put("ckcode","01010201");
             map.put("ckname","成都渠道总库");
             return map;
         }
-        if(mendian.contains("成都市锦江区锦华万达广场仁肄华为授权体验店")){
+        if(mendian.contains("成都市锦江区锦华万达广场仁肄华为授权体验店") || mendian.contains("锦华万达店") || mendian.contains("锦江区锦华路68号")){
             map.put("ckcode","0101011501");
             map.put("ckname","成都锦华MSC库");
             return map;
@@ -292,4 +292,97 @@ public class Utils {
         return result;
     }
 
+
+    public static Map<String, String> getZYOUResultMap(String shdz){
+        Map<String, String> result = new HashMap<String,String>();
+        if(shdz.contains("成都") && shdz.contains("力保大厦")){
+            result.put("merchantcode","020101012");
+            result.put("merchantname","成都-华为(中国邮电)");
+            result.put("departmentCode","HW-SC-CD-HYQD-QD");//成都华为渠道部
+            result.put("departmentName","成都华为渠道部");
+            result.put("userCode","CD-040");//严开伟
+            result.put("userName","严开伟");
+            return result;
+        }
+        if(shdz.contains("成都") && shdz.contains("锦华万达")){
+            result.put("merchantcode","020101012");
+            result.put("merchantname","成都-华为(中国邮电)");
+            result.put("departmentCode","HW-SC-CD-CPB");//成都华为产品部
+            result.put("departmentName","成都华为产品部");
+            result.put("userCode","CD-037");//雍聪
+            result.put("userName","雍聪");
+            return result;
+        }
+        if(shdz.contains("贵阳")){
+            result.put("merchantcode","020101403");
+            result.put("merchantname","贵阳-中国邮电");
+            result.put("departmentCode","HW-GZ-GY-CPB");//贵阳华为产品部
+            result.put("departmentName","贵阳华为产品部");
+            result.put("userCode","GY-007");// 李涛
+            result.put("userName","李涛");
+            return result;
+        }
+        if(shdz.contains("绵阳")){
+            result.put("merchantcode","020102052");
+            result.put("merchantname","绵阳-中国邮电器材西南有限公司");
+            result.put("departmentCode","HW-SC-MY-CPB");//绵阳华为产品部
+            result.put("departmentName","绵阳华为产品部");
+            result.put("userCode","MY-022");// 李文龙
+            result.put("userName","李文龙");
+            return result;
+        }
+        if(shdz.contains("苏州")){
+            result.put("merchantcode","020102505");
+            result.put("merchantname","苏州-中国邮电器材");
+            result.put("departmentCode","HW-JS-SZ-CPB");
+            result.put("departmentName","苏州华为产品部");
+            result.put("userCode","SZ-009");//王来香
+            result.put("userName","王来香");
+            return result;
+        }
+        if(shdz.contains("上海")){
+            result.put("merchantcode","020101504");
+            result.put("merchantname","上海-中国邮电器材华东公司");
+            result.put("departmentCode","HW-SH-CPB");
+            result.put("departmentName","上海华为产品部");
+            result.put("userCode","SH-009");//姚邦峰
+            result.put("userName","姚邦峰");
+            return result;
+        }
+        if(shdz.contains("昆明")){
+            result.put("merchantcode","KM000929");
+            result.put("merchantname","昆明-云南中邮普泰移动通信设备");
+            result.put("departmentCode","HW-YN-KM-CPB");
+            result.put("departmentName","昆明华为产品部");
+            result.put("userCode","KM-004");
+            result.put("userName","李海飞");
+            return result;
+        }
+        return result;
+    }
+
+    /*问叶庆，如何下单的*/
+    public static Map<String, String> getMSCResultMap(String shdz){
+        Map<String, String> result = new HashMap<String,String>();
+        if(shdz.contains("锦江区锦华路68号1幢")){ // 成都的MSC
+            result.put("merchantcode","020102070");
+            result.put("merchantname","成都-MSC(PMALL商城）");
+            result.put("departmentCode","HW-MSCSYB-DM-CDMSCJH");
+            result.put("departmentName","成都锦华万达MSC店");
+            result.put("userCode","CD-037");
+            result.put("userName","雍聪");
+            return result;
+        }
+        if(shdz.contains("昆明")){ // 昆明 的 瑞鼎城
+            result.put("merchantcode","KM000940");
+            result.put("merchantname","昆明-昆明MSC（华为）");
+            result.put("departmentCode","HW-YN-KM-CPB");
+            result.put("departmentName","昆明华为产品部");
+            result.put("userCode","KM-004");
+            result.put("userName","李海飞");
+            return result;
+        }
+        
+        return result;
+    }
 }

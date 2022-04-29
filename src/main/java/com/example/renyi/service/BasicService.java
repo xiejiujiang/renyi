@@ -1,7 +1,10 @@
 package com.example.renyi.service;
 
+import com.example.renyi.entity.Ptt;
 import com.example.renyi.saentity.JsonRootBean;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -46,4 +49,11 @@ public interface BasicService {
 
     //根据 base64的图片编码 和 code 调用红旗的上传图片
     public String  HQimage(String code,String base64img);
+
+
+    public List<Map<String,String>> getPUTIANListByFile(MultipartFile file, Map<String, Ptt> pttMapp);
+
+    public List<Map<String,String>> getZYOUListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
+
+    public List<Map<String,String>> getMSCListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
 }

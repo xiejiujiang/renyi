@@ -178,7 +178,7 @@ public class MapToJson {
             DetailMInventory.put("code",item.getPrvgdsid());//明细1 的 存货编码
             DetailM.put("Inventory",DetailMInventory);
             Map<String,Object> DetailMUnit = new HashMap<String,Object>();
-            DetailMUnit.put("Name","台");//明细1 的 存货计量单位 ？？？？？
+            DetailMUnit.put("Name","个");//明细1 的 存货计量单位 ？？？？？
             DetailM.put("Unit",DetailMUnit);
             //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
             DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异

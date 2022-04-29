@@ -27,4 +27,7 @@ public interface orderMapper {
 
     //根据单据编号 或者 附件 id
     public List<Map<String,String>> getfjidByCode(@Param("code")String code);
+
+    //根据员工的编号 或者 对应的 手机号
+    public String getMobileByCode(@Param("code")String code);
 }
