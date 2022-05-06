@@ -1,5 +1,9 @@
 package com.example.renyi.controller;
 
+import sun.misc.BASE64Decoder;
+
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -383,6 +387,69 @@ public class Utils {
             return result;
         }
         
+        return result;
+    }
+
+    public static Map<String,String> getAppleCKbyName(String mddm){
+        Map<String, String> result = new HashMap<String,String>();
+        switch (mddm){
+            case "000":
+                result.put("ckcode", "010102010");
+                result.put("ckname", "零售总库上海区");
+                break;
+            case "200":
+                result.put("ckcode", "020100021");
+                result.put("ckname", "上海闵行剑川库");
+                break;
+            case "201":
+                result.put("ckcode", "020100011");
+                result.put("ckname", "上海徐汇华泾库");
+                break;
+            case "202":
+                result.put("ckcode", "020200011");
+                result.put("ckname", "苏州木渎库");
+                break;
+            case "203":
+                result.put("ckcode", "020200021");
+                result.put("ckname", "苏州星湖天街库");
+                break;
+            case "204":
+                result.put("ckcode", "020100031");
+                result.put("ckname", "上海临港万达库");
+                break;
+            case "205":
+                result.put("ckcode", "020100041");
+                result.put("ckname", "上海正大乐城库");
+                break;
+            case "206":
+                result.put("ckcode", "020300011");
+                result.put("ckname", "合肥悦方库");
+                break;
+            case "207":
+                result.put("ckcode", "020400011");
+                result.put("ckname", "南京龙湾天街库");
+                break;
+            case "208":
+                result.put("ckcode", "020400021");
+                result.put("ckname", "南京六合天街库");
+                break;
+            case "212":
+                result.put("ckcode", "040100011");
+                result.put("ckname", "昆明富康城库");
+                break;
+            case "213":
+                result.put("ckcode", "040200011");
+                result.put("ckname", "贵阳印象城库");
+                break;
+            case "214":
+                result.put("ckcode", "040300011");
+                result.put("ckname", "成都空港华联库");
+                break;
+            case "215":
+                result.put("ckcode", "040100021");
+                result.put("ckname", "昆明宜家库");
+                break;
+        }
         return result;
     }
 }

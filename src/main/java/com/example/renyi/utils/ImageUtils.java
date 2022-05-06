@@ -1,12 +1,11 @@
 package com.example.renyi.utils;
 
+import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -71,11 +70,26 @@ public class ImageUtils {
     }
 
 
+    public static void base64toImg(String base64,String imgdownloadurl) throws Exception{
+        //下面这部分代码是 流 转 文件下载 用的。 测试通过后就注销了。
+        String filepath = imgdownloadurl +"D:\\new9999.jpg"; //???
+        BASE64Decoder decoder = new BASE64Decoder();
+        //Base64解码
+        byte[] b = decoder.decodeBuffer(base64);
+        for(int i=0;i<b.length;i++) {
+            if(b[i]<0) {//调整异常数据
+                b[i]+=256;
+            }
+        }
+        //生成图片
+        OutputStream out = new FileOutputStream(filepath);
+        out.write(b);
+        out.flush();
+        out.close();
+    }
 
-    public static void main(String[] args) throws  Exception{
-        String st1 = ImageUtils.encodeImgageToBase64(new URL("http://ra03a3vjl.hn-bkt.clouddn.com/1.png"));
-        System.out.println("st1 == " + st1);
-        //int ss = ImageUtils.getimageSize(st1);
-        //System.out.println("ss == " + ss);
+    public static void main(String[] args) throws Exception {
+        String base64 = encodeImgageToBase64(new File("D:\\tplus.jpg"));
+        base64toImg(base64,"");
     }
 }

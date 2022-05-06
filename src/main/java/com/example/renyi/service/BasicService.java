@@ -56,4 +56,6 @@ public interface BasicService {
     public List<Map<String,String>> getZYOUListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
 
     public List<Map<String,String>> getMSCListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
+
+    public List<Map<String,String>> getAPPLEListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
 }

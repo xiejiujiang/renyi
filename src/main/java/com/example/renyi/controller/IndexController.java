@@ -88,8 +88,6 @@ public class IndexController {
     @RequestMapping(value="/upload", method = {RequestMethod.GET,RequestMethod.POST})
     public void upload(@RequestParam(value = "file")MultipartFile file,HttpServletRequest request,HttpServletResponse response) throws IOException {
         try {
-            String contentType = request.getContentType();
-            LOGGER.info("contentType ========================= " + contentType);
             // ------------  先解析出 名称匹配的 关系表 --------------------------------//
             Map<String,Ptt> pttMapp = new HashMap<String, Ptt>();
             ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
@@ -254,10 +252,6 @@ public class IndexController {
     //下载excel
     @RequestMapping(value="/downloadexcel", method = {RequestMethod.GET,RequestMethod.POST})
     public void downloadexcel(HttpServletRequest request,HttpServletResponse response) throws Exception {
-
-        //ClassPathResource classPathResource = new ClassPathResource("excel/ptT.xlsx");
-        //File pttexcel = new File("C:\\apache-tomcat-9.0.56\\webapps\\renyi\\WEB-INF\\classes\\excel\\ptT.xlsx");
-
         // 下载本地文件
         String fileName = "ptT.xlsx".toString(); // 文件的默认保存名
         // 读到流中
@@ -270,11 +264,12 @@ public class IndexController {
         byte[] b = new byte[100];
         int len;
         try {
-            while ((len = inStream.read(b)) > 0)
+            while ((len = inStream.read(b)) > 0){
                 response.getOutputStream().write(b, 0, len);
-                inStream.close();
+            }
+            inStream.close();
         } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -301,10 +296,12 @@ public class IndexController {
         return mav;
     }
 
+
+    // 弃用！！！  由于在选项设置中 设置了图片上传至本地，所以，可以直接拿到图片了！
     //T+ 审核后 调用 此接口。 先 调用 HQ的配单 接口，再调用 图片上传接口
     @RequestMapping(value="/doBase64", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String doBase64(HttpServletRequest request, HttpServletResponse response) throws  Exception{
-        String imgNameFlag = request.getParameter("imgNameFlag");
+        /*String imgNameFlag = request.getParameter("imgNameFlag");
         String code = request.getParameter("code");//单据编号
         //System.out.println("前台传入的 code ： " + code);
         String base64Img = request.getParameter("base64Img");
@@ -322,8 +319,8 @@ public class IndexController {
         pas.put("code",code);//销货单的单号
         // 通过 OrgId 来获取 AppKey 和 AppSecret
         //Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
-        pas.put("AppKey","J1fLcnic");// 直接 写 死 ！
-        pas.put("AppSecret","3397185FC8C218C0FEC4004162C730CC");// 直接 写 死 ！
+        pas.put("AppKey","djrUbeB2");// 直接 写 死 ！
+        pas.put("AppSecret","F707B3834D9448B2A81856DE4E42357A");// 直接 写 死 ！
         JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
         LOGGER.error("这个销货单 的 明细 内容 " + sajrb.toString());//这个销货单 的 明细 内容。
         //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
@@ -339,26 +336,7 @@ public class IndexController {
                 // 先上传 配货单，后 调用 红旗的 图片上传接口
                 basicService.HQimage(code,r3);
             }
-        }
-
-        //下面这部分代码是 流 转 文件下载 用的。 测试通过后就注销了。
-        /*String filepath = "D:\\new9.jpg";
-        BASE64Decoder decoder = new BASE64Decoder();
-        //Base64解码
-        byte[] b = decoder.decodeBuffer(r3);
-        for(int i=0;i<b.length;i++) {
-            if(b[i]<0) {//调整异常数据
-                b[i]+=256;
-            }
-        }
-        //生成jpeg图片
-        OutputStream out = new FileOutputStream(filepath);
-        out.write(b);
-        out.flush();
-        out.close();*/
-        //System.out.println("图片格式为："+ imgIndex);
-        //System.out.println(base64Img.substring(0,base64Img.indexOf(",")));;
-        //System.out.println(base64Img.substring(base64Img.indexOf(",")+1,base64Img.length()));;
+        }*/
         return "0000";
     }
 

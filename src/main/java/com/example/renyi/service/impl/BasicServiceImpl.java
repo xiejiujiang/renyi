@@ -8,10 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.renyi.controller.ExcelListener;
 import com.example.renyi.controller.HQDemo;
 import com.example.renyi.controller.Utils;
-import com.example.renyi.entity.Msc;
-import com.example.renyi.entity.Ptt;
-import com.example.renyi.entity.Putian;
-import com.example.renyi.entity.Zyou;
+import com.example.renyi.entity.*;
 import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.saentity.Clerk;
 import com.example.renyi.saentity.JsonRootBean;
@@ -320,7 +317,7 @@ public class BasicServiceImpl implements BasicService {
         String mkdat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//制单时间
 
         Clerk clerk = jrb.getData().getClerk();//业务员
-        String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号   只能调接口去查了哦
+        String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号
 
         String snddat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//送货时间（可能是表头的自定义项）
         String brief = jrb.getData().getMemo();//销货单上的备注
@@ -575,6 +572,70 @@ public class BasicServiceImpl implements BasicService {
             e.printStackTrace();
         }
         LOGGER.error("-------------------- 上传的 MSC excel一共解析出了 " + ptlist.size() + " 行数据！开始写入 T+ 标准模板");
+        return ptlist;
+    }
+
+
+    public List<Map<String,String>> getAPPLEListByFile(MultipartFile file,Map<String, Ptt> pttMapp){
+        List<Map<String,String>> ptlist = new ArrayList<Map<String,String>>();
+        try{
+            // 解析上传的 excel 文件到 list 里面，并转换成对应的T+ list 数据
+            InputStream inputStream = file.getInputStream();
+            ExcelListener listener = new ExcelListener();
+            ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
+            com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,1, AppleYM.class);//苹果 英迈 的 下单excel
+            excelReader.read(sheet);
+            List<Object> list = listener.getDatas();
+            for(Object oo : list){
+                AppleYM Appleym = (AppleYM)oo;
+                Map<String,String> reobject = new HashMap<String,String>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                reobject.put("today",sdf.format(new Date()));//默认是 今天
+
+                String mddm = Appleym.getMddm();//门店代码。去获取 T+的仓库编码和名称
+                Map<String,String> ckmap = Utils.getAppleCKbyName(mddm);
+                if(ckmap == null || "".equals(ckmap.get("ckcode"))){
+                    LOGGER.error("-------------------- 门店代码是：" + mddm + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
+                }
+                reobject.put("ckcode",ckmap.get("ckcode"));
+                reobject.put("ckname",ckmap.get("ckname"));//T+ 仓库名称
+
+                reobject.put("djcode",Appleym.getOrdernmb());//单号
+
+                // 供应商
+                reobject.put("merchantcode","020101001");
+                reobject.put("merchantname","英迈电子商贸（上海）有限公司");
+                // 部门
+                reobject.put("departmentCode","XSYYZX-CPB-SW");
+                reobject.put("departmentName","商务");
+                // 业务员
+                reobject.put("userCode","APL-019");
+                reobject.put("userName","汪威");
+
+                //含税
+                reobject.put("taxflag","是");
+                String sku = Appleym.getSku();//英迈的SKU
+                if(pttMapp.get(sku) == null || "".equals(pttMapp.get(sku))){
+                    LOGGER.error("-------------------- SKU的名称："+sku+" 对应的 T+ 名称没找到！请及时更新excel匹配表");
+                }
+                String tcode = pttMapp.get(sku)==null?"":pttMapp.get(sku).getTcode();//对应的 T+ 的 编码
+                String tname = pttMapp.get(sku)==null?"":pttMapp.get(sku).getTname();//对应的 T+ 的 名称
+                reobject.put("tcode",tcode);//对应的 T+ 的 编码
+                reobject.put("tname",tname);//对应的 T+ 的 名称
+                reobject.put("danwei",pttMapp.get(sku)==null?"个":pttMapp.get(sku).getTdw());// 对应的T+ 单位
+
+                reobject.put("spdj",Appleym.getPrice());//商品单价（含税 13%）
+                reobject.put("tax","0.13");//税率
+                reobject.put("fhsl",Appleym.getSl());//数量
+                reobject.put("taxAcount",""+Float.valueOf(Appleym.getPrice())*Float.valueOf(Appleym.getSl()));// 含税金额
+
+                ptlist.add(reobject);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        LOGGER.error("-------------------- 上传的 英迈excel一共解析出了 " + ptlist.size() + " 行数据！开始写入 T+ 标准模板");
         return ptlist;
     }
 }
