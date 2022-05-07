@@ -107,7 +107,7 @@
       var file = $("#upload")[0].files[0];
       var filename = file.name;
       if(filename != '' && filename.length > 20){
-        filename = filename.substring(0,12)+'....';
+        filename = filename.substring(0,5)+'....' + filename.substring(filename.length-7,filename.length);
         $("#ptttext").text(filename);
       }else{
         $("#ptttext").text(filename);
