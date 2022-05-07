@@ -51,7 +51,7 @@ public class TokenController {
 
     @RequestMapping(value="/recode", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String recode(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 正式OAuth回调地址  ------------------------------------------");
+        LOGGER.info("------------------------------- 正式OAuth回调地址  ------------------------------------------");
         String code = request.getParameter("code");
         //第一次授权后，会有这个code,立刻调用 一次 授权码换token接口 ，拿到完整的 token 相关信息，并写入数据库。
 
@@ -63,7 +63,7 @@ public class TokenController {
     //T+ 的 消息订阅的接口。
     @RequestMapping(value="/ticket", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String reticket(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("--------------------------- 正式消息接收地址，包含 ticket，消息订阅，授权 ---------------------------");
+        LOGGER.info("--------------------------- 正式消息接收地址，包含 ticket，消息订阅，授权 ---------------------------");
         try{
             InputStreamReader reader=new InputStreamReader(request.getInputStream(),"utf-8");
             BufferedReader buffer=new BufferedReader(reader);
@@ -172,7 +172,7 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqordernotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqordernotice(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 红旗发起了 直配单据回传请求  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了 直配单据回传请求  ------------------------------------------");
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
@@ -198,7 +198,7 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqorderbacknotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqorderbacknotice(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 红旗发起了 退单回传请求  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了 退单回传请求  ------------------------------------------");
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
@@ -220,7 +220,7 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqorderback", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqorderback(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 红旗发起了 门店退回订单回传  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了 门店退回订单回传  ------------------------------------------");
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
@@ -248,7 +248,7 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/imgreupload", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String imgreupload(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.error("------------------------------- 红旗发起了 图片重传通知  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了 图片重传通知  ------------------------------------------");
         try{
             String saorder = request.getParameter("saorder");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);

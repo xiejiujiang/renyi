@@ -57,7 +57,7 @@ public class IndexController {
     @RequestMapping(value="/mav", method = {RequestMethod.GET,RequestMethod.POST}) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mav = new ModelAndView();
-        LOGGER.error("----------------------------------开始！--------------------------------------------");
+        LOGGER.info("----------------------------------开始！--------------------------------------------");
         /* 这部分代码是我之前测试 获取用户登录信息的，只要 你的 T+ 和 你这个自定义页面 在 相同的域名下，就可以 这样获取。
         String userid = "";
         Cookie[] cookies = request.getCookies();
@@ -79,7 +79,7 @@ public class IndexController {
             e.printStackTrace();
         }*/
         mav.setViewName("user");
-        LOGGER.error("----------------------------------是谁打开了江哥的页面！--------------------------------------------");
+        LOGGER.info("----------------------------------是谁打开了江哥的页面！--------------------------------------------");
         return mav; //返回user.html
     }
 
@@ -122,7 +122,7 @@ public class IndexController {
                     Ptt ptt = (Ptt)oo;
                     pttMapp.put(ptt.getPtmc(),ptt);
                 }
-                LOGGER.error("-------------------- 名称匹配关系表解析成功！--------------------");
+                LOGGER.info("-------------------- 名称匹配关系表解析成功！--------------------");
             }
 
             // 根据 普天的订单excel 转换 成T+ 的 list
@@ -155,7 +155,7 @@ public class IndexController {
             excelWriter.fill(ptlist, writeSheet);
             excelWriter.finish();
             bos.flush();
-            LOGGER.error("-------------------- 写入完成，请下载江哥的爱 --------------------");
+            LOGGER.info("-------------------- 写入完成，请下载江哥的爱 --------------------");
 
         } catch (Exception e) {
             //e.printStackTrace();

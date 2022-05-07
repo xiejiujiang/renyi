@@ -76,7 +76,7 @@ public class AppleController {
                     Ptt ptt = (Ptt)oo;
                     appleMapp.put(ptt.getPtmc(),ptt);
                 }
-                LOGGER.error("-------------------- 苹果名称匹配关系表解析成功！--------------------");
+                LOGGER.info("-------------------- 苹果名称匹配关系表解析成功！--------------------");
             }
 
             // 根据 苹果的订单excel 转换 成T+ 的 list
@@ -99,7 +99,7 @@ public class AppleController {
             excelWriter.fill(appleTList, writeSheet);
             excelWriter.finish();
             bos.flush();
-            LOGGER.error("-------------------- 写入完成，请下载江哥的爱 --------------------");
+            LOGGER.info("-------------------- 写入完成，请下载江哥的爱 --------------------");
         }catch (Exception e){
             //e.printStackTrace();
         }
