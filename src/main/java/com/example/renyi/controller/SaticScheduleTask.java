@@ -23,8 +23,12 @@ public class SaticScheduleTask {
     @Scheduled(cron = "0 0 3 * * ?")
     private void configureTasks() {
         System.err.println("-------------------- 执行静态定时任务开始: " + LocalDateTime.now() + "--------------------");
-        //去数据库里面  更新 token ,每天凌晨3点
+
+        //更新 仁肄 数据库里的 单据信息
+        tokenService.updateRenyiOrder();
+
         tokenService.refreshToken();
         System.err.println("-------------------- 执行静态定时任务结束: " + LocalDateTime.now() + "--------------------");
+
     }
 }

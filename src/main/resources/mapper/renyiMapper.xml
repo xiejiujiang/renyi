@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.renyi.mapper.renyiMapper">
+
+    <update id="updateRetailDetails">
+        update t1
+        set t1.priuserdefdecm2 = 1.13 * t2.price,t1.priuserdefdecm3 = t1.quantity * 1.13 * t2.price
+        from re_retail_b t1,ST_RDRecord_b t2,ST_RDRecord t3
+        where t1.idinventory = t2.idinventory  and t1.RdRecordCode = t3.code and t3.id = t2.idRDRecordDTO
+        and (t1.priuserdefdecm2 is null or  t1.priuserdefdecm2 = 0 )
+        and t2.price != 0 and t2.price is not null and t1.createdtime > '2021-12-31 23:59:59.617'
+    </update>
+
+
+    <update id="updateSadetails">
+        update t1
+        set t1.priuserdefdecm1 = t1.costPrice,t1.priuserdefdecm2 = t1.costPrice * t1.quantity
+        from SA_SaleDelivery_b t1,AA_Inventory t2
+        where t1.idinventory = t2.id  and t2.name  like '回收%' and t1.priuserdefdecm2 = 0.00000000000000 and t1.costPrice !=0
+    </update>
+</mapper>

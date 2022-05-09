@@ -2,6 +2,7 @@ package com.example.renyi.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.renyi.mapper.orderMapper;
+import com.example.renyi.mapper.renyiMapper;
 import com.example.renyi.service.TokenService;
 import com.example.renyi.utils.HttpClient;
 import org.slf4j.Logger;
@@ -19,6 +20,10 @@ public class TokenServiceImpl implements TokenService {
 
     @Autowired
     private orderMapper orderMapper;
+
+    @Autowired
+    private renyiMapper renyimapper;
+
 
     public String refreshToken(){
         try {
@@ -52,5 +57,14 @@ public class TokenServiceImpl implements TokenService {
             e.printStackTrace();
         }
         return "success";
+    }
+
+
+    //处理仁肄的  零售单和销货单上 考核成本没有反写成功的情况
+    public void updateRenyiOrder(){
+        //先更新零售单据
+        renyimapper.updateRetailDetails();
+        //再更新销货单
+        renyimapper.updateSadetails();
     }
 }
