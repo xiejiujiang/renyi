@@ -9,6 +9,9 @@ import com.example.renyi.controller.ExcelListener;
 import com.example.renyi.controller.HQDemo;
 import com.example.renyi.controller.Utils;
 import com.example.renyi.entity.*;
+import com.example.renyi.entity.msc.MscJB;
+import com.example.renyi.entity.msc.MscMX;
+import com.example.renyi.entity.msc.Mscpp;
 import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.saentity.Clerk;
 import com.example.renyi.saentity.JsonRootBean;
@@ -519,54 +522,83 @@ public class BasicServiceImpl implements BasicService {
             InputStream inputStream = file.getInputStream();
             ExcelListener listener = new ExcelListener();
             ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
-            com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,1, Msc.class);
+
+            //从第一个sheet里面获取 订单基本信息（门店。仓库。单号。）
+            com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,1, MscJB.class);
             excelReader.read(sheet);
-            List<Object> list = listener.getDatas();
-            for(Object oo : list){
-                Msc msc = (Msc)oo;
-                if(msc.getDdzt().contains("待收货") || msc.getDdzt().contains("待发货") || msc.getDdzt().contains("已完成")){
+            List<Object> list1 = listener.getDatas();
+            MscJB mscjb = new MscJB();
+            for(Object oo : list1) {
+                mscjb = (MscJB) oo;
+            }
 
-                    Map<String,String> reobject = new HashMap<String,String>();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    reobject.put("today",sdf.format(new Date()));//默认是 今天
-                    String shdz = msc.getAddress();//收获地址，返回门店名称
-                    Map<String,String> ckmap = Utils.getCKbyName(shdz);//T+仓库编码
-                    if(ckmap == null || "".equals(ckmap.get("ckcode"))){
-                        LOGGER.error("-------------------- 地址名称是：" + shdz + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
-                    }
-                    reobject.put("ckcode",ckmap.get("ckcode"));
-                    reobject.put("ckname",ckmap.get("ckname"));//T+ 仓库名称
-                    reobject.put("djcode",msc.getOrdernmb());//单号
+            listener.setDatas(null);
+            //从第二个sheet里面 获取 明细信息：SKU , 数量
+            com.alibaba.excel.metadata.Sheet sheet2 = new Sheet(2,1, MscMX.class);
+            excelReader.read(sheet2);
+            List<Object> list2 = listener.getDatas();
+            List<MscMX> listmx = new ArrayList<MscMX>();
+            for(Object oo : list2){
+                MscMX Mscmx = (MscMX)oo;
+                listmx.add(Mscmx);
+            }
 
-                    // 供应商
-                    reobject.put("merchantcode",Utils.getMSCResultMap(shdz).get("merchantcode"));
-                    reobject.put("merchantname",Utils.getMSCResultMap(shdz).get("merchantname"));
-                    // 部门
-                    reobject.put("departmentCode",Utils.getMSCResultMap(shdz).get("departmentCode"));
-                    reobject.put("departmentName",Utils.getMSCResultMap(shdz).get("departmentName"));
-                    // 业务员
-                    reobject.put("userCode",Utils.getMSCResultMap(shdz).get("userCode"));
-                    reobject.put("userName",Utils.getMSCResultMap(shdz).get("userName"));
+            listener.setDatas(null);
+            //从第二个sheet里面 获取 明细信息：SKU , 数量
+            com.alibaba.excel.metadata.Sheet sheet4 = new Sheet(4,1, Mscpp.class);
+            excelReader.read(sheet4);
+            List<Object> list4 = listener.getDatas();
+            List<Mscpp> listmscpp = new ArrayList<Mscpp>();
+            for(Object oo : list4){
+                Mscpp mscpp = (Mscpp)oo;
+                listmscpp.add(mscpp);
+            }
+            Map<String,Mscpp> mapMscpp = new HashMap<String,Mscpp>();
+            for(Mscpp mscpp : listmscpp){
+                mapMscpp.put(mscpp.getSpbm(),mscpp);
+            }
 
-                    //含税
-                    reobject.put("taxflag","是");
-                    String spmc = msc.getSpmc();//MSC 商品名称
-                    if(pttMapp.get(spmc) == null || "".equals(pttMapp.get(spmc))){
-                        LOGGER.error("-------------------- MSC的名称："+spmc+" 对应的 T+ 名称没找到！请及时更新excel匹配表");
-                    }
-                    String tcode = pttMapp.get(spmc)==null?"":pttMapp.get(spmc).getTcode();//对应的 T+ 的 编码
-                    String tname = pttMapp.get(spmc)==null?"":pttMapp.get(spmc).getTname();//对应的 T+ 的 名称
-                    reobject.put("tcode",tcode);//对应的 T+ 的 编码
-                    reobject.put("tname",tname);//对应的 T+ 的 名称
-                    reobject.put("danwei",pttMapp.get(spmc)==null?"个":pttMapp.get(spmc).getTdw());// 对应的T+ 单位
-
-                    reobject.put("spdj",msc.getPrice());//商品单价（含税 13%）
-                    reobject.put("tax","0.13");//税率
-                    reobject.put("fhsl",msc.getSl());//数量
-                    reobject.put("taxAcount",""+Float.valueOf(msc.getPrice())*Float.valueOf(msc.getSl()));// 含税金额
-                    ptlist.add(reobject);
-
+            //开始组装 reobject
+            for(MscMX mscmx : listmx){
+                Map<String,String> reobject = new HashMap<String,String>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                reobject.put("today",sdf.format(new Date()));//默认是 今天
+                String mdbh = mscjb.getMdbm();//MSC的门店编号 ， 涨这样？？？？  SCN223712
+                Map<String,String> ckmap = Utils.getCKbyName(mdbh);//T+仓库编码
+                if(ckmap == null || "".equals(ckmap.get("ckcode"))){
+                    LOGGER.error("-------------------- 门店编号是：" + mdbh + " ,没有找到对应的仓库名称！！！ 请检查代码配置");
                 }
+                reobject.put("ckcode",ckmap.get("ckcode"));
+                reobject.put("ckname",ckmap.get("ckname"));//T+ 仓库名称
+                reobject.put("djcode",mscjb.getFhdh());//单号
+
+                // 供应商
+                reobject.put("merchantcode",Utils.getMSCResultMap(mdbh).get("merchantcode"));
+                reobject.put("merchantname",Utils.getMSCResultMap(mdbh).get("merchantname"));
+                // 部门
+                reobject.put("departmentCode",Utils.getMSCResultMap(mdbh).get("departmentCode"));
+                reobject.put("departmentName",Utils.getMSCResultMap(mdbh).get("departmentName"));
+                // 业务员
+                reobject.put("userCode",Utils.getMSCResultMap(mdbh).get("userCode"));
+                reobject.put("userName",Utils.getMSCResultMap(mdbh).get("userName"));
+
+                //含税
+                reobject.put("taxflag","是");
+                String spmc = mapMscpp.get(mscmx.getSku()).getSpmc();
+                if(pttMapp.get(spmc) == null || "".equals(pttMapp.get(spmc))){
+                    LOGGER.error("-------------------- MSC的名称："+spmc+" 对应的 T+ 名称没找到！请及时更新excel匹配表");
+                }
+                String tcode = pttMapp.get(spmc)==null?"":pttMapp.get(spmc).getTcode();//对应的 T+ 的 编码
+                String tname = pttMapp.get(spmc)==null?"":pttMapp.get(spmc).getTname();//对应的 T+ 的 名称
+                reobject.put("tcode",tcode);//对应的 T+ 的 编码
+                reobject.put("tname",tname);//对应的 T+ 的 名称
+                reobject.put("danwei",pttMapp.get(spmc)==null?"个":pttMapp.get(spmc).getTdw());// 对应的T+ 单位
+
+                reobject.put("spdj",mapMscpp.get(mscmx.getSku()).getJzthj() );//商品单价（含税 13%）
+                reobject.put("tax","0.13");//税率
+                reobject.put("fhsl",mscmx.getYssl());//数量
+                reobject.put("taxAcount",""+Float.valueOf(mapMscpp.get(mscmx.getSku()).getJzthj())*Float.valueOf(mscmx.getYssl()));// 含税金额
+                ptlist.add(reobject);
             }
         }catch (Exception e){
             e.printStackTrace();

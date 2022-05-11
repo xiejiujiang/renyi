@@ -11,93 +11,99 @@ public class Zyou extends BaseRowModel {
     private String ordernmb;//订单编号
 
     @ExcelProperty(index = 1)
-    private String orderctm;//订单创建时间
+    private String wbordernmb;//外部订单编号
 
     @ExcelProperty(index = 2)
-    private String salearea;//销售区域
+    private String bussytype;//业务类型
 
     @ExcelProperty(index = 3)
+    private String orderctm;//订单创建时间
+
+    @ExcelProperty(index = 4)
+    private String salearea;//销售区域
+
+    @ExcelProperty(index = 5)
     private String orderstate;//订单状态
 
-    @ExcelProperty(index = 4)//商品编码
+    @ExcelProperty(index = 6)//商品编码
     private String spbm;
 
-    @ExcelProperty(index = 5)//商品编码
+    @ExcelProperty(index = 7)//商品编码
     private String spmc;
 
-    @ExcelProperty(index = 6)//原订货数量
+    @ExcelProperty(index = 8)//原订货数量
     private String ydhsl;
 
-    @ExcelProperty(index = 7)//商品单价
+    @ExcelProperty(index = 9)//商品单价
     private String spdj;
 
-    @ExcelProperty(index = 8)//实际订单总额
+    @ExcelProperty(index = 10)//实际订单总额
     private String sjddze;
 
-    @ExcelProperty(index = 9)//运费
+    @ExcelProperty(index = 11)//运费
     private String yf;
 
-    @ExcelProperty(index = 10)//支付金额
+    @ExcelProperty(index = 12)//支付金额
     private String zfje;
 
-    @ExcelProperty(index = 11)//使用折让
+    @ExcelProperty(index = 13)//使用折让
     private String syzr;
 
-    @ExcelProperty(index = 12)//待发运信用金额
+    @ExcelProperty(index = 14)//待发运信用金额
     private String dfyxyje;
 
-    @ExcelProperty(index = 13)//支付时间
+    @ExcelProperty(index = 15)//支付时间
     private String zfsj;
 
-    @ExcelProperty(index = 14)//支付方式
+    @ExcelProperty(index = 16)//支付方式
     private String zffs;
 
-    @ExcelProperty(index = 15)//支付状态
+    @ExcelProperty(index = 17)//支付状态
     private String zfzt;
 
-    @ExcelProperty(index = 16)//开票类型
+    @ExcelProperty(index = 18)//开票类型
     private String kplx;
 
-    @ExcelProperty(index = 17)//商品行状态
+    @ExcelProperty(index = 19)//商品行状态
     private String sphzt;
 
-    @ExcelProperty(index = 18)//撤货数
+    @ExcelProperty(index = 20)//撤货数
     private String chs;
 
-    @ExcelProperty(index = 19)//撤货释放金额
+    @ExcelProperty(index = 21)//撤货释放金额
     private String chsfje;
 
-    @ExcelProperty(index = 20)//实际订货数
+    @ExcelProperty(index = 22)//实际订货数
     private String sjdhs;
 
-    @ExcelProperty(index = 21)//已发货数
+    @ExcelProperty(index = 23)//已发货数
     private String yfhs;
 
-    @ExcelProperty(index = 22)//签收数
+    @ExcelProperty(index = 24)//签收数
     private String qss;
 
-    @ExcelProperty(index = 23)//退货数
+    @ExcelProperty(index = 25)//退货数
     private String ths;
 
-    @ExcelProperty(index = 24)//未发货数
+    @ExcelProperty(index = 26)//未发货数
     private String wfhs;
 
-    @ExcelProperty(index = 25)//未发货金额
+    @ExcelProperty(index = 27)//未发货金额
     private String wfhje;
 
-    @ExcelProperty(index = 26)//发运方式
+    @ExcelProperty(index = 28)//发运方式
     private String fyfs;
 
-    @ExcelProperty(index = 27)//提货人/收货人
+    @ExcelProperty(index = 29)//提货人/收货人
     private String thrshr;
 
-    @ExcelProperty(index = 28)//车牌号
+    @ExcelProperty(index = 30)//车牌号
     private String cph;
 
-    @ExcelProperty(index = 29)//地址编码
+    @ExcelProperty(index = 31)//地址编码
     private String dzbm;
 
-    @ExcelProperty(index = 30)//收货地址
+    @ExcelProperty(index = 32)//收货地址
     private String shdz;
 
     public String getOrdernmb() {
@@ -106,6 +112,22 @@ public class Zyou extends BaseRowModel {
 
     public void setOrdernmb(String ordernmb) {
         this.ordernmb = ordernmb;
+    }
+
+    public String getWbordernmb() {
+        return wbordernmb;
+    }
+
+    public void setWbordernmb(String wbordernmb) {
+        this.wbordernmb = wbordernmb;
+    }
+
+    public String getBussytype() {
+        return bussytype;
+    }
+
+    public void setBussytype(String bussytype) {
+        this.bussytype = bussytype;
     }
 
     public String getOrderctm() {
@@ -352,6 +374,8 @@ public class Zyou extends BaseRowModel {
     public String toString() {
         return "Zyou{" +
                 "ordernmb='" + ordernmb + '\'' +
+                ", wbordernmb='" + wbordernmb + '\'' +
+                ", bussytype='" + bussytype + '\'' +
                 ", orderctm='" + orderctm + '\'' +
                 ", salearea='" + salearea + '\'' +
                 ", orderstate='" + orderstate + '\'' +

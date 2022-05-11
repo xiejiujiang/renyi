@@ -48,7 +48,10 @@ public class Utils {
             map.put("ckname","成都渠道总库");
             return map;
         }
-        if(mendian.contains("成都市锦江区锦华万达广场仁肄华为授权体验店") || mendian.contains("锦华万达店") || mendian.contains("锦江区锦华路68号")){
+        if(mendian.contains("成都市锦江区锦华万达广场仁肄华为授权体验店")
+                || mendian.contains("锦华万达店")
+                || mendian.contains("锦江区锦华路68号")
+                || mendian.contains("SCN225001")){
             map.put("ckcode","0101011501");
             map.put("ckname","成都锦华MSC库");
             return map;
@@ -131,7 +134,7 @@ public class Utils {
             map.put("ckname", "昆明瑞鼎城MSC样机库");
             return map;
         }
-        if(mendian.contains("云南省昆明市盘龙区瑞鼎城爱琴海宝略华为授权体验店") && !mendian.contains("样机")) {
+        if(mendian.contains("SCN223712") || (mendian.contains("云南省昆明市盘龙区瑞鼎城爱琴海宝略华为授权体验店") && !mendian.contains("样机"))) {
             map.put("ckcode", "0201010401");
             map.put("ckname", "昆明瑞鼎城MSC库");
             return map;
@@ -368,7 +371,7 @@ public class Utils {
     /*问叶庆，如何下单的*/
     public static Map<String, String> getMSCResultMap(String shdz){
         Map<String, String> result = new HashMap<String,String>();
-        if(shdz.contains("锦江区锦华路68号1幢")){ // 成都的MSC
+        if(shdz.contains("锦江区锦华路68号1幢") || shdz.contains("SCN225001")){ // 成都的MSC
             result.put("merchantcode","020102070");
             result.put("merchantname","成都-MSC(PMALL商城）");
             result.put("departmentCode","HW-MSCSYB-DM-CDMSCJH");
@@ -377,7 +380,8 @@ public class Utils {
             result.put("userName","雍聪");
             return result;
         }
-        if(shdz.contains("昆明")){ // 昆明 的 瑞鼎城
+
+        if(shdz.contains("SCN223712")){ // 昆明 的 瑞鼎城
             result.put("merchantcode","KM000940");
             result.put("merchantname","昆明-昆明MSC（华为）");
             result.put("departmentCode","HW-YN-KM-CPB");
@@ -386,7 +390,6 @@ public class Utils {
             result.put("userName","李海飞");
             return result;
         }
-        
         return result;
     }
 
