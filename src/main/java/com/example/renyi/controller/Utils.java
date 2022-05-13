@@ -455,4 +455,16 @@ public class Utils {
         }
         return result;
     }
+
+    public static void main(String[] args) {
+        String rand = "" + Math.random();
+        String hndno = "05192" + "A2022050001";//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
+        String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
+        System.out.println(rand);
+        System.out.println(hndno);
+        System.out.println(lnkshpno);
+
+        String vourchcode = hndno.substring(5,hndno.length());
+        System.out.println(vourchcode);
+    }
 }

@@ -51,10 +51,9 @@ public class TokenController {
 
     @RequestMapping(value="/recode", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String recode(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("------------------------------- 正式OAuth回调地址  ------------------------------------------");
+        LOGGER.info("------------------- 正式OAuth回调地址 -------------------");
         String code = request.getParameter("code");
         //第一次授权后，会有这个code,立刻调用 一次 授权码换token接口 ，拿到完整的 token 相关信息，并写入数据库。
-
         //3月17日思考： 暂时不用接口来访问，直接在线访问后 拿到第一次的数据，并 复制 填入数据库表中接口（后续定时任务来更新）
         return code;
     }
@@ -63,7 +62,7 @@ public class TokenController {
     //T+ 的 消息订阅的接口。
     @RequestMapping(value="/ticket", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String reticket(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("--------------------------- 正式消息接收地址，包含 ticket，消息订阅，授权 ---------------------------");
+        LOGGER.info("------------------- 正式消息接收地址，包含 ticket，消息订阅，授权 -------------------");
         try{
             InputStreamReader reader=new InputStreamReader(request.getInputStream(),"utf-8");
             BufferedReader buffer=new BufferedReader(reader);
@@ -76,7 +75,7 @@ public class TokenController {
             if(job.getString("msgType").equals("SaleDelivery_Audit")){
                 SACsubJsonRootBean jrb =  job.toJavaObject(SACsubJsonRootBean.class);//销货单的订阅信息DTO
                 String voucherCode = jrb.getBizContent().getVoucherCode();
-                LOGGER.info(" 销货单 审核 来辣！！============================ " + voucherCode);
+                LOGGER.info(" 销货单 审核 来了！============================ " + voucherCode);
                 String OrgId = jrb.getOrgId();
                 //根据 voucherCode 查询 此 销货单的明细内容
                 Map<String,String> pas = new HashMap<String,String>();
@@ -88,7 +87,12 @@ public class TokenController {
                 pas.put("AppSecret",apk.get("AppSecret"));
                 com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
                 //如果是红旗的销货单审核的内容，就需要上传，否则，不做任何处理
-                if(sajrb.getData().getSettleCustomer().getName().contains("红旗")){
+                LOGGER.info(voucherCode + "： 这一单对应的结算客户名字是 " + sajrb.getData().getSettleCustomer().getName());
+                String memo = sajrb.getData().getMemo();
+                LOGGER.info(voucherCode + "： 这一单对应的备注内容是 " + memo);
+
+                if(sajrb.getData().getSettleCustomer().getName().contains("红旗")
+                    && !memo.contains("差异自动生成")){
                     //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
                     if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
                         List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
@@ -99,18 +103,40 @@ public class TokenController {
                                 String imgurl = fjlist.get(0).get("UploadPath");
                                 String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
                                 String base64 = URLEncoder.encode(img64,"UTF-8");
-                                basicService.HQimage(voucherCode,base64);  //红旗文档1.7
+                                String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
+                                //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
+                                LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
                             }else{
                                 LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗失败了，也没有上传图片！！");
+                                //要不要弃审这一单呢？？  要！
+                                String auditjson = "{\n" +
+                                        "  \"param\": {\n" +
+                                        "    \"voucherCode\": \""+voucherCode+"\"\n" +
+                                        "  }\n" +
+                                        "}";
+                                String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                                String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
+                                        "djrUbeB2",
+                                        "F707B3834D9448B2A81856DE4E42357A",
+                                        access_token);
+                                LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
                             }
                         }else{
-                            LOGGER.info(" 销货单: " + voucherCode + " 没有附件，无法上传图片给红旗！！");
+                            LOGGER.info(" 销货单: " + voucherCode + " 没有附件，无法上传图片给红旗！也没有上传单据内容！马上弃审！");
+                            String auditjson = "{\n" +
+                                    "  \"param\": {\n" +
+                                    "    \"voucherCode\": \""+voucherCode+"\"\n" +
+                                    "  }\n" +
+                                    "}";
+                            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
+                                    "djrUbeB2",
+                                    "F707B3834D9448B2A81856DE4E42357A",
+                                    access_token);
+                            LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
                         }
                     }else{//销售退货  红旗文档1.2
-
                         String HQresult = basicService.HQsabackorder(sajrb);
-
-
                     }
                 }
             }
@@ -134,17 +160,17 @@ public class TokenController {
             InputStreamReader reader=new InputStreamReader(request.getInputStream(),"utf-8");
             BufferedReader buffer=new BufferedReader(reader);
             String params=buffer.readLine();
-            LOGGER.error("请求参数: "+params);
+            //LOGGER.error("请求参数: "+params);
             JSONObject jsonObject = JSONObject.parseObject(params);
             String code = jsonObject.getString("Code");
-            LOGGER.error("Code =============== " + code);
+            LOGGER.error("管理员的二开消息订阅Code =============== " + code);
             LOGGER.error("当前操作，0 保存，1 审核，2 弃审，3 删除，4 取消中止，5 中止");
             String state = jsonObject.getString("SendState");
             LOGGER.error("SendState =============== " + state);
             String OrgId = jsonObject.getString("OrgId");
-            LOGGER.error("OrgId =============== " + OrgId);
+            //LOGGER.error("OrgId =============== " + OrgId);
             //如果是销货单，并且是 审核 条件，
-            if(code.contains("SA") && state.equals("1")){
+            if(state.equals("1")){
                 //查询对应的这个订单明细。并调用services，访问 红旗
                 Map<String,String> pas = new HashMap<String,String>();
                 pas.put("OrgId",OrgId);
@@ -153,10 +179,8 @@ public class TokenController {
                 Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
                 pas.put("AppKey",apk.get("AppKey"));
                 pas.put("AppSecret",apk.get("AppSecret"));
-                JsonRootBean jrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
-                LOGGER.error("这个销货单 的 明细 内容 " + jrb.toString());//这个销货单 的 明细 内容。
-                //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
-                String HQresult = basicService.HQsaorder(jrb);
+
+                LOGGER.info("新的开始：== " + OrgId+","+code+","+apk.get("AppKey")+","+apk.get("AppSecret"));
 
             }*/
         }catch (Exception e){
@@ -180,8 +204,12 @@ public class TokenController {
             JSONObject job = JSONObject.parseObject(decryptData);
             // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
             JsonRootBean jrb = job.toJavaObject(JsonRootBean.class);
+
+            String hndno = jrb.getHndno();//手工单号
+            String vourchcode = hndno.substring(5,hndno.length());
+
             Map<String,String> params = new HashMap<String,String>();
-            params.put("code",jrb.getHndno());// 这是T+ 的 单据编号，对应 HQ 里面的  手动单号！！！！
+            params.put("code",vourchcode);// 这是T+ 的 单据编号，对应 HQ 里面的  手动单号！！！！
             params.put("AppKey","djrUbeB2");// 直接 写 死 ！
             params.put("AppSecret","F707B3834D9448B2A81856DE4E42357A");// 直接 写 死 ！
             com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(params);
@@ -229,7 +257,13 @@ public class TokenController {
             String lnkshpno = job.getString("lnkshpno");//真实送货单号
             String hndno = job.getString("hndno");//手工单号
             // 表示 这个 单据 必须要 重新上传给 红旗 1.1 接口 ， 新传的送货单可以和原单的hndno不同
-            String auditjson = "{\"param\": { \"voucherCode\": \" " + hndno + " \" } }";//弃审的JSON
+
+            String vourchcode = hndno.substring(5,hndno.length());
+            String auditjson = "{\n" +
+                    "  \"param\": {\n" +
+                    "    \"voucherCode\": \""+vourchcode+"\"\n" +
+                    "  }\n" +
+                    "}";
             String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
             String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
                     "djrUbeB2",
@@ -263,8 +297,13 @@ public class TokenController {
             String sign = job.getString("sign");//当前数据完整json字符串的MD5
             //重新上传该图片即可。？？？？
 
+            String vourchcode = hndno.substring(5,hndno.length());
             // 表示 这个 单据 必须要 重新上传给 红旗 1.1 接口 ， 新传的送货单可以和原单的hndno不同
-            String auditjson = "{\"param\": { \"voucherCode\": \" " + hndno + " \" } }";//弃审的JSON
+            String auditjson = "{\n" +
+                    "  \"param\": {\n" +
+                    "    \"voucherCode\": \""+vourchcode+"\"\n" +
+                    "  }\n" +
+                    "}";
             String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
             String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
                     "djrUbeB2",
@@ -272,8 +311,6 @@ public class TokenController {
                     access_token);
             LOGGER.info("因为1.5接口，单号： " + hndno + "的弃审结果是：" + auditResult);
             //弃审成功之后，T+ 设置了 消息提醒，需要 业务员 重新 提交 审核（可能是 图片问题，或者 其他问题。）
-
-
 
         }catch (Exception e){
             e.printStackTrace();

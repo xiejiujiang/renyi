@@ -38,7 +38,7 @@ public interface BasicService {
     public JsonRootBean getSaOrder(Map<String,String> params);
 
     //根据 销货单str 访问 HQ 的  上传直配送货单
-    public String  HQsaorder(JsonRootBean jrb);
+    public String  HQsaorder(JsonRootBean jrb) throws Exception;
 
 
     //根据 销货单str 访问 HQ 的  上传直配 退货单

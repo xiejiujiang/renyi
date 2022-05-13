@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -242,24 +243,24 @@ public class BasicServiceImpl implements BasicService {
     }
 
     @Override
-    public String HQsaorder(JsonRootBean jrb) {
+    public String HQsaorder(JsonRootBean jrb) throws Exception{
         //解析 T+ 的 销货单 DTO。 转成 HQ 的参数，然后调用API 。
         String prvid = HQDemo.prvid;
         String tel = HQDemo.tel;
         String prvkey = HQDemo.prvkey;
 
-        String rand = "" + Math.random();
-        //String hndno = rand.substring(rand.length() - 11, rand.length());//T+的单号？ 跟客户确认 规则
-        String hndno = jrb.getData().getCode();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
-        String lnkshpno = HQDemo.prvid + rand.substring(rand.length() - 15, rand.length());//真实送货单号（最长20位）
+        String hndno = prvid + jrb.getData().getCode();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
+        String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length() );//真实送货单号（最长20位）
         String dptid = jrb.getData().getCustomer().getCode() ;//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
-        //dptid = jrb.getData().getCustomer().getCode();
-        String mkdat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//制单时间
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String mkdat = sdf.format(new Date());//制单时间
 
         Clerk clerk = jrb.getData().getClerk();//业务员
         String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号   只能调接口去查了哦
 
-        String snddat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//送货时间（可能是表头的自定义项）
+        SimpleDateFormat sdff = new SimpleDateFormat("yyyyMMdd");
+        String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
         String brief = jrb.getData().getMemo();//销货单上的备注
 
         String ts = (System.currentTimeMillis() / 1000L) + "";
@@ -279,7 +280,7 @@ public class BasicServiceImpl implements BasicService {
                 String qty = saleDeliveryDetail.getQuantity();//数量
                 String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
                 String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
-                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\"" + prvgdsid + "\",\"qty\":\"" + qty + "\",\"prvprc\":\"" + prvprc + "\",\"prvamt\":\"" + prvamt + "\"},");
+                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\"" + prvgdsid + "\",\"qty\":\"" + qty + "\",\"prvprc\":\"" + prvprc + "\",\"prvamt\":\"" + prvamt + "\",\"bthno\":\"0\",\"vlddat\":\"0\",\"crtdat\":\"0\"},");
             }
         }
         item.setLength(item.length() - 1);
@@ -293,16 +294,18 @@ public class BasicServiceImpl implements BasicService {
         LOGGER.info("红旗 json == " + json);
         String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
         String decryptData = Des.desDecrypt("8aue2u3q", result);
-        LOGGER.info("请求红旗结果：" + decryptData);
+        String ss1 = URLDecoder.decode(decryptData,"UTF-8");
+        LOGGER.info("请求红旗结果： " + ss1);
         JSONObject resultjob = JSONObject.parseObject(decryptData);
         String RetCode = resultjob.getString("RetCode");
-        if("200".equals(RetCode)){
-            LOGGER.info("调用红旗的 直配单 接口成功，但是 返回内容 以 上面的 字符串为准");
+        String HQObj = resultjob.getString("Obj");
+        if("200".equals(RetCode) && "[]".equals(HQObj)){
+            LOGGER.info("-------------- 调用红旗的 直配单 接口成功，可以上传图片了！ --------------");
+            return RetCode;
         }else{
-            LOGGER.info("调用红旗的 直配单 接口失败，但是 返回内容 以 上面的 字符串为准");
+            LOGGER.info("-------------- 调用红旗的 直配单 接口失败，但是 返回内容 以 上面的 字符串为准 ----------------------------");
+            return "9999"; //失败了！！！
         }
-
-        return RetCode;
     }
 
 
@@ -312,17 +315,19 @@ public class BasicServiceImpl implements BasicService {
         String tel = HQDemo.tel;
         String prvkey = HQDemo.prvkey;
 
-        String rand = "" + Math.random();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
-        //String hndno = rand.substring(rand.length() - 11, rand.length());//手工单号
-        String hndno = jrb.getData().getCode();
-        String lnkshpno = prvid + rand.substring(rand.length() - 15, rand.length());//真实送货单号（最长20位）
+        String hndno = prvid + jrb.getData().getCode();
+        String lnkshpno = prvid + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
         String dptid = jrb.getData().getCustomer().getCode();//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
-        String mkdat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//制单时间
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String mkdat = sdf.format(new Date());//制单时间
 
         Clerk clerk = jrb.getData().getClerk();//业务员
         String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号
 
-        String snddat = ("" + jrb.getData().getVoucherDate()).replaceAll("-", "");//送货时间（可能是表头的自定义项）
+        SimpleDateFormat sdff = new SimpleDateFormat("yyyyMMdd");
+        String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
+
         String brief = jrb.getData().getMemo();//销货单上的备注
 
         String ts = (System.currentTimeMillis() / 1000L) + "";
@@ -337,12 +342,13 @@ public class BasicServiceImpl implements BasicService {
         if (saleDeliveryDetails != null && saleDeliveryDetails.size() != 0) {
             for (int j = 0; j < saleDeliveryDetails.size(); j++) {//具体的商品明细
                 SaleDeliveryDetails saleDeliveryDetail = saleDeliveryDetails.get(j);
+                String hbrief = saleDeliveryDetail.getDetailMemo();
                 String gdsid = saleDeliveryDetail.getPartnerInventoryCode();//红旗商品编码（客户的）
                 String prvgdsid = saleDeliveryDetail.getInventory().getCode();//供应商商品编码(T+的)
                 String qty = saleDeliveryDetail.getQuantity();//数量
                 //String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
                 //String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
-                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\"" + prvgdsid + "\",\"qty\":\"" + qty + "\",\"brief\":\"行备注\"},");
+                item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\"" + prvgdsid + "\",\"qty\":\"" + qty + "\",\"brief\":\""+hbrief+"\"},");
             }
         }
         item.setLength(item.length() - 1);
@@ -367,28 +373,34 @@ public class BasicServiceImpl implements BasicService {
     }
 
     public String HQimage(String code, String base64img) {
+        String rruslt = "9999！ 上传图片失败！！！检查 图片大小！ 和 清晰度啊！！";
         try {
             String prvid = HQDemo.prvid;
             String tel = HQDemo.tel;
             String prvkey = HQDemo.prvkey;
+            String hndno = prvid + code;//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
             String encodeBase64image = URLEncoder.encode(base64img, "UTF-8");
-
             String ts = (System.currentTimeMillis() / 1000L) + "";
-
             StringBuffer json = new StringBuffer();
             json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"uploadImage\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[{");
-            json.append("\"idx\":\"" + code + "\",\"hndno\":\"" + code + "\",\"img64\":\"" + encodeBase64image + "\",");
-            json.append("]}");
+            json.append("\"idx\":\"" + hndno + "\",\"hndno\":\"" + hndno + "\",\"img64\":\"" + encodeBase64image + "\"}]}");
 
             LOGGER.info("调用 红旗 图片上传的 json == " + json);
             String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
             String decryptData = Des.desDecrypt("8aue2u3q", result);
             LOGGER.info("上传图片后 请求红旗 的结果：" + decryptData);
+            System.out.println("上传图片后 请求红旗 的结果：" + URLDecoder.decode(decryptData,"UTF-8"));
+            JSONObject resultjob = JSONObject.parseObject(decryptData);
+            String RetCode = resultjob.getString("RetCode");
+            String HQObj = resultjob.getString("Obj");
+            if("200".equals(RetCode) && "[]".equals(HQObj)){
+                LOGGER.info("-------------- 调用红旗的 图片上传 接口成功，完美！！！ --------------");
+                rruslt = "-------------- 调用红旗的 图片上传 接口成功，完美！！！ --------------";
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            return "";
         }
+        return  rruslt;
     }
 
     public List<Map<String,String>> getPUTIANListByFile(MultipartFile file, Map<String, Ptt> pttMapp){

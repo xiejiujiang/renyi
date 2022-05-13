@@ -4,13 +4,19 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSONObject;
+import com.example.renyi.controller.HQDemo;
 import com.example.renyi.saentity.JsonRootBean;
 import com.example.renyi.utils.*;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @SpringBootTest
@@ -33,6 +39,59 @@ class RenyiApplicationTests {
             JSONObject job = JSONObject.parseObject(result);
             JsonRootBean jrb =  job.toJavaObject(JsonRootBean.class);
             System.out.println("jrb : " + jrb.getData().getCode());*/
+
+            /*String ss1 = "{\n" +
+                    "  \"param\": {\n" +
+                    "    \"voucherCode\": \"A2022050032\"\n" +
+                    "  }\n" +
+                    "}";
+
+            String voucherCode = "A2022050032";
+            String auditjson = "{\"param\": { \"voucherCode\": \" " + voucherCode + " \" } }";//弃审的JSON
+            String access_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpc3YiLCJpc3MiOiJjaGFuamV0IiwidXNlcklkIjoiMzg5MzE5NTQ0MjcyOTIwIiwib3JnSWQiOiIxMjM0MTEyOTcwNDcxMjk5IiwiYWNjZXNzX3Rva2VuIjoiODY0MjU4ZTMtNmEwYi00YzdhLTg4YjMtM2Q2NTc4NGNiMmE5IiwiYXVkIjoiaXN2IiwibmJmIjoxNjUyMzgyMDAyLCJhcHBJZCI6IjU4Iiwic2NvcGUiOiJhdXRoX2FsbCIsImlkIjoiOGZlYzI1YWItZmFlZi00MmJhLTkwMjktNGFhNTJlOWVlMjBiIiwiZXhwIjoxNjUyOTAwNDAyLCJpYXQiOjE2NTIzODIwMDIsIm9yZ0FjY291bnQiOiJ1aTgwNGdzb2Z6em0ifQ.9VmYVwEd6j5MK2qM3PYahj2BGxV1ALehPLZddel81ko";
+            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",ss1,
+                    "djrUbeB2",
+                    "F707B3834D9448B2A81856DE4E42357A",
+                    access_token);
+            System.out.println("auditResult == " + auditResult);*/
+
+            /*Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            String ddd = sdf.format(date);
+            String ts = (System.currentTimeMillis() / 1000L)+"";
+            String token = HQDemo.md5(HQDemo.prvkey+HQDemo.prvid+HQDemo.tel + ts);
+            String json = "{\"prvid\":\"05192\",\"tel\":\"18428394131\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\""+ts+"\",\"token\":\""+token+"\",\"datas\":[{\"sign\":\"fb7119355a7f8666fd6f1536dd0e0e1d\",\"lnkshpno\":\"05192A20220500320032\",\"hndno\":\"05192A2022050032\",\"prvid\":\"05192\",\"dptid\":\"003\",\"mkdat\":\""+ddd+"\",\"snddat\":\"20220513\",\"sndusr\":\"18980673186\",\"brief\":\"\",\"items\":[{\"gdsid\":\"18002335\",\"prvgdsid\":\"0100001\",\"qty\":\"1.0000\",\"prvprc\":\"3.75\",\"prvamt\":\"3.75\"}]}]}";
+
+
+            String js1 = "{\"prvid\":\"05192\",\"tel\":\"18428394131\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\"1652421807\",\"token\":\"434685972c8a986ff07eed3e87883b07\",\"datas\":[{\"sign\":\"a1670b25acc9a124e45808d83c6d1dc8\",\"lnkshpno\":\"05192A20220500010001\",\"hndno\":\"05192A2022050001\",\"prvid\":\"05192\",\"dptid\":\"001\",\"mkdat\":\"20220513140327\",\"snddat\":\"20220513\",\"sndusr\":\"15378616426\",\"brief\":\"\",\"items\":[{\"gdsid\":\"18002335\",\"prvgdsid\":\"0100001\",\"qty\":\"1.0000\",\"prvprc\":\"6.00\",\"prvamt\":\"6.00\",\"bthno\":\"0\",\"vlddat\":\"0\",\"crtdat\":\"0\"}]}]}";
+            String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", js1.toString());
+            String decryptData = Des.desDecrypt("8aue2u3q", result);
+            System.out.println("decryptData == " + URLDecoder.decode(decryptData,"UTF-8"));*/
+
+            /*JSONObject resultjob = JSONObject.parseObject("{\"RetCode\":\"200\",\"RetMsg\":\"共1单，成功1单！\",\"Obj\":[],\"Objj\":{\"page\":0,\"size\":0,\"allPage\":0,\"allSize\":0,\"other\":[]}}");
+            String Obj = resultjob.getString("Obj");
+            System.out.println("Obj == " + Obj);*/
+
+
+            /*String fileurl = "D:\\123\\tplus.jpg";
+            //String img64 = ImageUtils.encodeImgageToBase64(new File("C:\\Chanjet\\TPlusStd\\WebSite\\Attachments\\30903f39-6f65-4707-bcdc-0b0a92d36231.jpg"));
+            String img64 = ImageUtils.encodeImgageToBase64(new File(fileurl));
+            System.out.println("img64 == " + img64);
+            String encodeBase64image = URLEncoder.encode(img64, "UTF-8");
+            System.out.println("encodeBase64image == " + encodeBase64image);*/
+
+            /*String img64 = ImageUtils.encodeImgageToBase64(new File("D:\\123\\logo.jpg"));
+            String base64 = URLEncoder.encode(img64,"UTF-8");
+            String encodeBase64image = URLEncoder.encode(base64, "UTF-8");
+            String ts = (System.currentTimeMillis() / 1000L) + "";
+            String token = Md5.md5(HQDemo.prvkey + HQDemo.prvid + HQDemo.tel + ts);
+            String s12 = "{\"prvid\":\"05192\",\"tel\":\"18428394131\",\"Request_Channel\":\"WEB\",\"method\":\"uploadImage\",\"timestamp\":\""+ts+"\",\"token\":\""+token+"\",\"datas\":[{\"idx\":\"05192A2022050003\",\"hndno\":\"05192A2022050003\",\"img64\":\""+encodeBase64image+"\"}]}";
+
+            String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", s12);
+            String decryptData = Des.desDecrypt("8aue2u3q", result);
+            System.out.println("decryptData == " + decryptData);*/
+
+
         }catch (Exception e){
             e.printStackTrace();
         }
