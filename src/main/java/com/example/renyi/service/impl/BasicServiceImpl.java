@@ -539,27 +539,31 @@ public class BasicServiceImpl implements BasicService {
             com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,1, MscJB.class);
             excelReader.read(sheet);
             List<Object> list1 = listener.getDatas();
+            int size1 = list1.size();
             MscJB mscjb = new MscJB();
             for(Object oo : list1) {
                 mscjb = (MscJB) oo;
             }
 
-            listener.setDatas(null);
             //从第二个sheet里面 获取 明细信息：SKU , 数量
+            //sheet = new Sheet(1,1, MscMX.class);
             com.alibaba.excel.metadata.Sheet sheet2 = new Sheet(2,1, MscMX.class);
             excelReader.read(sheet2);
             List<Object> list2 = listener.getDatas();
+            int size2 = list2.size();
+            list2 = list2.subList(size1,list2.size());
             List<MscMX> listmx = new ArrayList<MscMX>();
             for(Object oo : list2){
                 MscMX Mscmx = (MscMX)oo;
                 listmx.add(Mscmx);
             }
 
-            listener.setDatas(null);
-            //从第二个sheet里面 获取 明细信息：SKU , 数量
+            //从第四个sheet里面 获取 明细信息：SKU , 数量
             com.alibaba.excel.metadata.Sheet sheet4 = new Sheet(4,1, Mscpp.class);
             excelReader.read(sheet4);
             List<Object> list4 = listener.getDatas();
+            //int start = list1.size() + list2.size();
+            list4 = list4.subList(size2,list4.size());
             List<Mscpp> listmscpp = new ArrayList<Mscpp>();
             for(Object oo : list4){
                 Mscpp mscpp = (Mscpp)oo;
