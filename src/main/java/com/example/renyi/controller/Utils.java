@@ -383,7 +383,7 @@ public class Utils {
 
         if(shdz.contains("SCN223712")){ // 昆明 的 瑞鼎城
             result.put("merchantcode","KM000940");
-            result.put("merchantname","昆明-昆明MSC（华为）");
+            result.put("merchantname","昆明-MSC(PMALL商城)");
             result.put("departmentCode","HW-YN-KM-CPB");
             result.put("departmentName","昆明华为产品部");
             result.put("userCode","KM-004");
