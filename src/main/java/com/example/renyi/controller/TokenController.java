@@ -1,15 +1,13 @@
 package com.example.renyi.controller;
 
+import com.alibaba.excel.util.FileUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.example.renyi.HQorderBack.sa.JsonRootBean;
 import com.example.renyi.SAsubscribe.SACsubJsonRootBean;
 import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.service.BasicService;
 import com.example.renyi.service.HQservice;
-import com.example.renyi.utils.AESUtils;
-import com.example.renyi.utils.Des;
-import com.example.renyi.utils.HttpClient;
-import com.example.renyi.utils.ImageUtils;
+import com.example.renyi.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +88,7 @@ public class TokenController {
                 com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
                 //如果是红旗的销货单审核的内容，就需要上传，否则，不做任何处理
                 LOGGER.info(voucherCode + "： 这一单对应的结算客户名字是 " + sajrb.getData().getSettleCustomer().getName());
-                String memo = sajrb.getData().getMemo();
+                String memo = ""+sajrb.getData().getMemo();
                 LOGGER.info(voucherCode + "： 这一单对应的备注内容是 " + memo);
 
                 if(sajrb.getData().getSettleCustomer().getName().contains("红旗")
@@ -96,16 +96,38 @@ public class TokenController {
                     //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
                     if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
                         List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
-                        if(fjlist.size()>0){//有附件 才 允许  上传给 红旗。
+                        //有附件 并且 格式必须是 jpg 或 png(小于200K)  才 允许  上传给 红旗
+                        if(fjlist.size()>0 && (fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
                             String HQresult = basicService.HQsaorder(sajrb);  //红旗文档1.1
                             if(HQresult.contains("200")) {//上传成功，立刻上传图片！！
                                 LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗 成功，马上开始上传图片！！");
                                 String imgurl = fjlist.get(0).get("UploadPath");
-                                String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
-                                String base64 = URLEncoder.encode(img64,"UTF-8");
-                                String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
-                                //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
+                                    //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
+
+                                    File file = ImgUU.urlToFile(new URL(imgurl));
+                                    byte[] bytes = FileUtils.readFileToByteArray(file);
+                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
+                                    BASE64Encoder encoder = new BASE64Encoder();
+                                    // 返回Base64编码过的字节数组字符串
+                                    String img64 = encoder.encode(bytes);
+                                    String base64 = URLEncoder.encode(img64,"UTF-8");
+                                    String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
+                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
+                                    LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
+                                    //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
+
+                                    byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
+                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
+                                    BASE64Encoder encoder = new BASE64Encoder();
+                                    // 返回Base64编码过的字节数组字符串
+                                    String img64 = encoder.encode(bytes);
+                                    String base64 = URLEncoder.encode(img64,"UTF-8");
+                                    String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
+                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
+                                    LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                }
                             }else{
                                 LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗失败了，也没有上传图片！！");
                                 //要不要弃审这一单呢？？  要！
@@ -122,7 +144,7 @@ public class TokenController {
                                 LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
                             }
                         }else{
-                            LOGGER.info(" 销货单: " + voucherCode + " 没有附件，无法上传图片给红旗！也没有上传单据内容！马上弃审！");
+                            LOGGER.info(" 销货单: " + voucherCode + " 附件不合格（格式和大小），无法上传图片给红旗！也没有上传单据内容！马上弃审！");
                             String auditjson = "{\n" +
                                     "  \"param\": {\n" +
                                     "    \"voucherCode\": \""+voucherCode+"\"\n" +

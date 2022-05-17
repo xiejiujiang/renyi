@@ -3,11 +3,16 @@ package com.example.renyi.utils;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 
 public class ImageUtils {
 
@@ -72,7 +77,7 @@ public class ImageUtils {
 
     public static void base64toImg(String base64,String imgdownloadurl) throws Exception{
         //下面这部分代码是 流 转 文件下载 用的。 测试通过后就注销了。
-        String filepath = imgdownloadurl +"D:\\new9999.jpg"; //???
+        String filepath =  "D:\\" + imgdownloadurl; //???
         BASE64Decoder decoder = new BASE64Decoder();
         //Base64解码
         byte[] b = decoder.decodeBuffer(base64);
@@ -86,10 +91,5 @@ public class ImageUtils {
         out.write(b);
         out.flush();
         out.close();
-    }
-
-    public static void main(String[] args) throws Exception {
-        String base64 = encodeImgageToBase64(new File("D:\\tplus.jpg"));
-        base64toImg(base64,"");
     }
 }

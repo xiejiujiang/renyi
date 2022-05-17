@@ -385,7 +385,8 @@ public class BasicServiceImpl implements BasicService {
             json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"uploadImage\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[{");
             json.append("\"idx\":\"" + hndno + "\",\"hndno\":\"" + hndno + "\",\"img64\":\"" + encodeBase64image + "\"}]}");
 
-            LOGGER.info("调用 红旗 图片上传的 json == " + json);
+            LOGGER.info("调用 红旗 图片上传的 json == " + json);//这一句  以后 稳定了就注释 掉！
+
             String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
             String decryptData = Des.desDecrypt("8aue2u3q", result);
             LOGGER.info("上传图片后 请求红旗 的结果：" + decryptData);
