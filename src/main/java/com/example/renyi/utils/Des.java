@@ -46,4 +46,11 @@ public class Des {
         }
         return new String(retVal);
     }
+
+
+    public static void main(String[] args) {
+        String hndno = "05192A2022050001";
+        String vourchcode = hndno.substring(5,hndno.length());
+        System.out.println(vourchcode);
+    }
 }

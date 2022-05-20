@@ -48,7 +48,7 @@ public interface BasicService {
     public List<Map<String,String>> getfjidByCode(String code);
 
     //根据 base64的图片编码 和 code 调用红旗的上传图片
-    public String  HQimage(String code,String base64img);
+    public String  HQimage(String code,String base64img,int imgnumb);
 
 
     public List<Map<String,String>> getPUTIANListByFile(MultipartFile file, Map<String, Ptt> pttMapp);

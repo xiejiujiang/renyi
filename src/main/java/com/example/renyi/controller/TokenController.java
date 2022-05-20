@@ -91,8 +91,7 @@ public class TokenController {
                 String memo = ""+sajrb.getData().getMemo();
                 LOGGER.info(voucherCode + "： 这一单对应的备注内容是 " + memo);
 
-                if(sajrb.getData().getSettleCustomer().getName().contains("红旗")
-                    && !memo.contains("差异自动生成")){
+                if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成")){
                     //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
                     if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
                         List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
@@ -101,36 +100,40 @@ public class TokenController {
                             String HQresult = basicService.HQsaorder(sajrb);  //红旗文档1.1
                             if(HQresult.contains("200")) {//上传成功，立刻上传图片！！
                                 LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗 成功，马上开始上传图片！！");
-                                String imgurl = fjlist.get(0).get("UploadPath");
-                                if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
-                                    //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
+                                int imgsize = 10>fjlist.size()?fjlist.size():10;//最多只能10张
+                                for(int imgint = 0;imgint < imgsize;imgint ++){
+                                    Map<String,String> fjmap = fjlist.get(imgint);
+                                    String imgurl = fjmap.get("UploadPath");
+                                    if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
+                                        //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
 
-                                    File file = ImgUU.urlToFile(new URL(imgurl));
-                                    byte[] bytes = FileUtils.readFileToByteArray(file);
-                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                    BASE64Encoder encoder = new BASE64Encoder();
-                                    // 返回Base64编码过的字节数组字符串
-                                    String img64 = encoder.encode(bytes);
-                                    String base64 = URLEncoder.encode(img64,"UTF-8");
-                                    String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
-                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                    LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                                }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
-                                    //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
+                                        File file = ImgUU.urlToFile(new URL(imgurl));
+                                        byte[] bytes = FileUtils.readFileToByteArray(file);
+                                        bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
+                                        BASE64Encoder encoder = new BASE64Encoder();
+                                        // 返回Base64编码过的字节数组字符串
+                                        String img64 = encoder.encode(bytes);
+                                        String base64 = URLEncoder.encode(img64,"UTF-8");
+                                        String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
+                                        //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
+                                        LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                    }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
+                                        //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
 
-                                    byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
-                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                    BASE64Encoder encoder = new BASE64Encoder();
-                                    // 返回Base64编码过的字节数组字符串
-                                    String img64 = encoder.encode(bytes);
-                                    String base64 = URLEncoder.encode(img64,"UTF-8");
-                                    String  imgreuslt = basicService.HQimage(voucherCode,base64);  //红旗文档1.7
-                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                    LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                        byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
+                                        bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
+                                        BASE64Encoder encoder = new BASE64Encoder();
+                                        // 返回Base64编码过的字节数组字符串
+                                        String img64 = encoder.encode(bytes);
+                                        String base64 = URLEncoder.encode(img64,"UTF-8");
+                                        String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
+                                        //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
+                                        LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
+                                    }
                                 }
                             }else{
                                 LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗失败了，也没有上传图片！！");
-                                //要不要弃审这一单呢？？  要！
+                                //弃审这一单
                                 String auditjson = "{\n" +
                                         "  \"param\": {\n" +
                                         "    \"voucherCode\": \""+voucherCode+"\"\n" +
@@ -141,6 +144,13 @@ public class TokenController {
                                         "djrUbeB2",
                                         "F707B3834D9448B2A81856DE4E42357A",
                                         access_token);
+                                JSONObject unauditjob = JSONObject.parseObject(auditResult);
+                                if(unauditjob.getString("code").contains("999")){//如果弃审失败，就再弃审一次 试试
+                                    auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
+                                            "djrUbeB2",
+                                            "F707B3834D9448B2A81856DE4E42357A",
+                                            access_token);
+                                }
                                 LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
                             }
                         }else{
@@ -155,6 +165,13 @@ public class TokenController {
                                     "djrUbeB2",
                                     "F707B3834D9448B2A81856DE4E42357A",
                                     access_token);
+                            JSONObject unauditjob = JSONObject.parseObject(auditResult);
+                            if(unauditjob.getString("code").contains("999")){//如果弃审失败，就再弃审一次 试试
+                                auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
+                                        "djrUbeB2",
+                                        "F707B3834D9448B2A81856DE4E42357A",
+                                        access_token);
+                            }
                             LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
                         }
                     }else{//销售退货  红旗文档1.2
@@ -219,8 +236,9 @@ public class TokenController {
     @RequestMapping(value="/hqordernotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqordernotice(HttpServletRequest request, HttpServletResponse response) {
         LOGGER.info("------------------------------- 红旗发起了 直配单据回传请求  ------------------------------------------");
+        String restr = "";
         try{
-            String saorder = request.getParameter("saorder");
+            String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("1.3接口 接受到红旗的信息 :  decryptData == " + decryptData);
             JSONObject job = JSONObject.parseObject(decryptData);
@@ -237,10 +255,12 @@ public class TokenController {
             com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(params);
             //需要处理红旗返回的 差异 数量 问题。
             String result = hqService.createTSaOrderByHQ(jrb,sajrb);
+            restr = "{ \"code\":\"200\" }";
         }catch (Exception e){
             e.printStackTrace();
+            restr = "{ \"code\":\"999\",\"msg\":\"异常报错，需要检擦参数内容\"}";
         }
-        return "{ \"code\":\"200\" }";
+        return restr;
     }
 
     // 红旗文档1.4

@@ -144,6 +144,16 @@ public class Utils {
             map.put("ckname", "昆明宜家库");
             return map;
         }
+        if(mendian.contains("同德广场")) {
+            map.put("ckcode", "0201013001");
+            map.put("ckname", "昆明同德库");
+            return map;
+        }
+        if(mendian.contains("呈贡万达广场")) {
+            map.put("ckcode", "0201010601");
+            map.put("ckname", "昆明呈贡库");
+            return map;
+        }
 
 
         // -----------------------  苏州 ----------------------------------//

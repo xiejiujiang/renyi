@@ -48,7 +48,29 @@ public class HQserviceImpl implements HQservice {
                         "F707B3834D9448B2A81856DE4E42357A",
                         access_token);
             }else{//如果 创建 T+ 销货单 失败！ 应该 怎么办呢？
-                LOGGER.error(" 红旗返回差异后，T+ 根据差异数量 创建 销货单 失败了！ 请检查数据：" + json);
+                String json2 = MapToJson.getSAparamsJson(jrb,sajrb);
+                String access_token2 = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json2,
+                        "djrUbeB2",
+                        "F707B3834D9448B2A81856DE4E42357A",
+                        access_token2);
+                JSONObject jon2 = JSONObject.parseObject(result2);
+                if("0".equals(jon2.getString("code"))) {//如果 销货单 创建 成功！ 再调用  审核 功能
+                    String data2 = jon2.getString("data");
+                    JSONObject dataJob2 = JSONObject.parseObject(data2);
+                    String auditjson2 = "{\n" +
+                            "  \"param\": {\n" +
+                            "    \"externalCode\": \" " + Md5.md5(dataJob2.getString("ID") + dataJob2.getString("Code")) + " \",\n" +
+                            "    \"voucherID\": \" "+ dataJob2.getString("ID") +" \",\n" +
+                            "    \"voucherCode\": \" "+ dataJob2.getString("Code") +" \"\n" +
+                            "  }\n" +
+                            "}";
+                    HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson2,
+                            "djrUbeB2",
+                            "F707B3834D9448B2A81856DE4E42357A",
+                            access_token);
+                }
+                LOGGER.error(" 红旗返回差异后，T+ 根据差异数量 创建 T+销货单 失败了！ 请检查数据：" + json);
             }
         }catch (Exception e){
             e.printStackTrace();

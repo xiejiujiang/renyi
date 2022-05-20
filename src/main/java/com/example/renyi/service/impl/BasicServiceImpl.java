@@ -236,6 +236,15 @@ public class BasicServiceImpl implements BasicService {
                     orderMapper.getTokenByAppKey(params.get("AppKey")));
             JSONObject job = JSONObject.parseObject(result);
             jrb = job.toJavaObject(JsonRootBean.class);
+            if(jrb.getCode().contains("999")){//说明请求畅捷通失败，就再来一次
+                String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",
+                        json,
+                        params.get("AppKey"),
+                        params.get("AppSecret"),
+                        orderMapper.getTokenByAppKey(params.get("AppKey")));
+                JSONObject job2 = JSONObject.parseObject(result2);
+                jrb = job2.toJavaObject(JsonRootBean.class);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -372,18 +381,19 @@ public class BasicServiceImpl implements BasicService {
         return ids;
     }
 
-    public String HQimage(String code, String base64img) {
+    public String HQimage(String code, String base64img,int imgnumb) {
         String rruslt = "9999！ 上传图片失败！！！检查 图片大小！ 和 清晰度啊！！";
         try {
             String prvid = HQDemo.prvid;
             String tel = HQDemo.tel;
             String prvkey = HQDemo.prvkey;
             String hndno = prvid + code;//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
+            String idx = hndno + imgnumb;
             String encodeBase64image = URLEncoder.encode(base64img, "UTF-8");
             String ts = (System.currentTimeMillis() / 1000L) + "";
             StringBuffer json = new StringBuffer();
             json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"uploadImage\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[{");
-            json.append("\"idx\":\"" + hndno + "\",\"hndno\":\"" + hndno + "\",\"img64\":\"" + encodeBase64image + "\"}]}");
+            json.append("\"idx\":\"" + idx + "\",\"hndno\":\"" + hndno + "\",\"img64\":\"" + encodeBase64image + "\"}]}");
 
             LOGGER.info("调用 红旗 图片上传的 json == " + json);//这一句  以后 稳定了就注释 掉！
 
