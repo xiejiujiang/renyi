@@ -23,6 +23,7 @@
         select t2.id,t2.FileType,t2.FileSize,t2.FileName,t2.UploadPath
         from SA_SaleDelivery t1,eap_attachmentinfo t2
         where t1.code = #{code} and t1.id = t2.AssociateID
+        order by t2.id asc
     </select>
 
 

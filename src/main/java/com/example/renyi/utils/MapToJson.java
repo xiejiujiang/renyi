@@ -14,7 +14,9 @@ import java.util.Map;
 public class MapToJson {
 
     public static void main(String[] args) throws Exception{
-
+        String mkdate = "20220518121212";
+        String ss = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
+        System.out.println("ss === " + ss);
     }
 
     public static String getXMStrByMap(Map<String,String> param){
@@ -139,8 +141,9 @@ public class MapToJson {
         Clerk.put("Code",sajrb.getData().getClerk().getCode());//业务员编码
         sa.put("Clerk",Clerk);
 
-        String mkdate = jrb.getMkdat();//制单时间
-        sa.put("VoucherDate",mkdate);//单据日期
+        String mkdate = jrb.getMkdat();//20220518121212
+        String VoucherDate = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
+        sa.put("VoucherDate",VoucherDate);//单据日期
         sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
 
         Map<String,Object> Customer = new HashMap<String,Object>();

@@ -9,6 +9,8 @@ import com.example.renyi.saentity.JsonRootBean;
 import com.example.renyi.utils.*;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -21,6 +23,8 @@ import java.util.*;
 
 @SpringBootTest
 class RenyiApplicationTests {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenyiApplicationTests.class);
 
     @Test
     void testgetXHD(){ //测试 查询 销货单
@@ -238,68 +242,11 @@ class RenyiApplicationTests {
 
     @Test
     public void testHQ() throws Exception{
-        /*Map<String,String> map = new HashMap<String,String>();
-        Map<String,Object> params = new HashMap<String,Object>();
-        params.put("method","uploadOrder");
-        params.put("Request_Channel","WEB");
-        params.put("prvid","00001");//供应商编码
-        params.put("tel","15828574775");
-        //prvKey 由供应商编码登录后在[用户中心]-[直配接口设置]设置或生成。（红旗对tel赋权之后才能设置prvKey）
-        //params.put("token",Md5.md5(prvKey + prvid + "15828574775" + "2021-07-21 09:39:46"));
-        params.put("token",Md5.md5("00001" + "00001" + "15828574775" + "2021-07-21 09:39:46"));
-        params.put("timestamp","2021-07-21 09:39:46");
-        List<Map<String,Object>> datalist = new ArrayList<Map<String,Object>>();
-        Map<String,Object> orderMap1 = new HashMap<String,Object>();//代表一个订单
-        orderMap1.put("lnkshpno","12345678901234567890");
-        orderMap1.put("hndno","0000112345678901");
-        orderMap1.put("prvid","00001");//供应商编码
-        orderMap1.put("dptid","001");
-        orderMap1.put("mkdat","2021-07-21 09:39:46");
-        //orderMap1.put("sndusr","送货人（可为空，11位手机号。详见1.7注3）");
-        orderMap1.put("snddat","20210721");
-        //orderMap1.put("brief","备注（可为空，最长为40位）");
-
-        List<Map<String,Object>> itemsList = new ArrayList<Map<String,Object>>();//代表一个订单里面的商品明细
-        Map<String,Object> sp1 = new HashMap<String,Object>();//第一个商品
-        sp1.put("gdsid","00001");
-        sp1.put("prvgdsid","00001");
-        sp1.put("qty","1");
-        sp1.put("prvprc","100");
-        sp1.put("prvamt","100");
-        sp1.put("bthno","20210721");
-        sp1.put("vlddat","30");
-        sp1.put("crtdat","20210721");
-        itemsList.add(sp1);
-        orderMap1.put("items",itemsList);
-        orderMap1.put("sign",Md5.md5(JSONObject.toJSONString(orderMap1)));//这段代码的位置 可能会有影响！
-        datalist.add(orderMap1);
-        params.put("datas",datalist);
-        String jsondata = JSONObject.toJSONString(params);
-        String json1 = Des.desEncrypt("6wHgSX54",jsondata);
-        System.out.println("json1 == " + json1);
-        map.put("json",json1);
-        String reslut = HttpClient.doPostTestFour("https://www.hqwg.com.cn:9993/?OAH024",map);
-        System.out.println("reslut == " + reslut);*/
+        /*String json = "{\"prvid\":\"05192\",\"tel\":\"18428394131\",\"Request_Channel\":\"WEB\",\"method\":\"uploadOrder\",\"timestamp\":\"1653543245\",\"token\":\"7c1e22c91c128bde9f72faffbe91313d\",\"datas\":[{\"sign\":\"249b62a019d3b942224263c6ab6d3252\",\"lnkshpno\":\"05192A20220501640164\",\"hndno\":\"05192A2022050164\",\"prvid\":\"05192\",\"dptid\":\"001\",\"mkdat\":\"20220526133405\",\"snddat\":\"20220526\",\"sndusr\":\"15378616426\",\"brief\":\"\",\"items\":[{\"gdsid\":\"18002335\",\"prvgdsid\":\"0100001\",\"qty\":\"2.0000\",\"prvprc\":\"3.75\",\"prvamt\":\"7.50\",\"bthno\":\"0\",\"vlddat\":\"0\",\"crtdat\":\"0\"},{\"gdsid\":\"18002358\",\"prvgdsid\":\"0100007\",\"qty\":\"3.0000\",\"prvprc\":\"3.95\",\"prvamt\":\"11.85\",\"bthno\":\"0\",\"vlddat\":\"0\",\"crtdat\":\"0\"}]}]}";
+        LOGGER.info("调用红旗接口1.1 json == " + json);
+        String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
+        String decryptData = Des.desDecrypt("8aue2u3q", result);
+        String ss1 = URLDecoder.decode(decryptData,"GBK");
+        LOGGER.info("-------------- 请求红旗接口1.1结果： " + new String(ss1.getBytes("GBK"),"GBK"));*/
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

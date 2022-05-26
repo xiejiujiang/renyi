@@ -30,9 +30,9 @@ public class HQserviceImpl implements HQservice {
                     "djrUbeB2",
                     "F707B3834D9448B2A81856DE4E42357A",
                     access_token);
-            LOGGER.info("调用T+ 创建销货单的接口后返回：" + result);
+            LOGGER.info("-------------- 调用T+ 创建 差异销货单的接口后返回：" + result);
             JSONObject jon = JSONObject.parseObject(result);
-            if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再调用  审核 功能
+            if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再 调用  审核 功能
                 String data = jon.getString("data");
                 JSONObject dataJob = JSONObject.parseObject(data);
                 String auditjson = "{\n" +
@@ -49,11 +49,10 @@ public class HQserviceImpl implements HQservice {
                         access_token);
             }else{//如果 创建 T+ 销货单 失败！ 应该 怎么办呢？
                 String json2 = MapToJson.getSAparamsJson(jrb,sajrb);
-                String access_token2 = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
                 String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json2,
                         "djrUbeB2",
                         "F707B3834D9448B2A81856DE4E42357A",
-                        access_token2);
+                        access_token);
                 JSONObject jon2 = JSONObject.parseObject(result2);
                 if("0".equals(jon2.getString("code"))) {//如果 销货单 创建 成功！ 再调用  审核 功能
                     String data2 = jon2.getString("data");
@@ -70,7 +69,6 @@ public class HQserviceImpl implements HQservice {
                             "F707B3834D9448B2A81856DE4E42357A",
                             access_token);
                 }
-                LOGGER.error(" 红旗返回差异后，T+ 根据差异数量 创建 T+销货单 失败了！ 请检查数据：" + json);
             }
         }catch (Exception e){
             e.printStackTrace();

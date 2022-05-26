@@ -226,7 +226,7 @@ public class BasicServiceImpl implements BasicService {
     @Override
     public JsonRootBean getSaOrder(Map<String, String> params) {
         JsonRootBean jrb = new JsonRootBean();
-        String code = params.get("code");
+        String code = params.get("code");//单据编号
         try {
             String json = "{param:{voucherCode:\"" + code + "\"}}"; //{param:{}} 查所有
             String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/GetVoucherDTO",
@@ -254,9 +254,11 @@ public class BasicServiceImpl implements BasicService {
     @Override
     public String HQsaorder(JsonRootBean jrb) throws Exception{
         //解析 T+ 的 销货单 DTO。 转成 HQ 的参数，然后调用API 。
+        String hqurl = HQDemo.hqurl;
         String prvid = HQDemo.prvid;
         String tel = HQDemo.tel;
         String prvkey = HQDemo.prvkey;
+        String deskey = HQDemo.deskey;
 
         String hndno = prvid + jrb.getData().getCode();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
         String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length() );//真实送货单号（最长20位）
@@ -300,11 +302,10 @@ public class BasicServiceImpl implements BasicService {
         json.append(",");
         json.setLength(json.length() - 1);
         json.append("]}");
-        LOGGER.info("红旗 json == " + json);
-        String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
-        String decryptData = Des.desDecrypt("8aue2u3q", result);
-        String ss1 = URLDecoder.decode(decryptData,"UTF-8");
-        LOGGER.info("请求红旗结果： " + ss1);
+        LOGGER.info("-------------- 调用红旗接口1.1 json == " + json);
+        String result = HQDemo.request(hqurl, deskey, json.toString());
+        String decryptData = Des.desDecrypt(deskey, result);
+        LOGGER.info("-------------- 请求红旗接口1.1结果： " + new String(decryptData.getBytes("GBK"),"UTF-8"));
         JSONObject resultjob = JSONObject.parseObject(decryptData);
         String RetCode = resultjob.getString("RetCode");
         String HQObj = resultjob.getString("Obj");
@@ -312,7 +313,7 @@ public class BasicServiceImpl implements BasicService {
             LOGGER.info("-------------- 调用红旗的 直配单 接口成功，可以上传图片了！ --------------");
             return RetCode;
         }else{
-            LOGGER.info("-------------- 调用红旗的 直配单 接口失败，但是 返回内容 以 上面的 字符串为准 ----------------------------");
+            LOGGER.info("-------------- 调用红旗的 直配单 接口失败，失败内容 以 上面的 字符串为准 --------------");
             return "9999"; //失败了！！！
         }
     }
@@ -320,9 +321,11 @@ public class BasicServiceImpl implements BasicService {
 
     public String HQsabackorder(JsonRootBean jrb) {
         //解析 T+ 的 销货单 DTO。 转成 HQ 的参数，然后调用API 。
+        String hqurl = HQDemo.hqurl;
         String prvid = HQDemo.prvid;
         String tel = HQDemo.tel;
         String prvkey = HQDemo.prvkey;
+        String deskey = HQDemo.deskey;
 
         String hndno = prvid + jrb.getData().getCode();
         String lnkshpno = prvid + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
@@ -368,10 +371,14 @@ public class BasicServiceImpl implements BasicService {
         json.append(",");
         json.setLength(json.length() - 1);
         json.append("]}");
-        LOGGER.info("红旗 json == " + json);
-        String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
-        String decryptData = Des.desDecrypt("8aue2u3q", result);
-        LOGGER.info("请求红旗结果：" + decryptData);
+        //LOGGER.info("-------------- 红旗 json == " + json);
+        String result = HQDemo.request(hqurl, deskey, json.toString());
+        String decryptData = Des.desDecrypt(deskey, result);
+        try {
+            LOGGER.info("-------------- 请求红旗接口1.2结果： " + new String(decryptData.getBytes("GBK"),"UTF-8"));
+        }catch (Exception e){
+
+        }
         return "";
     }
 
@@ -384,9 +391,12 @@ public class BasicServiceImpl implements BasicService {
     public String HQimage(String code, String base64img,int imgnumb) {
         String rruslt = "9999！ 上传图片失败！！！检查 图片大小！ 和 清晰度啊！！";
         try {
+            String hqurl = HQDemo.hqurl;
             String prvid = HQDemo.prvid;
             String tel = HQDemo.tel;
             String prvkey = HQDemo.prvkey;
+            String deskey = HQDemo.deskey;
+
             String hndno = prvid + code;//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
             String idx = hndno + imgnumb;
             String encodeBase64image = URLEncoder.encode(base64img, "UTF-8");
@@ -395,18 +405,22 @@ public class BasicServiceImpl implements BasicService {
             json.append("{\"prvid\":\"" + prvid + "\",\"tel\":\"" + tel + "\",\"Request_Channel\":\"WEB\",\"method\":\"uploadImage\",\"timestamp\":\"" + ts + "\",\"token\":\"" + Md5.md5(prvkey + prvid + tel + ts) + "\",\"datas\":[{");
             json.append("\"idx\":\"" + idx + "\",\"hndno\":\"" + hndno + "\",\"img64\":\"" + encodeBase64image + "\"}]}");
 
-            LOGGER.info("调用 红旗 图片上传的 json == " + json);//这一句  以后 稳定了就注释 掉！
+            //LOGGER.info("调用 红旗 图片上传的 json == " + json);//这一句  以后 稳定了就注释 掉！
 
-            String result = HQDemo.request("https://www.hqwg.com.cn:9993/?OAH024", "8aue2u3q", json.toString());
-            String decryptData = Des.desDecrypt("8aue2u3q", result);
-            LOGGER.info("上传图片后 请求红旗 的结果：" + decryptData);
-            System.out.println("上传图片后 请求红旗 的结果：" + URLDecoder.decode(decryptData,"UTF-8"));
+            String result = HQDemo.request(hqurl, deskey, json.toString());
+            String decryptData = Des.desDecrypt(deskey, result);
+            LOGGER.info("-------------- 单号："+code+", 请求图片接口1.7结果： " + new String(decryptData.getBytes("GBK"),"UTF-8"));
             JSONObject resultjob = JSONObject.parseObject(decryptData);
             String RetCode = resultjob.getString("RetCode");
             String HQObj = resultjob.getString("Obj");
             if("200".equals(RetCode) && "[]".equals(HQObj)){
-                LOGGER.info("-------------- 调用红旗的 图片上传 接口成功，完美！！！ --------------");
+                LOGGER.info("-------------- 单号："+code+", 调用红旗的 图片上传 接口成功，完美！！！ --------------");
                 rruslt = "-------------- 调用红旗的 图片上传 接口成功，完美！！！ --------------";
+            }else{
+                LOGGER.info("-------------- 单号："+code+", 调用红旗的 图片上传 接口 失败！！！  再尝试一次 --------------");
+                String reresult = HQDemo.request(hqurl, deskey, json.toString());
+                String decryptDataa = Des.desDecrypt(deskey, reresult);
+                LOGGER.info("-------------- 单号："+code+", 再次请求图片接口1.7结果： " + new String(decryptDataa.getBytes("GBK"),"UTF-8"));
             }
         } catch (Exception e) {
             e.printStackTrace();

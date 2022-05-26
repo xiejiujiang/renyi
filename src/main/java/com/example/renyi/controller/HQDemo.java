@@ -20,9 +20,11 @@ import java.util.Random;
 public class HQDemo {
 
     //测试环境
+    public static String hqurl = "https://www.hqwg.com.cn:9993/?OAH024";
     public static String prvid = "05192";
     public static String tel = "18428394131";
     public static String prvkey = "syfapvrg1pkwNKIwLIpOTAOB131iHT";
+    public static String deskey = "8aue2u3q";
 
     public static void main(String[] args) {
         StringBuffer json = new StringBuffer();
