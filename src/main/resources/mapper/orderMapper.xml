@@ -30,4 +30,12 @@
     <select id="getMobileByCode" parameterType="java.lang.String" resultType="java.lang.String">
         select mobilePhoneNo  from AA_Person where code = #{code}
     </select>
+
+    <update id="updateTSAorderFlag" parameterType="java.lang.String">
+        update SA_SaleDelivery set priuserdefnvc6 = 'HQ1.6' where code = #{code}
+    </update>
+
+    <select id="getTSAorderFlag" parameterType="java.lang.String" resultType="java.lang.String">
+        select priuserdefnvc6 from SA_SaleDelivery where code = #{code}
+    </select>
 </mapper>

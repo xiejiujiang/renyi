@@ -30,4 +30,10 @@ public interface orderMapper {
 
     //根据员工的编号 或者 对应的 手机号
     public String getMobileByCode(@Param("code")String code);
+
+    //给这一单加上特殊标志
+    public void updateTSAorderFlag(@Param("code")String code);
+
+    //获取这一单加上特殊标志
+    public String getTSAorderFlag(@Param("code")String code);
 }
