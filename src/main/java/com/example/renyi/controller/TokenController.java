@@ -348,7 +348,7 @@ public class TokenController {
                     "djrUbeB2",
                     "F707B3834D9448B2A81856DE4E42357A",
                     access_token);
-            LOGGER.info("----------------- 因为1.5接口，单号： " + hndno + "的弃审结果是：" + auditResult);
+            LOGGER.info("----------------- 因为1.5接口，单号： " + vourchcode + "的弃审结果是：" + auditResult);
             //弃审成功之后，T+ 设置了 消息提醒，需要 业务员 重新 提交 审核（可能是 图片问题，或者 其他问题。）
         }catch (Exception e){
             e.printStackTrace();
@@ -389,7 +389,7 @@ public class TokenController {
                     "djrUbeB2",
                     "F707B3834D9448B2A81856DE4E42357A",
                     access_token);
-            LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + hndno + "的弃审结果是：" + auditResult);
+            LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + voucherCode + "的弃审结果是：" + auditResult);
             orderMapper.updateTSAorderFlag(voucherCode);//给这一单加上特殊标志
         }catch (Exception e){
             e.printStackTrace();

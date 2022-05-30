@@ -49,8 +49,10 @@ public class Des {
 
 
     public static void main(String[] args) {
-        String hndno = "05192A2022050001";
-        String vourchcode = hndno.substring(5,hndno.length());
-        System.out.println(vourchcode);
+        String qty = "-4";
+        if(Integer.valueOf(qty) < 0){
+            qty = "" + (0-Integer.valueOf(qty));
+        }
+        System.out.println(qty);
     }
 }

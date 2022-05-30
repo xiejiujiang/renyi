@@ -358,6 +358,9 @@ public class BasicServiceImpl implements BasicService {
                 String gdsid = saleDeliveryDetail.getPartnerInventoryCode();//红旗商品编码（客户的）
                 String prvgdsid = saleDeliveryDetail.getInventory().getCode();//供应商商品编码(T+的)
                 String qty = saleDeliveryDetail.getQuantity();//数量
+                if(Integer.valueOf(qty) < 0){
+                    qty = "" + (0-Integer.valueOf(qty));
+                }
                 //String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
                 //String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
                 item.append("{\"gdsid\":\"" + gdsid + "\",\"prvgdsid\":\"" + prvgdsid + "\",\"qty\":\"" + qty + "\",\"brief\":\""+hbrief+"\"},");

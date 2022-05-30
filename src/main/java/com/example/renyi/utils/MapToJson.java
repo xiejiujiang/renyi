@@ -163,8 +163,8 @@ public class MapToJson {
         Warehouse.put("Code", sajrb.getData().getWarehouse().getCode());//表头上的 仓库编码
         sa.put("Warehouse",Warehouse);
         Map<String,Object> ReciveType = new HashMap<String,Object>();
-        ReciveType.put("Code","76");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
-        sa.put("ReciveType",ReciveType);
+        ReciveType.put("Code","03");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
+        sa.put("ReciveType",ReciveType);// 红旗都是 月结
         Map<String,Object> RdStyle = new HashMap<String,Object>();
         RdStyle.put("Code",sajrb.getData().getRdStyle().getCode());//出库类别，RdStyleDTO对象，默认为“线上销售”类别； 具体值 我是查的数据库。  201 ?
         sa.put("RdStyle",RdStyle);
