@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.renyi.HQorderBack.sa.Items;
 import com.example.renyi.HQorderBack.sa.JsonRootBean;
+import com.example.renyi.saentity.SaleDeliveryDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,7 +182,7 @@ public class MapToJson {
             DetailMInventory.put("code",item.getPrvgdsid());//明细1 的 存货编码
             DetailM.put("Inventory",DetailMInventory);
             Map<String,Object> DetailMUnit = new HashMap<String,Object>();
-            DetailMUnit.put("Name","个");//明细1 的 存货计量单位 ？？？？？
+            DetailMUnit.put("Name",getUnitByCode(item.getPrvgdsid(),sajrb));// 使用 对应 原始销货单上这个商品的计量单位
             DetailM.put("Unit",DetailMUnit);
             //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
             DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
@@ -197,5 +198,20 @@ public class MapToJson {
         dto.put("dto",sa);
         String js = JSONObject.toJSONString(dto);
         return js;
+    }
+
+
+    // 根据 存货 编码  返回 这个存货的 计量单位
+    public static String getUnitByCode(String chcode,com.example.renyi.saentity.JsonRootBean sajrb){
+        String unit = "个";
+        List<SaleDeliveryDetails> listsa = sajrb.getData().getSaleDeliveryDetails();
+        for(SaleDeliveryDetails SaleDeliveryDetail : listsa){
+            String inventoryCode = SaleDeliveryDetail.getInventory().getCode();
+            if(chcode.equals(inventoryCode)){
+                unit = SaleDeliveryDetail.getUnit().getName();
+            }
+            break;
+        }
+        return unit;
     }
 }
