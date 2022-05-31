@@ -20,11 +20,13 @@ import java.util.Random;
 public class HQDemo {
 
     //测试环境
-    public static String hqurl = "https://www.hqwg.com.cn:9993/?OAH024";
+    //public static String hqurl = "https://www.hqwg.com.cn:9993/?OAH024";
+    public static String hqurl = "https://www.hqwg.com.cn/?OAH027";//正式
     public static String prvid = "05192";
     public static String tel = "18428394131";
     public static String prvkey = "syfapvrg1pkwNKIwLIpOTAOB131iHT";
-    public static String deskey = "8aue2u3q";
+    //public static String deskey = "8aue2u3q";//测试，但是 1.3,1.4,1.5,1.6  用的又是这个，我在代码中写死了的。
+    public static String deskey = "jsepc1xj";//正式
 
     public static void main(String[] args) {
         StringBuffer json = new StringBuffer();

@@ -278,7 +278,7 @@ public class TokenController {
         String restr = "";
         try{
             String saorder = request.getParameter("json");
-            String decryptData = Des.desDecrypt(HQDemo.deskey, saorder);
+            String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + decryptData);
             JSONObject job = JSONObject.parseObject(decryptData);
             // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
@@ -310,11 +310,11 @@ public class TokenController {
         LOGGER.info("------------------------------- 红旗发起了 退单回传请求  ------------------------------------------");
         try{
             String saorder = request.getParameter("json");
-            String decryptData = Des.desDecrypt(HQDemo.deskey, saorder);
+            String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("------------------ 1.4接口 接受到红旗的信息 : decryptData == " + decryptData);
             JSONObject job = JSONObject.parseObject(decryptData);
             com.example.renyi.HQorderBack.ba.JsonRootBean jbr = job.toJavaObject(com.example.renyi.HQorderBack.ba.JsonRootBean.class);
-            // 此处，啥也没做哈！
+            // 此处，啥也没做哈！  先看看  后续有再弄吧。
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -330,7 +330,7 @@ public class TokenController {
         LOGGER.info("------------------------------- 红旗发起了 门店退回订单回传  ------------------------------------------");
         try{
             String saorder = request.getParameter("json");
-            String decryptData = Des.desDecrypt(HQDemo.deskey, saorder);
+            String decryptData = Des.desDecrypt("8aue2u3q", saorder);
 
             LOGGER.info("----------------- 1.5接口 接受到红旗的信息 : decryptData == " + decryptData);
             JSONObject job = JSONObject.parseObject(decryptData);
@@ -364,7 +364,7 @@ public class TokenController {
         LOGGER.info("------------------------------- 红旗发起了 图片重传通知  ------------------------------------------");
         try{
             String saorder = request.getParameter("json");
-            String decryptData = Des.desDecrypt(HQDemo.deskey, saorder);
+            String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("----------------- 1.6 图片重传接口 接受到红旗的信息 : decryptData == " + decryptData);
             JSONObject job = JSONObject.parseObject(decryptData);
             String lnkshpno = job.getString("lnkshpno");//真实送货单号

@@ -271,9 +271,10 @@ public class BasicServiceImpl implements BasicService {
         String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号   只能调接口去查了哦
 
         SimpleDateFormat sdff = new SimpleDateFormat("yyyyMMdd");
-        String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
-        String brief = jrb.getData().getMemo();//销货单上的备注
+        //String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
+        String snddat = sdff.format(jrb.getData().getVoucherDate());//送货时间（改成 单据日期 ）
 
+        String brief = jrb.getData().getMemo();//销货单上的备注
         String ts = (System.currentTimeMillis() / 1000L) + "";
 
         StringBuffer json = new StringBuffer();
@@ -338,10 +339,10 @@ public class BasicServiceImpl implements BasicService {
         String sndusr = orderMapper.getMobileByCode(clerk.getCode());//送货人 可为空，11位手机号
 
         SimpleDateFormat sdff = new SimpleDateFormat("yyyyMMdd");
-        String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
+        //String snddat = sdff.format(new Date());//送货时间（可能是表头的自定义项）
+        String snddat = sdff.format(jrb.getData().getVoucherDate());//送货时间（改成 单据日期 ）
 
         String brief = jrb.getData().getMemo();//销货单上的备注
-
         String ts = (System.currentTimeMillis() / 1000L) + "";
 
         StringBuffer json = new StringBuffer();
