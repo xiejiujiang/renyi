@@ -261,7 +261,8 @@ public class BasicServiceImpl implements BasicService {
         String deskey = HQDemo.deskey;
 
         String hndno = prvid + jrb.getData().getCode();//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
-        String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length() );//真实送货单号（最长20位）
+        //String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length() );//真实送货单号（最长20位）
+        String lnkshpno = jrb.getData().getCode();
         String dptid = jrb.getData().getCustomer().getCode() ;//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -329,7 +330,8 @@ public class BasicServiceImpl implements BasicService {
         String deskey = HQDemo.deskey;
 
         String hndno = prvid + jrb.getData().getCode();
-        String lnkshpno = prvid + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
+        //String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
+        String lnkshpno = jrb.getData().getCode();
         String dptid = jrb.getData().getCustomer().getCode();//送货门店 最少3位，不足3位前面补0  销货单上的 客户 编码
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -359,8 +361,8 @@ public class BasicServiceImpl implements BasicService {
                 String gdsid = saleDeliveryDetail.getPartnerInventoryCode();//红旗商品编码（客户的）
                 String prvgdsid = saleDeliveryDetail.getInventory().getCode();//供应商商品编码(T+的)
                 String qty = saleDeliveryDetail.getQuantity();//数量
-                if(Integer.valueOf(qty) < 0){
-                    qty = "" + (0-Integer.valueOf(qty));
+                if(Float.valueOf(qty) < 0){
+                    qty = "" + (0-Float.valueOf(qty));
                 }
                 //String prvprc = saleDeliveryDetail.getOrigTaxPrice();//含税单价
                 //String prvamt = saleDeliveryDetail.getOrigTaxAmount();//含税金额
@@ -420,11 +422,22 @@ public class BasicServiceImpl implements BasicService {
             if("200".equals(RetCode) && "[]".equals(HQObj)){
                 LOGGER.info("-------------- 单号："+code+", 调用红旗的 图片上传 接口成功，完美！！！ --------------");
                 rruslt = "-------------- 调用红旗的 图片上传 接口成功，完美！！！ --------------";
+                Map<String,String> upMap = new HashMap<String,String>();
+                upMap.put("flag","2");upMap.put("code",code);
+                orderMapper.updateUploadHQState(upMap);
             }else{
                 LOGGER.info("-------------- 单号："+code+", 调用红旗的 图片上传 接口 失败！！！  再尝试一次 --------------");
                 String reresult = HQDemo.request(hqurl, deskey, json.toString());
                 String decryptDataa = Des.desDecrypt(deskey, reresult);
                 LOGGER.info("-------------- 单号："+code+", 再次请求图片接口1.7结果： " + new String(decryptDataa.getBytes("GBK"),"UTF-8"));
+                JSONObject resultjobb = JSONObject.parseObject(decryptDataa);
+                String RetCodee = resultjobb.getString("RetCode");
+                String HQObjj = resultjobb.getString("Obj");
+                if("200".equals(RetCodee) && "[]".equals(HQObjj)){
+                    Map<String,String> upMap = new HashMap<String,String>();
+                    upMap.put("flag","2");upMap.put("code",code);
+                    orderMapper.updateUploadHQState(upMap);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

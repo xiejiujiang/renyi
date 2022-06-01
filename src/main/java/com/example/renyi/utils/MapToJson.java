@@ -15,9 +15,11 @@ import java.util.Map;
 public class MapToJson {
 
     public static void main(String[] args) throws Exception{
-        String mkdate = "20220518121212";
-        String ss = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
-        System.out.println("ss === " + ss);
+        String qty = "-2";
+        if(Float.valueOf(qty) < 0){
+            qty = "" + (0-Float.valueOf(qty));
+        }
+        System.out.println(qty);
     }
 
     public static String getXMStrByMap(Map<String,String> param){

@@ -36,4 +36,8 @@ public interface orderMapper {
 
     //获取这一单加上特殊标志
     public String getTSAorderFlag(@Param("code")String code);
+
+
+    //更新销货单指定字段的上传状态标志
+    public void updateUploadHQState(Map<String,String> updateMap);
 }

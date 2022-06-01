@@ -38,4 +38,8 @@
     <select id="getTSAorderFlag" parameterType="java.lang.String" resultType="java.lang.String">
         select priuserdefnvc6 from SA_SaleDelivery where code = #{code}
     </select>
+
+    <update id="updateUploadHQState" parameterType="java.util.Map">
+        update SA_SaleDelivery set priuserdefnvc4 = #{flag} where code = #{code}
+    </update>
 </mapper>

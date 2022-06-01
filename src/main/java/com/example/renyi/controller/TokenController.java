@@ -92,6 +92,11 @@ public class TokenController {
                 LOGGER.info("--------------"+voucherCode + "： 这一单对应的备注内容是: " + memo);
                 String hq16flag = ""+orderMapper.getTSAorderFlag(voucherCode);// 这个参数 只是用来处理 重新上传图片的标志！！！
                 if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成") && !hq16flag.contains("HQ1.6")){
+                    // 进入这里，说明此单 一定要上传。先把 状态 更新成 0
+                    Map<String,String> upMap = new HashMap<String,String>();
+                    upMap.put("flag","0");upMap.put("code",voucherCode);
+                    orderMapper.updateUploadHQState(upMap);
+
                     //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
                     if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
                         List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
@@ -99,6 +104,11 @@ public class TokenController {
                         if(fjlist.size()>0 && (fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
                             String HQresult = basicService.HQsaorder(sajrb);  //红旗文档1.1
                             if(HQresult.contains("200")) {//上传成功，立刻上传图片！！
+
+                                Map<String,String> upMap1 = new HashMap<String,String>();
+                                upMap1.put("flag","1");upMap1.put("code",voucherCode);
+                                orderMapper.updateUploadHQState(upMap1);
+
                                 LOGGER.info("-------------- 销货单: " + voucherCode + " 上传给 红旗 成功，马上开始上传图片！");
                                 int imgsize = 10>fjlist.size()?fjlist.size():10;//最多只能10张
                                 for(int imgint = 0;imgint < imgsize;imgint ++){
@@ -350,6 +360,9 @@ public class TokenController {
                     access_token);
             LOGGER.info("----------------- 因为1.5接口，单号： " + vourchcode + "的弃审结果是：" + auditResult);
             //弃审成功之后，T+ 设置了 消息提醒，需要 业务员 重新 提交 审核（可能是 图片问题，或者 其他问题。）
+            Map<String,String> upMap = new HashMap<String,String>();
+            upMap.put("flag","0");upMap.put("code",vourchcode);
+            orderMapper.updateUploadHQState(upMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -391,6 +404,10 @@ public class TokenController {
                     access_token);
             LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + voucherCode + "的弃审结果是：" + auditResult);
             orderMapper.updateTSAorderFlag(voucherCode);//给这一单加上特殊标志
+
+            Map<String,String> upMap = new HashMap<String,String>();
+            upMap.put("flag","1");upMap.put("code",voucherCode);
+            orderMapper.updateUploadHQState(upMap);
         }catch (Exception e){
             e.printStackTrace();
         }
