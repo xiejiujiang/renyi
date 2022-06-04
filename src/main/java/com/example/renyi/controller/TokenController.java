@@ -343,6 +343,8 @@ public class TokenController {
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
 
             LOGGER.info("----------------- 1.5接口 接受到红旗的信息 : decryptData == " + decryptData);
+            LOGGER.info("----------------- 1.5接口 接受到红旗的信息 : " + new String(decryptData.getBytes("GBK"),"UTF-8"));
+
             JSONObject job = JSONObject.parseObject(decryptData);
             String lnkshpno = job.getString("lnkshpno");//真实送货单号
             String hndno = job.getString("hndno");//手工单号

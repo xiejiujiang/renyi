@@ -134,6 +134,7 @@ public class MapToJson {
 
     //重载了上一个方法，是为了  给 红旗的 1.3接口，回调信息 转成 T+ 的销货单 参数
     public static String getSAparamsJson(JsonRootBean jrb,com.example.renyi.saentity.JsonRootBean sajrb){
+        String noresult = "0000"; //代表 没有差异数量
         Map<String,Object> dto = new HashMap<String,Object>();
         Map<String,Object> sa = new HashMap<String,Object>();
         Map<String,Object> Department = new HashMap<String,Object>();
@@ -175,31 +176,38 @@ public class MapToJson {
         List<Map<String,Object>> SaleDeliveryDetailsList = new ArrayList<Map<String,Object>>();
         List<Items> items = jrb.getItems();
         for(Items item : items){
-            Map<String,Object> DetailM = new HashMap<String,Object>();
-            Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
-            //明细1 的 仓库编码,这里不好取，但是可以用表头的（因为每一个销货单 只 对应了一个 仓库）
-            DetailMWarehouse.put("code",Warehouse.get("Code"));
-            DetailM.put("Warehouse",DetailMWarehouse);
-            Map<String,Object> DetailMInventory = new HashMap<String,Object>();
-            DetailMInventory.put("code",item.getPrvgdsid());//明细1 的 存货编码
-            DetailM.put("Inventory",DetailMInventory);
-            Map<String,Object> DetailMUnit = new HashMap<String,Object>();
-            DetailMUnit.put("Name",getUnitByCode(item.getPrvgdsid(),sajrb));// 使用 对应 原始销货单上这个商品的计量单位
-            DetailM.put("Unit",DetailMUnit);
-            //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
-            DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
-            DetailM.put("TaxRate","13");//明细1 的 税率
-            DetailM.put("OrigTaxPrice",item.getPrvprc());//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
-            DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
-            //如果要跟 销售订单 关联，则需要传入 下面两个参数。
-            //DetailM.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
-            //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID
-            SaleDeliveryDetailsList.add(DetailM);
+            if(item.getDiffqty() != null && !"".equals(item.getDiffqty()) && Float.valueOf(item.getDiffqty()) != 0 ){
+                noresult = "1111";
+                Map<String,Object> DetailM = new HashMap<String,Object>();
+                Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
+                //明细1 的 仓库编码,这里不好取，但是可以用表头的（因为每一个销货单 只 对应了一个 仓库）
+                DetailMWarehouse.put("code",Warehouse.get("Code"));
+                DetailM.put("Warehouse",DetailMWarehouse);
+                Map<String,Object> DetailMInventory = new HashMap<String,Object>();
+                DetailMInventory.put("code",item.getPrvgdsid());//明细1 的 存货编码
+                DetailM.put("Inventory",DetailMInventory);
+                Map<String,Object> DetailMUnit = new HashMap<String,Object>();
+                DetailMUnit.put("Name",getUnitByCode(item.getPrvgdsid(),sajrb));// 使用 对应 原始销货单上这个商品的计量单位
+                DetailM.put("Unit",DetailMUnit);
+                //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
+                DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
+                DetailM.put("TaxRate","13");//明细1 的 税率
+                DetailM.put("OrigTaxPrice",item.getPrvprc());//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
+                DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
+                //如果要跟 销售订单 关联，则需要传入 下面两个参数。
+                //DetailM.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
+                //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID
+                SaleDeliveryDetailsList.add(DetailM);
+            }
         }
         sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
         dto.put("dto",sa);
         String js = JSONObject.toJSONString(dto);
-        return js;
+        if(noresult.equals("0000")){
+            return  noresult;
+        }else {
+            return js;
+        }
     }
 
 
