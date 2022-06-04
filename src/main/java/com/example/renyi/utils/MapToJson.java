@@ -190,7 +190,7 @@ public class MapToJson {
                 DetailMUnit.put("Name",getUnitByCode(item.getPrvgdsid(),sajrb));// 使用 对应 原始销货单上这个商品的计量单位
                 DetailM.put("Unit",DetailMUnit);
                 //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
-                DetailM.put("Quantity", (0-Integer.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
+                DetailM.put("Quantity", (0-Float.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
                 DetailM.put("TaxRate","13");//明细1 的 税率
                 DetailM.put("OrigTaxPrice",item.getPrvprc());//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
                 DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
