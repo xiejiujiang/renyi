@@ -15,11 +15,9 @@ import java.util.Map;
 public class MapToJson {
 
     public static void main(String[] args) throws Exception{
-        String qty = "-2";
-        if(Float.valueOf(qty) < 0){
-            qty = "" + (0-Float.valueOf(qty));
-        }
-        System.out.println(qty);
+        String snddat = "20220605";
+        String VoucherDate = snddat.substring(0,4) + "-" + snddat.substring(4,6) + "-" + snddat.substring(6,8);
+        System.out.println(VoucherDate);
     }
 
     public static String getXMStrByMap(Map<String,String> param){
@@ -146,7 +144,19 @@ public class MapToJson {
         sa.put("Clerk",Clerk);
 
         String mkdate = jrb.getMkdat();//20220518121212
-        String VoucherDate = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
+        String VoucherDate = "";
+        if(mkdate == null || "".equals(mkdate) ){//因为1.4 也会传这个接口，但是 1.4 没有mkdat
+            String snddat = jrb.getSnddat();//20220605
+            VoucherDate = snddat.substring(0,4) + "-" + snddat.substring(4,6) + "-" + snddat.substring(6,8);
+            Map<String,Object> BusinessType = new HashMap<String,Object>();
+            BusinessType.put("Code","16");//业务类型编码，15–普通销售；16–销售退货
+            sa.put("BusinessType",BusinessType);
+        }else{
+            VoucherDate = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
+            Map<String,Object> BusinessType = new HashMap<String,Object>();
+            BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+            sa.put("BusinessType",BusinessType);
+        }
         sa.put("VoucherDate",VoucherDate);//单据日期
         sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
 
@@ -156,10 +166,7 @@ public class MapToJson {
         Map<String,Object> SettleCustomer = new HashMap<String,Object>();
         SettleCustomer.put("Code",sajrb.getData().getSettleCustomer().getCode());//结算客户编码（一般等同于 客户编码）
         sa.put("SettleCustomer",SettleCustomer);
-        Map<String,Object> BusinessType = new HashMap<String,Object>();
 
-        BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
-        sa.put("BusinessType",BusinessType);
         Map<String,Object> InvoiceType = new HashMap<String,Object>();
         InvoiceType.put("Code","01");//票据类型，枚举类型；00--普通发票，01--专用发票，02–收据；为空时，默认按收据处理
         sa.put("InvoiceType",InvoiceType);

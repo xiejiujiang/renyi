@@ -71,6 +71,8 @@ public class HQserviceImpl implements HQservice {
                                 access_token);
                     }
                 }
+            }else{
+                LOGGER.info("-------------- 红旗回调了1.3接口，但是没有差异数量，所以不会再生成 T+ 的销货单了！ --------------");
             }
         }catch (Exception e){
             e.printStackTrace();
