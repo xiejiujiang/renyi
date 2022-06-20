@@ -58,4 +58,8 @@ public interface BasicService {
     public List<Map<String,String>> getMSCListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
 
     public List<Map<String,String>> getAPPLEListByFile(MultipartFile file,Map<String, Ptt> pttMapp);
+
+    public String unAuditZDorder(String voucherCode);
+
+    public void uploadHQimg(String voucherCode,List<Map<String,String>> fjlist);
 }

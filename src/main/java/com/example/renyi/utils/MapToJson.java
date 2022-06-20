@@ -14,10 +14,14 @@ import java.util.Map;
 
 public class MapToJson {
 
-    public static void main(String[] args) throws Exception{
-        String snddat = "20220605";
-        String VoucherDate = snddat.substring(0,4) + "-" + snddat.substring(4,6) + "-" + snddat.substring(6,8);
-        System.out.println(VoucherDate);
+    public static void main(String[] args){
+        JSONObject job = JSONObject.parseObject("");
+        String lnkshpno = job.getString("lnkshpno");//真实送货单号
+        String hndno = job.getString("hndno");//手工单号
+        String why = job.getString("brief");//红旗传过来的 弃审 的 原因啊！
+        System.out.println(lnkshpno);
+        System.out.println(hndno);
+        System.out.println(why);
     }
 
     public static String getXMStrByMap(Map<String,String> param){
@@ -148,14 +152,8 @@ public class MapToJson {
         if(mkdate == null || "".equals(mkdate) ){//因为1.4 也会传这个接口，但是 1.4 没有mkdat
             String snddat = jrb.getSnddat();//20220605
             VoucherDate = snddat.substring(0,4) + "-" + snddat.substring(4,6) + "-" + snddat.substring(6,8);
-            Map<String,Object> BusinessType = new HashMap<String,Object>();
-            BusinessType.put("Code","16");//业务类型编码，15–普通销售；16–销售退货
-            sa.put("BusinessType",BusinessType);
         }else{
             VoucherDate = mkdate.substring(0,4) + "-" + mkdate.substring(4,6) + "-" + mkdate.substring(6,8);
-            Map<String,Object> BusinessType = new HashMap<String,Object>();
-            BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
-            sa.put("BusinessType",BusinessType);
         }
         sa.put("VoucherDate",VoucherDate);//单据日期
         sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
@@ -182,8 +180,14 @@ public class MapToJson {
         sa.put("Memo","这一单是根据红旗返回的差异自动生成的，请注意区别 ！");//备注
         List<Map<String,Object>> SaleDeliveryDetailsList = new ArrayList<Map<String,Object>>();
         List<Items> items = jrb.getItems();
+        int bussyssType = 0;
         for(Items item : items){
             if(item.getDiffqty() != null && !"".equals(item.getDiffqty()) && Float.valueOf(item.getDiffqty()) != 0 ){
+                Float qty = 0-Float.valueOf(item.getDiffqty());//返回的差异数量  送货 - 实收 = 差异
+                //如果 qty 只有负数， 业务类型就只能选择  销售退货。否则 就是 普通销售！！
+                if(qty > 0){
+                    bussyssType = 1;
+                }
                 noresult = "1111";
                 Map<String,Object> DetailM = new HashMap<String,Object>();
                 Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
@@ -197,7 +201,7 @@ public class MapToJson {
                 DetailMUnit.put("Name",getUnitByCode(item.getPrvgdsid(),sajrb));// 使用 对应 原始销货单上这个商品的计量单位
                 DetailM.put("Unit",DetailMUnit);
                 //DetailM1.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
-                DetailM.put("Quantity", (0-Float.valueOf(item.getDiffqty())) );//返回的差异数量  送货 - 实收 = 差异
+                DetailM.put("Quantity", qty);//返回的差异数量  送货 - 实收 = 差异
                 DetailM.put("TaxRate","13");//明细1 的 税率
                 DetailM.put("OrigTaxPrice",item.getPrvprc());//明细1 的 含税单价(实际上 在传入 来源单据之后，只会用销售订单 上的 单价？？？)
                 DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
@@ -208,6 +212,15 @@ public class MapToJson {
             }
         }
         sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
+        if(bussyssType == 0){
+            Map<String,Object> BusinessType = new HashMap<String,Object>();
+            BusinessType.put("Code","16");//业务类型编码，15–普通销售；16–销售退货
+            sa.put("BusinessType",BusinessType);
+        }else{
+            Map<String,Object> BusinessType = new HashMap<String,Object>();
+            BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+            sa.put("BusinessType",BusinessType);
+        }
         dto.put("dto",sa);
         String js = JSONObject.toJSONString(dto);
         if(noresult.equals("0000")){

@@ -74,227 +74,8 @@ public class TokenController {
             JSONObject job = JSONObject.parseObject(destr);
             if("SaleDelivery_Audit".equals(job.getString("msgType"))){
                 SACsubJsonRootBean jrb =  job.toJavaObject(SACsubJsonRootBean.class);//销货单的订阅信息DTO
-                String voucherCode = jrb.getBizContent().getVoucherCode();
-                LOGGER.info("=============== 销货单: "+voucherCode+" 审核 来了！=============== ");
-                String OrgId = jrb.getOrgId();
-                //根据 voucherCode 查询 此 销货单的明细内容
-                Map<String,String> pas = new HashMap<String,String>();
-                pas.put("OrgId",OrgId);
-                pas.put("code",voucherCode);//销货单的单号
-                // 通过 OrgId 来获取 AppKey 和 AppSecret
-                Map<String,String> apk = orderMapper.getAppKeySecretByAppKey(OrgId);
-                pas.put("AppKey",apk.get("AppKey"));
-                pas.put("AppSecret",apk.get("AppSecret"));
-                com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(pas);//返回了 T+ 销货单的实体类
-                //如果是红旗的销货单审核的内容，就需要上传，否则，不做任何处理
-                LOGGER.info("--------------"+ voucherCode + "： 这一单对应的结算客户名字是: " + sajrb.getData().getSettleCustomer().getName());
-                String memo = ""+sajrb.getData().getMemo();
-                LOGGER.info("--------------"+voucherCode + "： 这一单对应的备注内容是: " + memo);
-                String hq16flag = ""+orderMapper.getTSAorderFlag(voucherCode);// 这个参数 只是用来处理 重新上传图片的标志！！！
-                if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成") && !hq16flag.contains("HQ1.6")){
-                    // 进入这里，说明此单 一定要上传。先把 状态 更新成 0
-                    Map<String,String> upMap = new HashMap<String,String>();
-                    upMap.put("flag","0");upMap.put("code",voucherCode);
-                    orderMapper.updateUploadHQState(upMap);
-
-                    //调用 新的 services 转换成HQ 的参数，并调用HQ接口，返回结果
-                    if(sajrb.getData().getBusinessType().getName().equals("普通销售")){
-                        List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
-                        //有附件 并且 格式必须是 jpg 或 png(小于200K)  才 允许  上传给 红旗
-                        if(fjlist.size()>0 && (fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
-                            String HQresult = basicService.HQsaorder(sajrb);  //红旗文档1.1
-                            if(HQresult.contains("200")) {//上传成功，立刻上传图片！！
-
-                                Map<String,String> upMap1 = new HashMap<String,String>();
-                                upMap1.put("flag","1");upMap1.put("code",voucherCode);
-                                orderMapper.updateUploadHQState(upMap1);
-
-                                LOGGER.info("-------------- 销货单: " + voucherCode + " 上传给 红旗 成功，马上开始上传图片！");
-                                int imgsize = 10>fjlist.size()?fjlist.size():10;//最多只能10张
-                                for(int imgint = 0;imgint < imgsize;imgint ++){
-                                    Map<String,String> fjmap = fjlist.get(imgint);
-                                    String imgurl = fjmap.get("UploadPath");
-                                    if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
-                                        //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
-
-                                        File file = ImgUU.urlToFile(new URL(imgurl));
-                                        byte[] bytes = FileUtils.readFileToByteArray(file);
-                                        bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                        BASE64Encoder encoder = new BASE64Encoder();
-                                        // 返回Base64编码过的字节数组字符串
-                                        String img64 = encoder.encode(bytes);
-                                        String base64 = URLEncoder.encode(img64,"UTF-8");
-                                        String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                        //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                        //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                                    }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
-                                        //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
-
-                                        byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
-                                        bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                        BASE64Encoder encoder = new BASE64Encoder();
-                                        // 返回Base64编码过的字节数组字符串
-                                        String img64 = encoder.encode(bytes);
-                                        String base64 = URLEncoder.encode(img64,"UTF-8");
-                                        String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                        //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                        //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                                    }
-                                }
-                            }else{
-                                LOGGER.info(" 销货单: " + voucherCode + " 上传给 红旗失败了，也没有上传图片！所以马上弃审这一单！");
-                                //弃审这一单
-                                String auditjson = "{\n" +
-                                        "  \"param\": {\n" +
-                                        "    \"voucherCode\": \""+voucherCode+"\"\n" +
-                                        "  }\n" +
-                                        "}";
-                                String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-                                String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                        "djrUbeB2",
-                                        "F707B3834D9448B2A81856DE4E42357A",
-                                        access_token);
-                                JSONObject unauditjob = JSONObject.parseObject(auditResult);
-                                if(unauditjob.getString("code").contains("999")){//如果弃审失败，就再弃审一次 试试
-                                    auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                            "djrUbeB2",
-                                            "F707B3834D9448B2A81856DE4E42357A",
-                                            access_token);
-                                }
-                                LOGGER.info("单号： " + voucherCode + " 的弃审结果是：" + auditResult);
-                                Map<String,String> upMap1 = new HashMap<String,String>();
-                                upMap1.put("flag","0");upMap1.put("code",voucherCode);
-                                orderMapper.updateUploadHQState(upMap1);
-                            }
-                        }else{
-                            LOGGER.info(" 销货单: " + voucherCode + " 附件不合格（格式和大小），无法上传图片给红旗！也没有上传单据内容！马上弃审！");
-                            String auditjson = "{\n" +
-                                    "  \"param\": {\n" +
-                                    "    \"voucherCode\": \""+voucherCode+"\"\n" +
-                                    "  }\n" +
-                                    "}";
-                            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-                            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                    "djrUbeB2",
-                                    "F707B3834D9448B2A81856DE4E42357A",
-                                    access_token);
-                            JSONObject unauditjob = JSONObject.parseObject(auditResult);
-                            if(unauditjob.getString("code").contains("999")){//如果弃审失败，就再弃审一次 试试
-                                auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                        "djrUbeB2",
-                                        "F707B3834D9448B2A81856DE4E42357A",
-                                        access_token);
-                            }
-                            LOGGER.info("单号： " + voucherCode + "的弃审结果是：" + auditResult);
-                            Map<String,String> upMap1 = new HashMap<String,String>();
-                            upMap1.put("flag","0");upMap1.put("code",voucherCode);
-                            orderMapper.updateUploadHQState(upMap1);
-                        }
-                    }else{//销售退货  红旗文档1.2
-                        List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
-                        if(fjlist.size()>0 && (fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
-                            String HQresult = basicService.HQsabackorder(sajrb);
-                            Map<String,String> upMap1 = new HashMap<String,String>();
-                            upMap1.put("flag","1");upMap1.put("code",voucherCode);
-                            orderMapper.updateUploadHQState(upMap1);
-                            //上传退单的图片！
-                            int imgsize = 10>fjlist.size()?fjlist.size():10;//最多只能10张
-                            for(int imgint = 0;imgint < imgsize;imgint ++){
-                                Map<String,String> fjmap = fjlist.get(imgint);
-                                String imgurl = fjmap.get("UploadPath");
-                                if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
-                                    //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
-
-                                    File file = ImgUU.urlToFile(new URL(imgurl));
-                                    byte[] bytes = FileUtils.readFileToByteArray(file);
-                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                    BASE64Encoder encoder = new BASE64Encoder();
-                                    // 返回Base64编码过的字节数组字符串
-                                    String img64 = encoder.encode(bytes);
-                                    String base64 = URLEncoder.encode(img64,"UTF-8");
-                                    String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                    //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                                }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
-                                    //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
-
-                                    byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
-                                    bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                    BASE64Encoder encoder = new BASE64Encoder();
-                                    // 返回Base64编码过的字节数组字符串
-                                    String img64 = encoder.encode(bytes);
-                                    String base64 = URLEncoder.encode(img64,"UTF-8");
-                                    String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                    //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                    //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                                }
-                            }
-                        }else {
-                            //弃审 这一单
-                            LOGGER.info(" 销货退单: " + voucherCode + " 附件不合格（格式和大小），无法上传图片给红旗！也没有上传单据内容！马上弃审！");
-                            String auditjson = "{\n" +
-                                    "  \"param\": {\n" +
-                                    "    \"voucherCode\": \""+voucherCode+"\"\n" +
-                                    "  }\n" +
-                                    "}";
-                            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-                            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                    "djrUbeB2",
-                                    "F707B3834D9448B2A81856DE4E42357A",
-                                    access_token);
-                            JSONObject unauditjob = JSONObject.parseObject(auditResult);
-                            if(unauditjob.getString("code").contains("999")){//如果弃审失败，就再弃审一次 试试
-                                auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                                        "djrUbeB2",
-                                        "F707B3834D9448B2A81856DE4E42357A",
-                                        access_token);
-                            }
-                            LOGGER.info("销货退单-单号： " + voucherCode + "的弃审结果是：" + auditResult);
-                            Map<String,String> upMap1 = new HashMap<String,String>();
-                            upMap1.put("flag","0");upMap1.put("code",voucherCode);
-                            orderMapper.updateUploadHQState(upMap1);
-                        }
-                    }
-                }
-                if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成") && hq16flag.contains("HQ1.6")){
-                    //说明 此单是 业务员 修改附件之后 再审核 带来的消息，此处，就只需要上传图片即可。
-                    //直接再上传图片！！！  管他妈的！
-                    List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
-                    //有附件 并且 格式必须是 jpg 或 png(小于200K)  才 允许  上传给 红旗
-                    if(fjlist.size()>0 && (fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
-                        int imgsize = 10 > fjlist.size() ? fjlist.size():10;//最多只能10张
-                        for(int imgint = 0;imgint < imgsize;imgint ++){
-                            Map<String,String> fjmap = fjlist.get(imgint);
-                            String imgurl = fjmap.get("UploadPath");
-                            if(imgurl.contains("http")){//如果是手机端上传的图片，是http的
-                                //String img64 = ImageUtils.encodeImgageToBase64(new URL(imgurl));
-
-                                File file = ImgUU.urlToFile(new URL(imgurl));
-                                byte[] bytes = FileUtils.readFileToByteArray(file);
-                                bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                BASE64Encoder encoder = new BASE64Encoder();
-                                // 返回Base64编码过的字节数组字符串
-                                String img64 = encoder.encode(bytes);
-                                String base64 = URLEncoder.encode(img64,"UTF-8");
-                                String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                            }else{//如果是电脑上传的图片，没有http。是一个 windows文件路径。
-                                //String img64 = ImageUtils.encodeImgageToBase64(new File(imgurl));
-
-                                byte[] bytes = FileUtils.readFileToByteArray(new File(imgurl));
-                                bytes = ImgUU.compressPicForScale(bytes, 200, "x");// 压缩后的图片小于200kb
-                                BASE64Encoder encoder = new BASE64Encoder();
-                                // 返回Base64编码过的字节数组字符串
-                                String img64 = encoder.encode(bytes);
-                                String base64 = URLEncoder.encode(img64,"UTF-8");
-                                String  imgreuslt = basicService.HQimage(voucherCode,base64,imgint);  //红旗文档1.7
-                                //判断图片上传的结果！！！（注意，此时，单据已经成功上传了！！）
-                                //LOGGER.info(" 销货单: " + voucherCode + " 的图片上传结果是：" + imgreuslt);
-                            }
-                        }
-                    }
-                }
+                // 处理 正常的 销货单审核 上传 ，图片上传 功能   和  单据不上传，只上传图片的功能。
+                hqService.dealHQservice(jrb);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -357,9 +138,9 @@ public class TokenController {
         try{
             String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + decryptData);
-            //LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
-            JSONObject job = JSONObject.parseObject(decryptData);
+            //LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + decryptData);
+            LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
+            JSONObject job = JSONObject.parseObject(new String(decryptData.getBytes("GBK"),"UTF-8"));
             // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
             JsonRootBean jrb = job.toJavaObject(JsonRootBean.class);
 
@@ -412,31 +193,26 @@ public class TokenController {
             String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
 
-            LOGGER.info("----------------- 1.5接口 接受到红旗的信息 : decryptData == " + decryptData);
             LOGGER.info("----------------- 1.5接口 接受到红旗的信息 : " + new String(decryptData.getBytes("GBK"),"UTF-8"));
 
-            JSONObject job = JSONObject.parseObject(decryptData);
+            JSONObject job = JSONObject.parseObject(new String(decryptData.getBytes("GBK"),"UTF-8"));
             String lnkshpno = job.getString("lnkshpno");//真实送货单号
             String hndno = job.getString("hndno");//手工单号
+            String why = job.getString("brief");//红旗传过来的 弃审 的 原因啊！
             // 表示 这个 单据 必须要 重新上传给 红旗 1.1 接口 ， 新传的送货单可以和原单的hndno不同
             String vourchcode = hndno.substring(5,hndno.length());
-            String auditjson = "{\n" +
-                    "  \"param\": {\n" +
-                    "    \"voucherCode\": \""+vourchcode+"\"\n" +
-                    "  }\n" +
-                    "}";
-            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                    "djrUbeB2",
-                    "F707B3834D9448B2A81856DE4E42357A",
-                    access_token);
-            LOGGER.info("----------------- 因为1.5接口，单号： " + vourchcode + "的弃审结果是：" + auditResult);
+            LOGGER.info("----------------- 因为1.5接口，单号： " + vourchcode + " 需要立刻被弃审 -----------------");
             //弃审成功之后，T+ 设置了 消息提醒，需要 业务员 重新 提交 审核（可能是 图片问题，或者 其他问题。）
             Map<String,String> upMap = new HashMap<String,String>();
             upMap.put("flag","0");upMap.put("code",vourchcode);
+            upMap.put("memo","(此单被红旗退回过，原因是："+why+",如已修改，请忽略，再审核即可重新上传");
             orderMapper.updateUploadHQState(upMap);
+            orderMapper.updateTOrderMemo(upMap);
+            //弃审此单！
+            basicService.unAuditZDorder(vourchcode);
         }catch (Exception e){
             e.printStackTrace();
+            return "{ \"code\":\"999\" }";
         }
         return "{ \"code\":\"200\" }";
     }
@@ -450,7 +226,6 @@ public class TokenController {
         try{
             String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            LOGGER.info("----------------- 1.6 图片重传接口 接受到红旗的信息 : decryptData == " + decryptData);
             LOGGER.info("----------------- 1.6 图片重传接口 接受到红旗的信息 : decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
             JSONObject job = JSONObject.parseObject(decryptData);
             String lnkshpno = job.getString("lnkshpno");//真实送货单号
@@ -460,32 +235,25 @@ public class TokenController {
             String sndusr = job.getString("sndusr");//送货人
             String snddat = job.getString("snddat");//送货时间
             String sign = job.getString("sign");//当前数据完整json字符串的MD5
-
             String voucherCode = hndno.substring(5,hndno.length());
             // 先 弃审，然后 加上特殊标志！
             // 然后 T+ 会通知业务员 重新上传图片，
             // 然后 再 上面的 审核接口内。 只上传图片信息即可。
-            String auditjson = "{\n" +
-                    "  \"param\": {\n" +
-                    "    \"voucherCode\": \""+voucherCode+"\"\n" +
-                    "  }\n" +
-                    "}";
-            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-            String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/UnAudit",auditjson,
-                    "djrUbeB2",
-                    "F707B3834D9448B2A81856DE4E42357A",
-                    access_token);
-            LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + voucherCode + "的弃审结果是：" + auditResult);
+            LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + voucherCode + "需要立刻被弃审 -----------------" );
+
             //增加一个备注，此单 被 红旗退回过。原因是： 附件的图片 有问题！ 请注意检查！
-
-
             orderMapper.updateTSAorderFlag(voucherCode);//给这一单加上特殊标志
 
             Map<String,String> upMap = new HashMap<String,String>();
             upMap.put("flag","1");upMap.put("code",voucherCode);
+            upMap.put("memo","(图片不合格，被红旗退回，如已修改，请忽略此消息，保存审核后会自动上传图片)");
             orderMapper.updateUploadHQState(upMap);
+            orderMapper.updateTOrderMemo(upMap);
+            //弃审此单！
+            basicService.unAuditZDorder(voucherCode);
         }catch (Exception e){
             e.printStackTrace();
+            return "{ \"code\":\"999\" }";
         }
         return "{ \"code\":\"200\" }";
     }

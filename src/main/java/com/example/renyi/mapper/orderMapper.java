@@ -40,4 +40,6 @@ public interface orderMapper {
 
     //更新销货单指定字段的上传状态标志
     public void updateUploadHQState(Map<String,String> updateMap);
+
+    public void updateTOrderMemo(Map<String,String> updateMap);
 }

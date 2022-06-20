@@ -70,6 +70,7 @@ public class HQDemo {
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(60000);
             conn.setRequestMethod("POST");
+            //conn.setRequestProperty("Content-type", "application/json");
 
             String encrptyData = "json=" + URLEncoder.encode(desEncrypt(key, postData), "utf-8");
             byte[] bytes = encrptyData.getBytes("utf-8");

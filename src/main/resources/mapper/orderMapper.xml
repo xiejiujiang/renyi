@@ -42,4 +42,9 @@
     <update id="updateUploadHQState" parameterType="java.util.Map">
         update SA_SaleDelivery set priuserdefnvc4 = #{flag} where code = #{code}
     </update>
+
+    <update id="updateTOrderMemo" parameterType="java.util.Map">
+        update SA_SaleDelivery set memo = memo + #{memo} where code = #{code}
+    </update>
+
 </mapper>
