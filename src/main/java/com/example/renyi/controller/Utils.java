@@ -312,7 +312,7 @@ public class Utils {
 
     public static Map<String, String> getZYOUResultMap(String shdz){
         Map<String, String> result = new HashMap<String,String>();
-        if(shdz.contains("成都") && shdz.contains("力保大厦")){
+        if(shdz.contains("成都") && shdz.contains("力宝大厦")){
             result.put("merchantcode","020101012");
             result.put("merchantname","成都-华为(中国邮电)");
             result.put("departmentCode","HW-SC-CD-HYQD-QD");//成都华为渠道部
@@ -467,14 +467,13 @@ public class Utils {
     }
 
     public static void main(String[] args) {
-        String rand = "" + Math.random();
-        String hndno = "05192" + "A2022050001";//手工单号（16位。5位供应商编码+11位随机数。不可重复，存在则以此为主键进行修改）
-        String lnkshpno = hndno + hndno.substring(hndno.length() - 4, hndno.length());//真实送货单号（最长20位）
-        System.out.println(rand);
-        System.out.println(hndno);
-        System.out.println(lnkshpno);
-
-        String vourchcode = hndno.substring(5,hndno.length());
-        System.out.println(vourchcode);
+        String shdz = "四川-成都-武侯区-科华北路62号力宝大厦南楼17楼05";
+        Map<String,String> map = getZYOUResultMap(shdz);
+        System.out.println("map.getmercode === " + map.get("merchantcode"));
+        System.out.println("map.merchantname === " + map.get("merchantname"));
+        System.out.println("map.departmentCode === " + map.get("departmentCode"));
+        System.out.println("map.departmentName === " + map.get("departmentName"));
+        System.out.println("map.userCode === " + map.get("userCode"));
+        System.out.println("map.userName === " + map.get("userName"));
     }
 }

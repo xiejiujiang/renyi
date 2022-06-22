@@ -22,12 +22,6 @@ public class SaticScheduleTask {
     @Scheduled(cron = "0 0 3 * * ?")
     private void configureTasks() {
         System.err.println("-------------------- 执行静态定时任务开始: " + LocalDateTime.now() + "--------------------");
-        /*try{
-            //更新 仁肄 数据库里的 单据信息
-            tokenService.updateRenyiOrder();
-        }catch (Exception e){
-            e.printStackTrace();
-        }*/
         try{
             tokenService.refreshToken();
         }catch (Exception e){
