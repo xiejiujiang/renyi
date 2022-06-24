@@ -133,12 +133,11 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqordernotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqordernotice(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("------------------------------- 红旗发起了 直配单据回传请求  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了1.3 直配单据回传请求  ------------------------------------------");
         String restr = "";
         try{
             String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            //LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + decryptData);
             LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
             JSONObject job = JSONObject.parseObject(new String(decryptData.getBytes("GBK"),"UTF-8"));
             // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
@@ -167,15 +166,24 @@ public class TokenController {
     //测试消息订阅的接口。  key = 8aue2u3q
     @RequestMapping(value="/hqorderbacknotice", method = {RequestMethod.GET,RequestMethod.POST})
     public @ResponseBody String hqorderbacknotice(HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.info("------------------------------- 红旗发起了 退单回传请求  ------------------------------------------");
+        LOGGER.info("------------------------------- 红旗发起了1.4 退单回传请求  ------------------------------------------");
         try{
             String saorder = request.getParameter("json");
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
-            LOGGER.info("------------------ 1.4接口 接受到红旗的信息 : decryptData == " + decryptData);
             LOGGER.info("------------------ 1.4接口 接受到红旗的信息 : decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
             JSONObject job = JSONObject.parseObject(decryptData);
+            // 我选择 接受 差异数量。并进行 处理（生成红字的 销货单，并审核，但是这个红单 不会 触发 红旗的接口。）
             com.example.renyi.HQorderBack.ba.JsonRootBean jbr = job.toJavaObject(com.example.renyi.HQorderBack.ba.JsonRootBean.class);
-            // 此处，啥也没做哈！  先看看  后续有再弄吧。
+            String hndno = jbr.getHndno();//手工单号
+            String vourchcode = hndno.substring(5,hndno.length());
+
+            Map<String,String> params = new HashMap<String,String>();
+            params.put("code",vourchcode);// 这是T+ 的 单据编号，对应 HQ 里面的  手动单号！！！！
+            params.put("AppKey","djrUbeB2");// 直接 写 死 ！
+            params.put("AppSecret","F707B3834D9448B2A81856DE4E42357A");// 直接 写 死 ！
+            com.example.renyi.saentity.JsonRootBean sajrb = basicService.getSaOrder(params);
+            //需要处理红旗返回的 差异 数量 问题。
+            //String result = hqService.createTSaOrderByHQ(jbr,sajrb);  ???  因为红旗那边 把1.3 和 1.4 都配置在1.3 上了，而却我也兼容了，所以就不改了！
         }catch (Exception e){
             e.printStackTrace();
         }
