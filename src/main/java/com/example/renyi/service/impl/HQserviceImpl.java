@@ -112,10 +112,18 @@ public class HQserviceImpl implements HQservice {
 
             //如果是红旗的销货单审核的内容，就需要上传，否则，不做任何处理
             LOGGER.info("--------------"+ voucherCode + "： 这一单对应的结算客户名字是: " + sajrb.getData().getSettleCustomer().getName());
+            String project = ""+sajrb.getData().getProject();// 项目： 样品，试吃，赔付 不传。 空退要传。
             String memo = ""+ sajrb.getData().getMemo();
+            String zpflag = ""+Md5.getHQSadetailszpflag(sajrb); //判断 这个销货单 明细 里面的，是否 都勾选了 赠品！！
             LOGGER.info("--------------"+ voucherCode + "： 这一单对应的备注内容是: " + memo);
             String hq16flag = ""+orderMapper.getTSAorderFlag(voucherCode);// 这个参数 只是用来处理 重新上传图片的标志！！！
-            if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成") && !hq16flag.contains("HQ1.6")) {
+            if(sajrb.getData().getSettleCustomer().getName().contains("红旗")
+                    && !memo.contains("差异自动生成")
+                    && !hq16flag.contains("HQ1.6")
+                    && !project.contains("样品")
+                    && !project.contains("试吃")
+                    && !project.contains("赔付")
+                    && !"1".equals(zpflag)) {
                 // 进入这里，说明此单 一定要上传。先把 状态 更新成 0
                 Map<String,String> upMap = new HashMap<String,String>();
                 upMap.put("flag","0");upMap.put("code",voucherCode);
@@ -158,7 +166,13 @@ public class HQserviceImpl implements HQservice {
                 }
             }
             //这里处理 ，审核，但是不上传 单据内容，只上传 图片！
-            if(sajrb.getData().getSettleCustomer().getName().contains("红旗") && !memo.contains("差异自动生成") && hq16flag.contains("HQ1.6")){
+            if(sajrb.getData().getSettleCustomer().getName().contains("红旗")
+                    && !memo.contains("差异自动生成")
+                    && hq16flag.contains("HQ1.6")
+                    && !project.contains("样品")
+                    && !project.contains("试吃")
+                    && !project.contains("赔付")
+                    && !"1".equals(zpflag)){
                 //获取 此单 的附件 内容
                 List<Map<String,String>> fjlist = orderMapper.getfjidByCode(voucherCode);
                 if(fjlist != null && fjlist.size() != 0 && ( fjlist.get(0).get("FileType").contains("jpg") || fjlist.get(0).get("FileType").contains("png") )){
