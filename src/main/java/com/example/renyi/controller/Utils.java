@@ -446,6 +446,10 @@ public class Utils {
                 result.put("ckcode", "020400021");
                 result.put("ckname", "南京六合天街库");
                 break;
+            case "209":
+                result.put("ckcode", "020300021");
+                result.put("ckname", "合肥万科广场库");
+                break;
             case "212":
                 result.put("ckcode", "040100011");
                 result.put("ckname", "昆明富康城库");
@@ -461,6 +465,10 @@ public class Utils {
             case "215":
                 result.put("ckcode", "040100021");
                 result.put("ckname", "昆明宜家库");
+                break;
+            case "216":
+                result.put("ckcode", "040400011");
+                result.put("ckname", "长沙喜盈门库");
                 break;
         }
         return result;
