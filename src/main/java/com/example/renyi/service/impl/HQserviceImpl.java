@@ -35,51 +35,59 @@ public class HQserviceImpl implements HQservice {
         try{
             String json = MapToJson.getSAparamsJson(jrb,sajrb);
             if(!json.equals("0000")){
-                String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
-                String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
-                        "djrUbeB2",
-                        "F707B3834D9448B2A81856DE4E42357A",
-                        access_token);
-                LOGGER.info("-------------- 调用T+ 创建 差异销货单的接口后返回：" + result + " --------------s");
-                JSONObject jon = JSONObject.parseObject(result);
-                if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再 调用  审核 功能
-                    String data = jon.getString("data");
-                    JSONObject dataJob = JSONObject.parseObject(data);
-                    String auditjson = "{\n" +
-                            "  \"param\": {\n" +
-                            "    \"externalCode\": \" " + Md5.md5(dataJob.getString("ID") + dataJob.getString("Code")) + " \",\n" +
-                            "    \"voucherID\": \" "+ dataJob.getString("ID") +" \",\n" +
-                            "    \"voucherCode\": \" "+ dataJob.getString("Code") +" \"\n" +
-                            "  }\n" +
-                            "}";
+                new Thread(){
+                    public void run(){
+                        try{
+                            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                            String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
+                                    "djrUbeB2",
+                                    "F707B3834D9448B2A81856DE4E42357A",
+                                    access_token);
+                            LOGGER.info("-------------- 调用T+ 创建 差异销货单的接口后返回：" + result + " --------------s");
+                            JSONObject jon = JSONObject.parseObject(result);
+                            if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再 调用  审核 功能
+                                String data = jon.getString("data");
+                                JSONObject dataJob = JSONObject.parseObject(data);
+                                String auditjson = "{\n" +
+                                        "  \"param\": {\n" +
+                                        "    \"externalCode\": \" " + Md5.md5(dataJob.getString("ID") + dataJob.getString("Code")) + " \",\n" +
+                                        "    \"voucherID\": \" "+ dataJob.getString("ID") +" \",\n" +
+                                        "    \"voucherCode\": \" "+ dataJob.getString("Code") +" \"\n" +
+                                        "  }\n" +
+                                        "}";
 
-                    String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson,
-                            "djrUbeB2",
-                            "F707B3834D9448B2A81856DE4E42357A",
-                            access_token);
-                }else{//如果 创建 T+ 销货单 失败！ 应该 怎么办呢？
-                    String json2 = MapToJson.getSAparamsJson(jrb,sajrb);
-                    String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json2,
-                            "djrUbeB2",
-                            "F707B3834D9448B2A81856DE4E42357A",
-                            access_token);
-                    JSONObject jon2 = JSONObject.parseObject(result2);
-                    if("0".equals(jon2.getString("code"))) {//如果 销货单 创建 成功！ 再调用  审核 功能
-                        String data2 = jon2.getString("data");
-                        JSONObject dataJob2 = JSONObject.parseObject(data2);
-                        String auditjson2 = "{\n" +
-                                "  \"param\": {\n" +
-                                "    \"externalCode\": \" " + Md5.md5(dataJob2.getString("ID") + dataJob2.getString("Code")) + " \",\n" +
-                                "    \"voucherID\": \" "+ dataJob2.getString("ID") +" \",\n" +
-                                "    \"voucherCode\": \" "+ dataJob2.getString("Code") +" \"\n" +
-                                "  }\n" +
-                                "}";
-                        HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson2,
-                                "djrUbeB2",
-                                "F707B3834D9448B2A81856DE4E42357A",
-                                access_token);
+                                String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson,
+                                        "djrUbeB2",
+                                        "F707B3834D9448B2A81856DE4E42357A",
+                                        access_token);
+                            }else{//如果 创建 T+ 销货单 失败！ 应该 怎么办呢？
+                                //String json2 = MapToJson.getSAparamsJson(jrb,sajrb);
+                                String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
+                                        "djrUbeB2",
+                                        "F707B3834D9448B2A81856DE4E42357A",
+                                        access_token);
+                                JSONObject jon2 = JSONObject.parseObject(result2);
+                                if("0".equals(jon2.getString("code"))) {//如果 销货单 创建 成功！ 再调用  审核 功能
+                                    String data2 = jon2.getString("data");
+                                    JSONObject dataJob2 = JSONObject.parseObject(data2);
+                                    String auditjson2 = "{\n" +
+                                            "  \"param\": {\n" +
+                                            "    \"externalCode\": \" " + Md5.md5(dataJob2.getString("ID") + dataJob2.getString("Code")) + " \",\n" +
+                                            "    \"voucherID\": \" "+ dataJob2.getString("ID") +" \",\n" +
+                                            "    \"voucherCode\": \" "+ dataJob2.getString("Code") +" \"\n" +
+                                            "  }\n" +
+                                            "}";
+                                    HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson2,
+                                            "djrUbeB2",
+                                            "F707B3834D9448B2A81856DE4E42357A",
+                                            access_token);
+                                }
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
-                }
+                }.start();
             }else{
                 LOGGER.info("-------------- 红旗回调了1.3接口，但是没有差异数量，所以不会再生成 T+ 的销货单了！ --------------");
             }
