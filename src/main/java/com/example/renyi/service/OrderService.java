@@ -2,5 +2,7 @@ package com.example.renyi.service;
 
 public interface OrderService {
 
-    public String getTnameByCode(String code);
+    String getTnameByCode(String code);
+
+    String getDistricntKC(String department,String thistotal);
 }

@@ -8,7 +8,7 @@
         from re_retail_b t1,ST_RDRecord_b t2,ST_RDRecord t3
         where t1.idinventory = t2.idinventory  and t1.RdRecordCode = t3.code and t3.id = t2.idRDRecordDTO
         and (t1.priuserdefdecm2 is null or  t1.priuserdefdecm2 = 0 )
-        and t2.price != 0 and t2.price is not null and t1.createdtime > '2021-12-31 23:59:59.617'
+        and t2.price != 0 and t2.price is not null and t1.createdtime > '2022-07-01 23:59:59.617'
     </update>
 
 
@@ -18,4 +18,23 @@
         from SA_SaleDelivery_b t1,AA_Inventory t2
         where t1.idinventory = t2.id  and t2.name  like '回收%' and t1.priuserdefdecm2 = 0.00000000000000 and t1.costPrice !=0
     </update>
+
+    <select id="getDistricntKC" parameterType="java.lang.String" resultType="java.lang.Float">
+        /*select y1.ckname,y1.chname,y1.baseQuantity,y2.finalAmount*/
+        select sum(y2.finalAmount) as finalAmount
+        from(
+                select k3.name as ckname, k2.name as chname,k1.baseQuantity,k1.idwarehouse,k1.idinventory
+                from ST_NewCurrentStock k1,AA_Inventory k2,AA_Warehouse k3
+                where k1.propertyName in('CurrentStock','PurchaseOrderOnWay') and k1.idinventory = k2.id and k1.idwarehouse = k3.id )y1 ,
+            (select s1.idinventory,s1.idwarehouse,s1.AccountYearPeriod,s2.finalAmount
+             from (select idinventory,idwarehouse,max(AccountYearPeriod) as AccountYearPeriod
+                   from ST_SummaryBook where finalQuantity != 0
+                   group by idinventory,idwarehouse  ) s1,
+                  (select idinventory,idwarehouse,AccountYearPeriod,max(finalAmount) as finalAmount
+                   from ST_SummaryBook where finalQuantity != 0
+                   group by idinventory,idwarehouse,AccountYearPeriod ) s2
+             where s1.idinventory = s2.idinventory and s1.AccountYearPeriod = s2.AccountYearPeriod and s1.idwarehouse = s2.idwarehouse)y2
+        where y1.idinventory = y2.idinventory and y1.idwarehouse = y2.idwarehouse
+          and y1.ckname like  #{department} and y1.ckname not like '%全屋%' and y1.ckname not like '%汽车%'
+    </select>
 </mapper>

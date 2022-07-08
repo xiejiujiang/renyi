@@ -355,4 +355,16 @@ public class IndexController {
         JSONObject job = new JSONObject(imgMap);
         return job.toJSONString();
     }
+
+
+    //根据 部门 查询当前 库存结存金额+采购订单未执行的金额
+    @RequestMapping(value="/getDistricntKC", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String getDistricntKC(HttpServletRequest request, HttpServletResponse response){
+        String department = request.getParameter("department");
+        String thistotal = request.getParameter("thistotal");
+        LOGGER.error("---------------department == "+department+" ---------------");
+        LOGGER.error("---------------thistotal == "+thistotal+" ---------------");
+        String result = OrderService.getDistricntKC(department,thistotal);
+        return result;
+    }
 }

@@ -2,14 +2,16 @@ package com.example.renyi.mapper;
 
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Mapper
 @Repository
 public interface renyiMapper {
 
-    public void updateRetailDetails();
+    void updateRetailDetails();
 
-    public void updateSadetails();
+    void updateSadetails();
 
+    Float getDistricntKC(@Param("department") String department);
 }

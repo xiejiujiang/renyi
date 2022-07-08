@@ -162,7 +162,7 @@ public class Utils {
             map.put("ckname", "苏州万象汇库");
             return map;
         }
-        if(mendian.contains("吴中区爀苒科技丽丰华为合作店")) {
+        if(mendian.contains("吴中区爀苒科技丽丰华为合作店") || mendian.contains("宝带东路399号丽丰购物中心")) {
             map.put("ckcode", "0501010201");
             map.put("ckname", "苏州丽丰库");
             return map;
@@ -450,23 +450,23 @@ public class Utils {
                 result.put("ckcode", "020300021");
                 result.put("ckname", "合肥万科广场库");
                 break;
-            case "212":
+            case "300":
                 result.put("ckcode", "040100011");
                 result.put("ckname", "昆明富康城库");
                 break;
-            case "213":
+            case "301":
                 result.put("ckcode", "040200011");
                 result.put("ckname", "贵阳印象城库");
                 break;
-            case "214":
+            case "302":
                 result.put("ckcode", "040300011");
                 result.put("ckname", "成都空港华联库");
                 break;
-            case "215":
+            case "303":
                 result.put("ckcode", "040100021");
                 result.put("ckname", "昆明宜家库");
                 break;
-            case "216":
+            case "304":
                 result.put("ckcode", "040400011");
                 result.put("ckname", "长沙喜盈门库");
                 break;
