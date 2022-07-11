@@ -94,6 +94,6 @@ public class TokenServiceImpl implements TokenService {
         //先更新零售单据
         renyimapper.updateRetailDetails();
         //再更新销货单
-        renyimapper.updateSadetails();
+        //renyimapper.updateSadetails();
     }
 }

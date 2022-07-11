@@ -13,5 +13,11 @@ public interface renyiMapper {
 
     void updateSadetails();
 
+    Float getCDDistricntKC(@Param("department") String department);
+
+    Float getCDDistricntPUorder(@Param("department") String department);
+
     Float getDistricntKC(@Param("department") String department);
+
+    Float getDistricntPUorder(@Param("department") String department);
 }

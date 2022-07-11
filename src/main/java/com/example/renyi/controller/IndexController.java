@@ -364,7 +364,8 @@ public class IndexController {
         String thistotal = request.getParameter("thistotal");
         LOGGER.error("---------------department == "+department+" ---------------");
         LOGGER.error("---------------thistotal == "+thistotal+" ---------------");
-        String result = OrderService.getDistricntKC(department,thistotal);
-        return result;
+        Map<String,Object> result = OrderService.getDistricntKC(department,thistotal);
+        JSONObject job = new JSONObject(result);
+        return job.toJSONString();
     }
 }
