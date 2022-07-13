@@ -23,7 +23,7 @@
       导入订单无需修改直接上传即可
     </div>
     <div style="position: absolute;margin-top: 79px;margin-left: 20px;background-color: #D9D9D9;width: 300px;height: 30px"></div>
-    <form method="POST" enctype="multipart/form-data" action="http://mexjj.natapp1.cc/renyi/xkk/upload">
+    <form method="POST" enctype="multipart/form-data" action="http://39.101.182.84:9998/renyi/xkk/upload">
       <input type="file" name="file" style="display: none" id="upload"></input>
       <input type="button" value="选择文件" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 350px" onclick="test1();">
       <input type="button" value="取消" style="cursor: pointer;height: 30px;width: 80px;position: absolute;margin-top: 10px;margin-left: 470px" onclick="clear1();">
@@ -92,7 +92,7 @@
       //提交form表单
       var formData = new FormData($( "#form2")[0]);
       $.ajax({
-        url: 'http://mexjj.natapp1.cc/renyi/xkk/updatePTT' ,
+        url: 'http://39.101.182.84:9998/renyi/xkk/updatePTT' ,
         type: 'POST',
         data: formData,
         async: false,
@@ -135,7 +135,7 @@
   */
 
   function downloadexcel(){
-    location.href = 'http://mexjj.natapp1.cc/renyi/xkk/downloadexcel';
+    location.href = 'http://39.101.182.84:9998/renyi/xkk/downloadexcel';
   }
 
   //跳转至 普天的订单下载介绍页面
@@ -143,7 +143,7 @@
     //location.href = 'http://mexjj.natapp1.cc/renyi/xkk/ptdesc';//访问后台跳转
     //window.location.href = "../templates/ptdesc.html"; //打开当前页面
     //window.open("../templates/ptdesc.html");//打开新页面
-    window.open("http://mexjj.natapp1.cc/renyi/xkk/ptdesc");//打开新页面
+    window.open("http://39.101.182.84:9998/renyi/xkk/ptdesc");//打开新页面
   }
 </script>
 </html>

@@ -362,9 +362,11 @@ public class IndexController {
     public @ResponseBody String getDistricntKC(HttpServletRequest request, HttpServletResponse response){
         String department = request.getParameter("department");
         String thistotal = request.getParameter("thistotal");
+        String code = request.getParameter("code");
         LOGGER.error("---------------department == "+department+" ---------------");
         LOGGER.error("---------------thistotal == "+thistotal+" ---------------");
-        Map<String,Object> result = OrderService.getDistricntKC(department,thistotal);
+        LOGGER.error("---------------code == "+code+" ---------------");
+        Map<String,Object> result = OrderService.getDistricntKC(department,thistotal,code);
         JSONObject job = new JSONObject(result);
         return job.toJSONString();
     }

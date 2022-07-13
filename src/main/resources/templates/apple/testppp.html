@@ -87,7 +87,7 @@
   <div style="height: 40px;width: 60%;margin-left: 50px;margin-top: 30px;">
     <div style="text-align: center;line-height: 40px;position: absolute;font-size: small;width: 70px;">数据路径:</div>
     <div id="ptttext" style="width: 300px;height: 25px;position: absolute;margin-left: 80px;background-color: #EEEEEE;margin-top: 7px;"></div>
-    <form id="uploadfile" method="POST" enctype="multipart/form-data" action="http://mexjj.natapp1.cc/renyi/apple/updatePTT">
+    <form id="uploadfile" method="POST" enctype="multipart/form-data" action="http://39.101.182.84:9998/renyi/apple/updatePTT">
       <input type="file" name="file" style="display: none" id="upload"></input>
     </form>
     <div id="chosefile">选择文件</div>
@@ -150,7 +150,7 @@
         //提交form表单
         var formData = new FormData($( "#uploadfile")[0]);
         $.ajax({
-          url: 'http://mexjj.natapp1.cc/renyi/apple/updatePTT' ,
+          url: 'http://39.101.182.84:9998/renyi/apple/updatePTT' ,
           type: 'POST',
           data: formData,
           async: false,
@@ -176,7 +176,7 @@
   });
 
   $("#downloadexcel").click(function (){
-    location.href = 'http://mexjj.natapp1.cc/renyi/apple/downloadexcel';
+    location.href = 'http://39.101.182.84:9998/renyi/apple/downloadexcel';
   });
 </script>
 </html>

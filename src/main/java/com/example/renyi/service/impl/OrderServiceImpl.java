@@ -1,6 +1,5 @@
 package com.example.renyi.service.impl;
 
-import com.example.renyi.mapper.orderMapper;
 import com.example.renyi.mapper.renyiMapper;
 import com.example.renyi.service.OrderService;
 import org.slf4j.Logger;
@@ -17,9 +16,6 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
-    private orderMapper orderMapper;
-
-    @Autowired
     private renyiMapper renyiMapper;
 
     @Override
@@ -28,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Map<String,Object> getDistricntKC(String department, String thistotal) {
+    public Map<String,Object> getDistricntKC(String department, String thistotal,String code) {
         Map<String,Object> result = new HashMap<String,Object>();
         if(thistotal == null || "".equals(thistotal)){
             thistotal = "0";
@@ -42,7 +38,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 成都 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 15500000f || (now+ddnow+thisnow) > 15500000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1550万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1550万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -54,7 +54,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 绵阳 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 5000000f || (now+ddnow+thisnow) > 5000000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限500万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限500万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -66,7 +70,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 昆明 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 16500000f || (now+ddnow+thisnow) > 16500000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1650万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1650万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -78,7 +86,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 锦华MSC 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 2000000f || (now+ddnow+thisnow) > 2000000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限200万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限200万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -90,7 +102,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 贵阳 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 3000000f || (now+ddnow+thisnow) > 3000000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限300万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限300万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -102,7 +118,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 上海 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 8000000f || (now+ddnow+thisnow) > 8000000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限800万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限800万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }
@@ -114,7 +134,11 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("------------ 苏州 现在的采购订单未入库金额是："+ddnow+ " ------------");
             if((now+ddnow) > 6000000f || (now+ddnow+thisnow) > 6000000f) {
                 result.put("data","0");
-                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限600万，禁止下单！");//当前库存金额*元，库存金额上限*万，禁止下单！
+                result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限600万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
+                    //更新付款申请单的备注，追加 “超额” 二字
+                    renyiMapper.updateFKSQdesc(code);
+                }
             }else{
                 result.put("data","1");
             }

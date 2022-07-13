@@ -82,4 +82,8 @@
                   and t2.quantity > isnull(t2.countQuantity,0)
                   and t1.voucherState = 189 and t2.IsClose != 1)y1
     </select>
+
+    <update id="updateFKSQdesc" parameterType="java.lang.String">
+        update ARAP_PrepaymentRequisition set memo = memo + '(超额)'  where code = #{code}
+    </update>
 </mapper>

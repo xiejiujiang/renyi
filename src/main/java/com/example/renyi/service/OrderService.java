@@ -6,5 +6,5 @@ public interface OrderService {
 
     String getTnameByCode(String code);
 
-    Map<String,Object> getDistricntKC(String department, String thistotal);
+    Map<String,Object> getDistricntKC(String department, String thistotal,String code);
 }

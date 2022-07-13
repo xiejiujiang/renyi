@@ -20,4 +20,6 @@ public interface renyiMapper {
     Float getDistricntKC(@Param("department") String department);
 
     Float getDistricntPUorder(@Param("department") String department);
+
+    void updateFKSQdesc(@Param("code") String code);
 }
