@@ -47,4 +47,10 @@
         update SA_SaleDelivery set memo = memo + #{memo} where code = #{code}
     </update>
 
+    <select id="getUnuploadList" resultType="java.util.Map">
+        select code
+        from SA_SaleDelivery
+        where priuserdefnvc4 is null and idsettlecustomer in (1724,1723)
+        and voucherState = 189 and voucherdate > '2022-07-25' and priuserdefnvc6 is null
+    </select>
 </mapper>

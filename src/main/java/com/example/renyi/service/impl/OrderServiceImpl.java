@@ -39,9 +39,12 @@ public class OrderServiceImpl implements OrderService {
             if((now+ddnow) > 15500000f || (now+ddnow+thisnow) > 15500000f) {
                 result.put("data","0");
                 result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1550万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
+                LOGGER.error("------------ 马上开始更新备注了！ -----------" + code);
                 if(!"xjj".equals(code) && !"".equals(code)){//说明是付款申请单
                     //更新付款申请单的备注，追加 “超额” 二字
+                    LOGGER.error("------------ 1111111111111111111111111 -----------" + code);
                     renyiMapper.updateFKSQdesc(code);
+                    LOGGER.error("------------ 2222222222222222222222222 -----------" + code);
                 }
             }else{
                 result.put("data","1");

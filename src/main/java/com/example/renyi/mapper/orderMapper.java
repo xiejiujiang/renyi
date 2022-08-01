@@ -42,4 +42,7 @@ public interface orderMapper {
     public void updateUploadHQState(Map<String,String> updateMap);
 
     public void updateTOrderMemo(Map<String,String> updateMap);
+
+    //增加了 专门处理中德的红旗单据 消息订阅 未收到的问题
+    List<Map<String,String>> getUnuploadList();
 }
