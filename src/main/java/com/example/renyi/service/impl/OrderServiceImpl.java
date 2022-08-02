@@ -31,12 +31,12 @@ public class OrderServiceImpl implements OrderService {
         }
         Float thisnow = Float.valueOf(thistotal);
         //根据部门判断不同的 地区 SQL
-        if(department.contains("成都")){ //除了车业务和全屋的商品。剩下的不超过最高限值 1550万
+        if(department.contains("成都")){ //除了车业务和全屋的商品。剩下的不超过最高限值 1550万  包含MSC 的 200万了哦
             Float now = renyiMapper.getCDDistricntKC("%成都%"); //当前库存结存金额
             Float ddnow = renyiMapper.getCDDistricntPUorder("%成都%");//采购订单未执行完的总金额
             LOGGER.error("------------ 成都 现在的库存金额是："+now+ " ------------");
             LOGGER.error("------------ 成都 现在的采购订单未入库金额是："+ddnow+ " ------------");
-            if((now+ddnow) > 15500000f || (now+ddnow+thisnow) > 15500000f) {
+            if((now+ddnow) > 17500000f || (now+ddnow+thisnow) > 17500000f) {
                 result.put("data","0");
                 result.put("msg","当前库存金额"+(now+ddnow)+"元，库存金额上限1550万，禁止下单，请联系王洪田");//当前库存金额*元，库存金额上限*万，禁止下单！
                 LOGGER.error("------------ 马上开始更新备注了！ -----------" + code);
@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
                 result.put("data","1");
             }
         }
-        if(department.contains("锦华MSC")){ //除了车业务和全屋的商品。剩下的不超过最高限值 200万
+        /*if(department.contains("锦华MSC")){ //除了车业务和全屋的商品。剩下的不超过最高限值 200万
             Float now = renyiMapper.getDistricntKC("%锦华MSC%");
             Float ddnow = renyiMapper.getDistricntPUorder("%锦华MSC%");//采购订单未执行完的总金额
             LOGGER.error("------------ 锦华MSC 现在的库存金额是："+now+ " ------------");
@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
             }else{
                 result.put("data","1");
             }
-        }
+        }*/
         if(department.contains("贵阳")){ //除了车业务和全屋的商品。剩下的不超过最高限值 300万
             Float now = renyiMapper.getDistricntKC("%贵阳%");
             Float ddnow = renyiMapper.getDistricntPUorder("%贵阳%");//采购订单未执行完的总金额

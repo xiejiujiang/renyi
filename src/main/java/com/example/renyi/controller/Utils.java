@@ -97,7 +97,7 @@ public class Utils {
             map.put("ckname","上海绿地缤纷城库");
             return map;
         }
-        if(mendian.contains("上海市长宁区金虹桥商业广场华为授权体验店")){
+        if(mendian.contains("金虹桥商业广场")){
             map.put("ckcode","0401010401");
             map.put("ckname","上海金虹桥库");
             return map;

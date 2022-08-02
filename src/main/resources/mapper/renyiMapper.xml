@@ -37,7 +37,6 @@
              where s1.idinventory = s2.idinventory and s1.AccountYearPeriod = s2.AccountYearPeriod and s1.idwarehouse = s2.idwarehouse)y2
         where y1.idinventory = y2.idinventory and y1.idwarehouse = y2.idwarehouse
           and y1.ckname like  #{department} and y1.ckname not like '%全屋%' and y1.ckname not like '%汽车%' and y1.baseQuantity != 0
-          and y1.ckname not like '%锦华MSC%'
     </select>
 
     <select id="getCDDistricntPUorder" parameterType="java.lang.String" resultType="java.lang.Float">
@@ -47,7 +46,7 @@
                        t2.quantity,t2.countQuantity, t2.countArrivalQuantity,(t2.quantity - isnull(t2.countQuantity,0) ) as cc
                 from PU_PurchaseOrder t1,PU_PurchaseOrder_b t2,AA_Warehouse t3
                 where t1.idwarehouse = t3.id and t1.id = t2.idPurchaseOrderDTO
-                  and t3.name not like '%全屋%' and t3.name not like '%汽车%' and t3.name like  #{department} and t3.name not like '%锦华MSC%'
+                  and t3.name not like '%全屋%' and t3.name not like '%汽车%' and t3.name like  #{department}
                   and t2.quantity > isnull(t2.countQuantity,0)
                   and t1.voucherState = 189 and t2.IsClose != 1)y1
     </select>
