@@ -250,7 +250,7 @@ public class TokenController {
             LOGGER.info("----------------- 因为1.6接口，图片不合格，单号： " + voucherCode + "需要立刻被弃审 -----------------" );
 
             //增加一个备注，此单 被 红旗退回过。原因是： 附件的图片 有问题！ 请注意检查！
-            orderMapper.updateTSAorderFlag(voucherCode);//给这一单加上特殊标志
+            //orderMapper.updateTSAorderFlag(voucherCode);//给这一单加上特殊标志
 
             Map<String,String> upMap = new HashMap<String,String>();
             upMap.put("flag","1");upMap.put("code",voucherCode);

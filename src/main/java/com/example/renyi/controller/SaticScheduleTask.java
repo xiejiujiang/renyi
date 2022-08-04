@@ -26,13 +26,12 @@ public class SaticScheduleTask {
     @Autowired
     private orderMapper orderMapper;
 
-    //每天凌晨3点执行
-    //@Scheduled(cron = "0 0 3 * * ?")
+    //每天凌晨6点执行
+    //@Scheduled(cron = "0 0 6 * * ?")
 
     //每天 早上8点，中午12点 和晚上 10点执行
     //@Scheduled(cron = "0 0 8,12,22 * * ?")
 
-    //每天凌晨6点执行
     @Scheduled(cron = "0 0 6 * * ?")
     private void configureTasks() {
         System.err.println("-------------------- 执行静态定时任务开始: " + LocalDateTime.now() + "--------------------");
@@ -42,7 +41,7 @@ public class SaticScheduleTask {
             //增加了 专门处理中德的红旗单据 消息订阅 未收到的问题
             List<Map<String,String>> list = orderMapper.getUnuploadList();
             if(list != null && list.size() != 0){
-                System.err.println("-------------------- 今晚要处理的单据长度: " + list.size() + "--------------------");
+                System.err.println("-------------------- 今天要处理的单据长度: " + list.size() + "--------------------");
                 for(Map<String,String> map : list){
                     String code = map.get("code");
                     String auditjson = "{\n" +
@@ -69,7 +68,8 @@ public class SaticScheduleTask {
                     }
                 }
             }
-            //定时更新 数据库中的 价格本触发器反写失败的问题
+
+            // 仁肄 的 定时更新 数据库中的 价格本触发器反写失败的问题
             //tokenService.updateRenyiOrder();
         }catch (Exception e){
             e.printStackTrace();
