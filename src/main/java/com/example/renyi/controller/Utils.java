@@ -470,6 +470,14 @@ public class Utils {
                 result.put("ckcode", "040400011");
                 result.put("ckname", "长沙喜盈门库");
                 break;
+            case "305":
+                result.put("ckcode", "040100031");
+                result.put("ckname", "昆明和谐广场库");
+                break;
+            case "306":
+                result.put("ckcode", "040300021");
+                result.put("ckname", "成都鹏瑞利库");
+                break;
         }
         return result;
     }
