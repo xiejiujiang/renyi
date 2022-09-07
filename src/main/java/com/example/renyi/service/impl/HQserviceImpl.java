@@ -43,7 +43,7 @@ public class HQserviceImpl implements HQservice {
                                     "djrUbeB2",
                                     "F707B3834D9448B2A81856DE4E42357A",
                                     access_token);
-                            LOGGER.info("-------------- 调用T+ 创建 差异销货单的接口后返回：" + result + " --------------s");
+                            LOGGER.info("-------------- 调用T+ 创建 差异销货单的接口后返回：" + result + " --------------");
                             JSONObject jon = JSONObject.parseObject(result);
                             if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再 调用  审核 功能
                                 String data = jon.getString("data");
