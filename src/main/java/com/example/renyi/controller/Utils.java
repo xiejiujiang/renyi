@@ -1,10 +1,20 @@
 package com.example.renyi.controller;
 
+import ch.qos.logback.core.util.FileUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import sun.misc.BASE64Decoder;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Utils {
@@ -482,14 +492,31 @@ public class Utils {
         return result;
     }
 
-    public static void main(String[] args) {
-        String shdz = "四川-成都-武侯区-科华北路62号力宝大厦南楼17楼05";
-        Map<String,String> map = getZYOUResultMap(shdz);
-        System.out.println("map.getmercode === " + map.get("merchantcode"));
-        System.out.println("map.merchantname === " + map.get("merchantname"));
-        System.out.println("map.departmentCode === " + map.get("departmentCode"));
-        System.out.println("map.departmentName === " + map.get("departmentName"));
-        System.out.println("map.userCode === " + map.get("userCode"));
-        System.out.println("map.userName === " + map.get("userName"));
+    public static void main(String[] args) throws Exception {
+        //----------------------------------读取标准的T+excel，写数据，然后下载--------------------------------------//
+        HttpServletResponse response = null;
+        OutputStream out = null;
+        BufferedOutputStream bos = null;
+        String templateFileName = FileUtil.class.getResource("/").getPath()+"templates"+ File.separator + "tcgddd.xlsx";
+        response.setContentType("application/vnd.ms-excel");
+        response.setCharacterEncoding("utf-8");
+        String excelName = URLEncoder.encode("xjj999.xls", "utf-8");
+        response.setHeader("Content-disposition", "attachment; filename=" + new String(excelName.getBytes("UTF-8"), "ISO-8859-1"));
+        out = response.getOutputStream();
+        bos = new BufferedOutputStream(out);
+        //读取Excel
+        ExcelWriter excelWriter = EasyExcel.write(bos).withTemplate(templateFileName).build();
+        List<Integer> ll = new ArrayList<Integer>();
+        ll.add(1);ll.add(2);ll.add(3);
+        WriteSheet writeSheet = EasyExcel.writerSheet().includeColumnIndexes(ll).build();
+
+
+        //list map 是查询并需导出的数据，并且里面的字段和excel需要导出的字段对应
+        // 直接写入Excel数据
+        List<Map<String,String>> datalist = new ArrayList<Map<String,String>>();
+        excelWriter.fill(datalist, writeSheet);
+        excelWriter.finish();
+        bos.flush();
+        System.out.println("-------------------- 写入完成，请下载江哥的爱 --------------------");
     }
 }
