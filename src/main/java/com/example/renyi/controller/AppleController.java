@@ -8,7 +8,9 @@ import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.example.renyi.entity.Ptt;
+import com.example.renyi.entity.RetailCode;
 import com.example.renyi.service.BasicService;
+import com.example.renyi.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class AppleController {
 
     @Autowired
     private BasicService basicService;
+
+    @Autowired
+    private TokenService tokenService;
 
 
     //订单转换页面
@@ -160,6 +165,46 @@ public class AppleController {
             inStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    //苹果的A账 订单导入页面
+    @RequestMapping(value="/appleadeal", method = {RequestMethod.GET,RequestMethod.POST})
+    public ModelAndView appleadeal(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mav = new ModelAndView();
+        LOGGER.info("-------------------  打开苹果的A账 订单导入页面打开事件  ----------------------");
+        mav.setViewName("apple/appleadeal");
+        return mav;
+    }
+
+    // 导入excel , 解析出 08 账套中的 零售单 单号列表
+    @RequestMapping(value="/autoasaleinfo", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String autoasaleinfo(@RequestParam(value = "file")MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            InputStream inputStream = file.getInputStream();
+            ExcelListener listener = new ExcelListener();
+            ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS, null, listener);
+
+            //已经做好的 普天T+名称匹配表是 从 第一个sheet 的 第一行 开始获取数据
+            com.alibaba.excel.metadata.Sheet sheet = new Sheet(1,0, RetailCode.class);
+            excelReader.read(sheet);
+            List<Object> list = listener.getDatas();//当前从上传的excel中获取的数据
+            List<String> codelist = new ArrayList<String>();//最终读取之后的数据
+            for(Object oo : list){
+                RetailCode retailCode = (RetailCode)oo;
+                if(retailCode != null && !"".equals(retailCode.getCode())){
+                    codelist.add(retailCode.getCode());
+                }
+            }
+            if(codelist != null && codelist.size() != 0){
+                return tokenService.getRetailToSaleResult(codelist);
+            }else{
+                return "参数错误，请重试！";
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "参数错误，请重试！";
         }
     }
 }

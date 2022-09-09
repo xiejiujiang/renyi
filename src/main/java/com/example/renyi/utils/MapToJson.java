@@ -244,4 +244,73 @@ public class MapToJson {
         }
         return unit;
     }
+
+    //参照上面的。把零售单的数据 拼成 一个 销货单的 DTO
+    public static String getSAJsonByRetailData(List<Map<String,Object>> dataList){
+        Map<String,Object> dto = new HashMap<String,Object>();
+        Map<String,Object> sa = new HashMap<String,Object>();
+
+        Map<String,Object> Department = new HashMap<String,Object>();
+        Department.put("Code",dataList.get(0).get("departmentCode"));//部门编码
+        sa.put("Department",Department);
+
+        Map<String,Object> Clerk = new HashMap<String,Object>();
+        Clerk.put("Code",dataList.get(0).get("personCode"));//业务员编码
+        sa.put("Clerk",Clerk);
+
+        String VoucherDate = dataList.get(0).get("VoucherDate").toString();
+        sa.put("VoucherDate",VoucherDate);//单据日期
+        sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
+
+        Map<String,Object> Customer = new HashMap<String,Object>();
+        Customer.put("Code","LS001");//客户编码  都用 零售客户？
+        sa.put("Customer",Customer);
+        Map<String,Object> SettleCustomer = new HashMap<String,Object>();
+        SettleCustomer.put("Code","LS001");//结算客户编码（一般等同于 客户编码）
+        sa.put("SettleCustomer",SettleCustomer);
+
+        Map<String,Object> InvoiceType = new HashMap<String,Object>();
+        InvoiceType.put("Code","01");//票据类型，枚举类型；00--普通发票，01--专用发票，02–收据；为空时，默认按收据处理
+        sa.put("InvoiceType",InvoiceType);
+        Map<String,Object> Warehouse = new HashMap<String,Object>();
+        Warehouse.put("Code", dataList.get(0).get("warehouseCode").toString());//表头上的 仓库编码
+        sa.put("Warehouse",Warehouse);
+        Map<String,Object> ReciveType = new HashMap<String,Object>();
+        ReciveType.put("Code","05");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
+        sa.put("ReciveType",ReciveType);// 红旗都是 月结
+        Map<String,Object> RdStyle = new HashMap<String,Object>();
+        RdStyle.put("Code","201");//出库类别，RdStyleDTO对象，默认为“线上销售”类别； 具体值 我是查的数据库。  201
+        sa.put("RdStyle",RdStyle);
+        Map<String,Object> BusinessType = new HashMap<String,Object>();
+        BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+        sa.put("BusinessType",BusinessType);
+        //sa.put("Memo","这一单是根据红旗返回的差异自动生成的，请注意区别 ！");//备注
+        List<Map<String,Object>> SaleDeliveryDetailsList = new ArrayList<Map<String,Object>>();
+        for(Map<String,Object> retailmap :dataList){
+            Map<String,Object> DetailM = new HashMap<String,Object>();
+            Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
+            //明细1 的 仓库编码,这里不好取，但是可以用表头的（因为每一个销货单 只 对应了一个 仓库）
+            DetailMWarehouse.put("code",Warehouse.get("Code"));
+            DetailM.put("Warehouse",DetailMWarehouse);
+            Map<String,Object> DetailMInventory = new HashMap<String,Object>();
+            DetailMInventory.put("code",retailmap.get("inventoryCode").toString());//明细1 的 存货编码
+            DetailM.put("Inventory",DetailMInventory);
+            Map<String,Object> DetailMUnit = new HashMap<String,Object>();
+            DetailMUnit.put("Name",retailmap.get("unitName").toString());// 使用 对应 原始销货单上这个商品的计量单位
+            DetailM.put("Unit",DetailMUnit);
+            //DetailM.put("Batch","？？？？？？？？？？？？？？？？？？？");//批号
+            DetailM.put("Quantity", retailmap.get("quantity").toString());//返回的差异数量  送货 - 实收 = 差异
+            DetailM.put("TaxRate","13");//明细1 的 税率
+            DetailM.put("OrigTaxPrice",retailmap.get("taxprice").toString());//明细1 的 含税单价
+            DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
+            //如果要跟 销售订单 关联，则需要传入 下面两个参数。
+            //DetailM.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
+            //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID
+            SaleDeliveryDetailsList.add(DetailM);
+        }
+        sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
+        dto.put("dto",sa);
+        String js = JSONObject.toJSONString(dto);
+        return js;
+    }
 }

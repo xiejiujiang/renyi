@@ -85,4 +85,18 @@
     <update id="updateFKSQdesc" parameterType="java.lang.String">
         update ARAP_PrepaymentRequisition set memo = memo + '(超额)'  where code = #{code}
     </update>
+
+    <select id="getRetailDataListByCode" parameterType="java.lang.String" resultType="java.util.Map">
+        select t1.id,t2.id,isnull(t1.priuserdefnvc6,'') as priuserdefnvc6,t3.code as departmentCode,t4.code as personCode,
+        t6.code as warehouseCode,t2.idinventory,t7.code as inventoryCode,t2.quantity,t8.code as unitCode,
+        t2.taxprice,t1.VoucherDate,t8.name as unitName
+        from re_retail t1,re_retail_b t2,AA_department t3,AA_person t4,AA_DR_Store t5,AA_warehouse t6,AA_inventory t7,AA_unit t8
+        where t1.code = #{code} and t1.id = t2.idRetailDTO and t1.idDepartment_Store = t3.id
+        and t1.idperson = t4.id and t1.idstore = t5.id and t5.idwarehouse = t6.id and t2.idinventory = t7.id
+        and t2.idbaseUnit = t8.id
+    </select>
+
+    <update id="updateReretailAStateByCode" parameterType="java.lang.String">
+        update RE_Retail set priuserdefnvc6 = '1' where code = #{code}
+    </update>
 </mapper>
