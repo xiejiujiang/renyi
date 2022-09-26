@@ -246,7 +246,7 @@ public class MapToJson {
     }
 
     //参照上面的。把零售单的数据 拼成 一个 销货单的 DTO
-    public static String getSAJsonByRetailData(List<Map<String,Object>> dataList){
+    public static String getSAJsonByRetailData(List<Map<String,Object>> dataList,List<Map<String,Object>> settleList){
         Map<String,Object> dto = new HashMap<String,Object>();
         Map<String,Object> sa = new HashMap<String,Object>();
 
@@ -263,7 +263,7 @@ public class MapToJson {
         sa.put("ExternalCode",Md5.md5("XJJ"+System.currentTimeMillis()));//外部订单号，不可以重复（MD5，建议记录）
 
         Map<String,Object> Customer = new HashMap<String,Object>();
-        Customer.put("Code","LS001");//客户编码  都用 零售客户？
+        Customer.put("Code","LS001");//客户编码  都用 零售客户
         sa.put("Customer",Customer);
         Map<String,Object> SettleCustomer = new HashMap<String,Object>();
         SettleCustomer.put("Code","LS001");//结算客户编码（一般等同于 客户编码）
@@ -276,17 +276,24 @@ public class MapToJson {
         Warehouse.put("Code", dataList.get(0).get("warehouseCode").toString());//表头上的 仓库编码
         sa.put("Warehouse",Warehouse);
         Map<String,Object> ReciveType = new HashMap<String,Object>();
-        ReciveType.put("Code","05");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
-        sa.put("ReciveType",ReciveType);// 红旗都是 月结
+        ReciveType.put("Code","02");//收款方式，枚举类型；00--限期收款，01--全额订金，02--全额现结，03--月结，04--分期收款，05--其它；
+        sa.put("ReciveType",ReciveType);// A账都是现结
         Map<String,Object> RdStyle = new HashMap<String,Object>();
         RdStyle.put("Code","201");//出库类别，RdStyleDTO对象，默认为“线上销售”类别； 具体值 我是查的数据库。  201
         sa.put("RdStyle",RdStyle);
         Map<String,Object> BusinessType = new HashMap<String,Object>();
-        BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+        if("34".equals(dataList.get(0).get("idbusitype").toString())){
+            BusinessType.put("Code","15");//业务类型编码，15–普通销售；16–销售退货
+        }else{
+            BusinessType.put("Code","16");//业务类型编码，15–普通销售；16–销售退货
+        }
         sa.put("BusinessType",BusinessType);
         //sa.put("Memo","这一单是根据红旗返回的差异自动生成的，请注意区别 ！");//备注
         List<Map<String,Object>> SaleDeliveryDetailsList = new ArrayList<Map<String,Object>>();
+        Float totaltaxamount = 0f;
         for(Map<String,Object> retailmap :dataList){
+            String taxamount = retailmap.get("taxamount").toString();
+            totaltaxamount = totaltaxamount + Float.valueOf(taxamount);
             Map<String,Object> DetailM = new HashMap<String,Object>();
             Map<String,Object> DetailMWarehouse = new HashMap<String,Object>();
             //明细1 的 仓库编码,这里不好取，但是可以用表头的（因为每一个销货单 只 对应了一个 仓库）
@@ -308,9 +315,33 @@ public class MapToJson {
             //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID
             SaleDeliveryDetailsList.add(DetailM);
         }
+        sa.put("OrigSettleAmount",""+totaltaxamount);// 如果选择了全额现结，就必须录入 现结金额
+        List<Map<String,Object>> SaleDeliverySettlements = new ArrayList<Map<String,Object>>();
+        for(Map<String,Object>  map : settleList){//此单的 结算方式 明细
+            Map<String,Object> settleMap = new HashMap<String,Object>();
+            settleMap.put("origAmount",map.get("amount").toString()); //金额
+            Map<String,Object> SettleStyle = new HashMap<String,Object>();
+            if("996".equals(map.get("code").toString())){
+                SettleStyle.put("Code","9996");//结算方式编码
+                Map<String,Object> BankAccount = new HashMap<String,Object>();
+                BankAccount.put("Name","代金券");//账号名称
+                settleMap.put("SettleStyle",SettleStyle);
+                settleMap.put("BankAccount",BankAccount);
+                SaleDeliverySettlements.add(settleMap);
+            }else{
+                SettleStyle.put("Code",map.get("code").toString());//结算方式编码
+                Map<String,Object> BankAccount = new HashMap<String,Object>();
+                BankAccount.put("Name",map.get("name").toString());//账号名称
+                settleMap.put("SettleStyle",SettleStyle);
+                settleMap.put("BankAccount",BankAccount);
+                SaleDeliverySettlements.add(settleMap);
+            }
+        }
+        sa.put("SaleDeliverySettlements",SaleDeliverySettlements);
         sa.put("SaleDeliveryDetails",SaleDeliveryDetailsList);
         dto.put("dto",sa);
         String js = JSONObject.toJSONString(dto);
+        System.out.println("js======" + js);
         return js;
     }
 }

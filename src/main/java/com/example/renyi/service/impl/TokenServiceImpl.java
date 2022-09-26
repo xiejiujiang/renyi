@@ -107,11 +107,12 @@ public class TokenServiceImpl implements TokenService {
         int successCodes = 0;
         for(String code : codelist){
             List<Map<String,Object>> dataList = renyiMapper.getRetailDataListByCode(code);//零售单的DATA
+            List<Map<String,Object>> settleList = renyiMapper.getRetailSettleListByCode(code);//零售单的结算明细
             //解析出这个 list 的具体数据，做销货单创建准备。
             if(dataList != null && dataList.size() != 0
                     && !"1".equals(dataList.get(0).get("priuserdefnvc6").toString())){//否则 说明 已经传成功了，就不要重复传了。
                 try{
-                    String sajson = MapToJson.getSAJsonByRetailData(dataList);
+                    String sajson = MapToJson.getSAJsonByRetailData(dataList,settleList);
                     String access_token = orderMapper.getTokenByAppKey("CfeqWq1g");//appKey
                     String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",sajson,
                             "CfeqWq1g",

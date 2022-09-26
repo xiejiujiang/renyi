@@ -29,5 +29,7 @@ public interface renyiMapper {
 
     List<Map<String,Object>> getRetailDataListByCode(@Param("code")String code);
 
+    List<Map<String,Object>> getRetailSettleListByCode(@Param("code")String code);
+
     void updateReretailAStateByCode(@Param("code")String code);
 }

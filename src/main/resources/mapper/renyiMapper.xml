@@ -89,11 +89,18 @@
     <select id="getRetailDataListByCode" parameterType="java.lang.String" resultType="java.util.Map">
         select t1.id,t2.id,isnull(t1.priuserdefnvc6,'') as priuserdefnvc6,t3.code as departmentCode,t4.code as personCode,
         t6.code as warehouseCode,t2.idinventory,t7.code as inventoryCode,t2.quantity,t8.code as unitCode,
-        t2.taxprice,t1.VoucherDate,t8.name as unitName
+        t2.taxprice,t1.VoucherDate,t8.name as unitName,t2.taxamount,t1.idbusitype
         from re_retail t1,re_retail_b t2,AA_department t3,AA_person t4,AA_DR_Store t5,AA_warehouse t6,AA_inventory t7,AA_unit t8
         where t1.code = #{code} and t1.id = t2.idRetailDTO and t1.idDepartment_Store = t3.id
         and t1.idperson = t4.id and t1.idstore = t5.id and t5.idwarehouse = t6.id and t2.idinventory = t7.id
         and t2.idbaseUnit = t8.id
+    </select>
+
+    <select id="getRetailSettleListByCode" parameterType="java.lang.String" resultType="java.util.Map">
+        select t1.amount,t2.code,isnull(t3.name,'') as name
+        from re_retail t0,RE_Retail_Payment t1,AA_SettleStyle t2
+        left join AA_BankAccount t3 on t2.idbankaccount = t3.id
+        where t1.idRetailDTO = t0.id and t1.idsettlestyle = t2.id  and t0.code = #{code}
     </select>
 
     <update id="updateReretailAStateByCode" parameterType="java.lang.String">

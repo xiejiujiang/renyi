@@ -488,6 +488,14 @@ public class Utils {
                 result.put("ckcode", "040300021");
                 result.put("ckname", "成都鹏瑞利库");
                 break;
+            case "307":
+                result.put("ckcode", "020100051");
+                result.put("ckname", "上海金汇天街库");
+                break;
+            case "308":
+                result.put("ckcode", "020500011");
+                result.put("ckname", "盐城中南大有境库");
+                break;
         }
         return result;
     }
