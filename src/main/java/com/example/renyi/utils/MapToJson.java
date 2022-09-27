@@ -321,16 +321,31 @@ public class MapToJson {
             Map<String,Object> settleMap = new HashMap<String,Object>();
             settleMap.put("origAmount",map.get("amount").toString()); //金额
             Map<String,Object> SettleStyle = new HashMap<String,Object>();
-            if("996".equals(map.get("code").toString())){
+            Map<String,Object> BankAccount = new HashMap<String,Object>();
+            if("996".equals(map.get("code").toString())){ //08上的代金券
                 SettleStyle.put("Code","9996");//结算方式编码
-                Map<String,Object> BankAccount = new HashMap<String,Object>();
                 BankAccount.put("Name","代金券");//账号名称
                 settleMap.put("SettleStyle",SettleStyle);
                 settleMap.put("BankAccount",BankAccount);
                 SaleDeliverySettlements.add(settleMap);
-            }else{
+            }
+            if("94".equals(map.get("code").toString())){ // 08上的 储值卡
+                SettleStyle.put("Code","941");//结算方式编码
+                BankAccount.put("Name","会员储值");//账号名称
+                settleMap.put("SettleStyle",SettleStyle);
+                settleMap.put("BankAccount",BankAccount);
+                SaleDeliverySettlements.add(settleMap);
+            }
+            if("99".equals(map.get("code").toString())){ // 08上的 积分抵现
+                SettleStyle.put("Code","991");//结算方式编码
+                BankAccount.put("Name","积分抵现");//账号名称
+                settleMap.put("SettleStyle",SettleStyle);
+                settleMap.put("BankAccount",BankAccount);
+                SaleDeliverySettlements.add(settleMap);
+            }
+            if(!"996".equals(map.get("code").toString()) && !"94".equals(map.get("code").toString())
+               && !"99".equals(map.get("code").toString())){
                 SettleStyle.put("Code",map.get("code").toString());//结算方式编码
-                Map<String,Object> BankAccount = new HashMap<String,Object>();
                 BankAccount.put("Name",map.get("name").toString());//账号名称
                 settleMap.put("SettleStyle",SettleStyle);
                 settleMap.put("BankAccount",BankAccount);

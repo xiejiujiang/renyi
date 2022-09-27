@@ -112,6 +112,11 @@ public class Utils {
             map.put("ckname","上海金虹桥库");
             return map;
         }
+        if(mendian.contains("南行港路龙湖金汇天街")){
+            map.put("ckcode","0401011301");
+            map.put("ckname","上海金汇天街库");
+            return map;
+        }
 
         // -----------------------  昆明 ----------------------------------//
         if(mendian.contains("昆明宝略大悦城华为授权体验店")) {
