@@ -23,7 +23,11 @@ public interface renyiMapper {
 
     Float getDistricntKC(@Param("department") String department);
 
+    Float getDistricntKCNOmsc(@Param("department") String department);
+
     Float getDistricntPUorder(@Param("department") String department);
+
+    Float getDistricntPUorderNOmsc(@Param("department") String department);
 
     void updateFKSQdesc(@Param("code") String code);
 
@@ -32,4 +36,13 @@ public interface renyiMapper {
     List<Map<String,Object>> getRetailSettleListByCode(@Param("code")String code);
 
     void updateReretailAStateByCode(@Param("code")String code);
+
+    String getClerkcreditQuantity(@Param("idclerk")String idclerk);
+    String getClerkaRBalance(@Param("idclerk")String idclerk);
+    String getClerkaCxje(@Param("idclerk")String idclerk);
+
+
+    Map<String, Object> getCustomerSaleDetails(@Param("idcustomer")String idcustomer);
+
+    String getCustomerSaleEarliest(@Param("idcustomer")String idcustomer);
 }

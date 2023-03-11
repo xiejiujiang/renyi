@@ -246,17 +246,20 @@ public class MapToJson {
     }
 
     //参照上面的。把零售单的数据 拼成 一个 销货单的 DTO
-    public static String getSAJsonByRetailData(List<Map<String,Object>> dataList,List<Map<String,Object>> settleList){
+    public static String getSAJsonByRetailData(List<Map<String,Object>> dataList,List<Map<String,Object>> settleList,String sacode){
         Map<String,Object> dto = new HashMap<String,Object>();
         Map<String,Object> sa = new HashMap<String,Object>();
 
-        Map<String,Object> Department = new HashMap<String,Object>();
-        Department.put("Code",dataList.get(0).get("departmentCode"));//部门编码
-        sa.put("Department",Department);
+        sa.put("Code",sacode);//指定销售订单号
 
         Map<String,Object> Clerk = new HashMap<String,Object>();
-        Clerk.put("Code",dataList.get(0).get("personCode"));//业务员编码
+        Clerk.put("Code","APL-9999");//业务员编码  APL-9999  业务员1  财务部
         sa.put("Clerk",Clerk);
+
+        Map<String,Object> Department = new HashMap<String,Object>();
+        //Department.put("Code","CWB");//部门编码  CWB  财务部
+        Department.put("Code",dataList.get(0).get("departmentCode"));//部门编码
+        sa.put("Department",Department);
 
         String VoucherDate = dataList.get(0).get("VoucherDate").toString();
         sa.put("VoucherDate",VoucherDate);//单据日期
@@ -309,7 +312,7 @@ public class MapToJson {
             DetailM.put("Quantity", retailmap.get("quantity").toString());//返回的差异数量  送货 - 实收 = 差异
             DetailM.put("TaxRate","13");//明细1 的 税率
             DetailM.put("OrigTaxPrice",retailmap.get("taxprice").toString());//明细1 的 含税单价
-            DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
+            //DetailM.put("idsourcevouchertype","43");//明细1 的 来源单据类型ID
             //如果要跟 销售订单 关联，则需要传入 下面两个参数。
             //DetailM.put("sourceVoucherCode","SO-2022-03-0006");//明细1 的 来源单据单据编号
             //DetailM.put("sourceVoucherDetailId","9");//明细1 的 来源单据单据对应的明细行ID

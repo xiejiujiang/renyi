@@ -66,6 +66,18 @@ public class Utils {
             map.put("ckname","成都锦华MSC库");
             return map;
         }
+        if(mendian.contains("武侯区银泰城仁肄华为授权体验店")){
+            map.put("ckcode","0101012518");
+            map.put("ckname","成都银泰城库");
+            return map;
+        }
+
+        // -----------------------  这个只是为了给严开伟用的  ------------------------------//
+        if(mendian.contains("成都IFS国际金融中心")){
+            map.put("ckcode","0101010701");
+            map.put("ckname","成都IFS库");
+            return map;
+        }
 
         // -----------------------  绵阳 ----------------------------------//
         if(mendian.contains("绵阳市涪城区临园路东段78号福星楼A座1905")){
@@ -129,7 +141,9 @@ public class Utils {
             map.put("ckname", "昆明西山万达库");
             return map;
         }
-        if(mendian.contains("昆明宝略爱琴海华为授权体验店")) {
+
+        //云南省昆明市西山区爱琴海宝略华为授权体验店
+        if(mendian.contains("爱琴海宝略华为授权体验店")) {
             map.put("ckcode", "0201010201");
             map.put("ckname", "昆明爱琴海库");
             return map;
@@ -265,6 +279,33 @@ public class Utils {
             result.put("departmentName","上海华为产品部");
             result.put("userCode","SH-009");//姚邦峰
             result.put("userName","姚邦峰");
+            return result;
+        }
+        if(mendian.contains("昆明") && xm.contains("华为体验店供货平台") && mendian.contains("爱琴海")){
+            result.put("merchantcode","0101751");
+            result.put("merchantname","昆明-西山爱琴海（普天太力）");
+            result.put("departmentCode","HW-YN-KM-CPB");
+            result.put("departmentName","昆明华为产品部");
+            result.put("userCode","KM-004");//李海飞
+            result.put("userName","李海飞");//李海飞
+            return result;
+        }
+        if(mendian.contains("昆明") && xm.contains("华为体验店供货平台") && mendian.contains("呈贡")){
+            result.put("merchantcode","0101625");
+            result.put("merchantname","昆明-呈贡万达（普天太力）");
+            result.put("departmentCode","HW-YN-KM-CPB");
+            result.put("departmentName","昆明华为产品部");
+            result.put("userCode","KM-004");//李海飞
+            result.put("userName","李海飞");//李海飞
+            return result;
+        }
+        if(mendian.contains("昆明") && xm.contains("华为体验店供货平台") && mendian.contains("同德")){
+            result.put("merchantcode","0101622");
+            result.put("merchantname","昆明-同德（普天太力）");
+            result.put("departmentCode","HW-YN-KM-CPB");
+            result.put("departmentName","昆明华为产品部");
+            result.put("userCode","KM-004");//李海飞
+            result.put("userName","李海飞");//李海飞
             return result;
         }
         if(mendian.contains("昆明") && xm.contains("华为体验店供货平台")){
@@ -500,6 +541,22 @@ public class Utils {
             case "308":
                 result.put("ckcode", "020500011");
                 result.put("ckname", "盐城中南大有境库");
+                break;
+            case "309":
+                result.put("ckcode", "040100041");
+                result.put("ckname", "昆明爱琴海库");
+                break;
+            case "310":
+                result.put("ckcode", "040300031");
+                result.put("ckname", "成都悠方购物中心库");
+                break;
+            case "311":
+                result.put("ckcode", "020100061");
+                result.put("ckname", "上海奉贤天街库");
+                break;
+            case "312":
+                result.put("ckcode", "040200021");
+                result.put("ckname", "贵阳美的悦然广场库");
                 break;
         }
         return result;

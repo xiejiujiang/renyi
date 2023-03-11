@@ -15,6 +15,7 @@ import com.example.renyi.entity.Putian;
 import com.example.renyi.entity.TData;
 import com.example.renyi.entity.User;
 
+import com.example.renyi.mapper.renyiMapper;
 import com.example.renyi.saentity.JsonRootBean;
 import com.example.renyi.service.BasicService;
 import com.example.renyi.service.OrderService;
@@ -53,6 +54,9 @@ public class IndexController {
 
     @Autowired
     private BasicService basicService;
+
+    @Autowired
+    private renyiMapper renyiMapper;
 
     @RequestMapping(value="/mav", method = {RequestMethod.GET,RequestMethod.POST}) //网址
     public ModelAndView Info(HttpServletRequest request, HttpServletResponse response) {
@@ -369,5 +373,39 @@ public class IndexController {
         Map<String,Object> result = OrderService.getDistricntKC(department,thistotal,code);
         JSONObject job = new JSONObject(result);
         return job.toJSONString();
+    }
+
+
+    //根据 销货单上的 业务员ID，往来单位，查询此业务员的 信用额度和应收余额， 以及 此客户的是否超账龄了。
+    // 增加了需求，如果大客销售毛利（财务端毛利）˃时间成本（合同总金额*合同回款期*1%月息），则销货单可过账
+    @RequestMapping(value="/getClerkCustomer", method = {RequestMethod.GET,RequestMethod.POST})
+    public @ResponseBody String getClerkCustomer(HttpServletRequest request, HttpServletResponse response){
+        String idclerk = request.getParameter("idclerk");//业务员ID
+        String idcustomer = request.getParameter("idcustomer");//客户ID
+
+        String totaltaxprice = request.getParameter("totaltaxprice");// 含税的总金额
+        String totalprice = request.getParameter("totalprice");//不含税的总金额
+        String totalcb = request.getParameter("totalcb");//不含税的总成本
+
+        // 这个客户对应的 账龄天数
+        String customerAccountDays = renyiMapper.getCustomerSaleDetails(idcustomer).get("saleCreditDays").toString();
+        Float clerckmounth = Float.valueOf(customerAccountDays)/30; //换算成 几月
+
+        if((Float.valueOf(totalprice)-Float.valueOf(totalcb)) > (Float.valueOf(totaltaxprice)*0.01*clerckmounth)){
+            LOGGER.error("---------------idclerk == "+idclerk+" ---------------");
+            LOGGER.error("---------------idcustomer == "+idcustomer+" ---------------");
+            Map<String,Object> result = OrderService.getClerkCustomer(idclerk,idcustomer);
+            JSONObject job = new JSONObject(result);
+            return job.toJSONString();
+        }else{
+            LOGGER.error("---------------idclerk == "+idclerk+" ---------------");
+            LOGGER.error("---------------idcustomer == "+idcustomer+" ---------------");
+            Map<String,Object> result = OrderService.getClerkCustomer(idclerk,idcustomer);
+            //不允许保存！！！
+            //Map<String,Object> result = new HashMap<String,Object>();
+            result.put("flag","2");
+            JSONObject job = new JSONObject(result);
+            return job.toJSONString();
+        }
     }
 }

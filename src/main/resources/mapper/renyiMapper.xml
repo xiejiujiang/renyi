@@ -8,7 +8,7 @@
         from re_retail_b t1,ST_RDRecord_b t2,ST_RDRecord t3
         where t1.idinventory = t2.idinventory  and t1.RdRecordCode = t3.code and t3.id = t2.idRDRecordDTO
         and (t1.priuserdefdecm2 is null or  t1.priuserdefdecm2 = 0 )
-        and t2.price != 0 and t2.price is not null and t1.createdtime > '2022-07-01 23:59:59.617'
+        and t2.price != 0 and t2.price is not null and t1.createdtime > '2022-11-20 23:59:59.617'
     </update>
 
 
@@ -70,6 +70,26 @@
           and y1.ckname like  #{department} and y1.ckname not like '%全屋%' and y1.ckname not like '%汽车%' and y1.baseQuantity != 0
     </select>
 
+    <select id="getDistricntKCNOmsc" parameterType="java.lang.String" resultType="java.lang.Float">
+        /*select y1.ckname,y1.chname,y1.baseQuantity,y2.finalAmount*/
+        select isnull(sum(y2.finalAmount),0) as finalAmount
+        from(
+                select k3.name as ckname, k2.name as chname,k1.baseQuantity,k1.idwarehouse,k1.idinventory
+                from ST_NewCurrentStock k1,AA_Inventory k2,AA_Warehouse k3
+                where k1.propertyName = 'CurrentStock' and k1.idinventory = k2.id and k1.idwarehouse = k3.id )y1 ,
+            (select s1.idinventory,s1.idwarehouse,s1.AccountYearPeriod,s2.finalAmount
+             from (select idinventory,idwarehouse,max(AccountYearPeriod) as AccountYearPeriod
+                   from ST_SummaryBook where finalQuantity != 0
+                   group by idinventory,idwarehouse  ) s1,
+                  (select idinventory,idwarehouse,AccountYearPeriod,max(finalAmount) as finalAmount
+                   from ST_SummaryBook where finalQuantity != 0
+                   group by idinventory,idwarehouse,AccountYearPeriod ) s2
+             where s1.idinventory = s2.idinventory and s1.AccountYearPeriod = s2.AccountYearPeriod and s1.idwarehouse = s2.idwarehouse)y2
+        where y1.idinventory = y2.idinventory and y1.idwarehouse = y2.idwarehouse
+          and y1.ckname like  #{department} and y1.ckname not like '%全屋%' and y1.ckname not like '%汽车%' and y1.baseQuantity != 0
+        and  y1.ckname not like '%msc%'
+    </select>
+
     <select id="getDistricntPUorder" parameterType="java.lang.String" resultType="java.lang.Float">
         select isnull(sum(y1.origDiscountPrice*y1.cc),0) as ddnow
         from(
@@ -78,6 +98,18 @@
                 from PU_PurchaseOrder t1,PU_PurchaseOrder_b t2,AA_Warehouse t3
                 where t1.idwarehouse = t3.id and t1.id = t2.idPurchaseOrderDTO
                   and t3.name not like '%全屋%' and t3.name not like '%汽车%' and t3.name like  #{department}
+                  and t2.quantity > isnull(t2.countQuantity,0)
+                  and t1.voucherState = 189 and t2.IsClose != 1)y1
+    </select>
+
+    <select id="getDistricntPUorderNOmsc" parameterType="java.lang.String" resultType="java.lang.Float">
+        select isnull(sum(y1.origDiscountPrice*y1.cc),0) as ddnow
+        from(
+                select t1.code,t2.IsClose,t2.idinventory,t2.origDiscountPrice,
+                       t2.quantity,t2.countQuantity, t2.countArrivalQuantity,(t2.quantity - isnull(t2.countQuantity,0) ) as cc
+                from PU_PurchaseOrder t1,PU_PurchaseOrder_b t2,AA_Warehouse t3
+                where t1.idwarehouse = t3.id and t1.id = t2.idPurchaseOrderDTO
+                  and t3.name not like '%全屋%' and t3.name not like '%汽车%' and t3.name not like '%msc%'  and t3.name like  #{department}
                   and t2.quantity > isnull(t2.countQuantity,0)
                   and t1.voucherState = 189 and t2.IsClose != 1)y1
     </select>
@@ -106,4 +138,57 @@
     <update id="updateReretailAStateByCode" parameterType="java.lang.String">
         update RE_Retail set priuserdefnvc6 = '1' where code = #{code}
     </update>
+
+    <select id="getClerkcreditQuantity" parameterType="java.lang.String" resultType="java.lang.String">
+        select ISNULL(SUM(t1.creditQuantity),0) AS creditQuantity
+        from AA_Person t1
+        where t1.mobilePhoneNo = (SELECT mobilePhoneNo FROM AA_Person WHERE id = #{idclerk} )
+    </select>
+
+    <select id="getClerkaRBalance" parameterType="java.lang.String" resultType="java.lang.String">
+        select ISNULL(sum(y1.aRBalance),0) as aRBalance
+        from (
+                 select p1.code,min(p1.aRBalance) as aRBalance
+                 from
+                     (
+                         select t2.code,ISNULL(t3.origVoucherNoSettleAmount,t2.taxAmount ) as yingshou,ISNULL(t3.origCurrentAmount,0) AS SHISHOU ,
+                         (ISNULL(t3.origVoucherNoSettleAmount,t2.taxAmount ) - ISNULL(t3.origCurrentAmount,0)) AS aRBalance
+                         from AA_Department t0, AA_Person t1,SA_SaleDelivery t2 left join ARAP_ReceivePayment_b t3 on t2.code = t3.voucherCode
+                         where t1.mobilePhoneNo = (select mobilePhoneNo from AA_Person where id = #{idclerk}) and t0.id = t2.iddepartment
+                        and t2.idclerk = t1.id and t2.voucherState = 189 and (t2.isCancel != 180 or t2.isCancel is null) and (t0.name like '%渠道%' or t0.name like '%大客%')
+                     )p1
+                 group by p1.code
+             )y1
+    </select>
+
+    <select id="getClerkaCxje" parameterType="java.lang.String" resultType="java.lang.String">
+        select sum(pp1.cxje) as cxje
+        from (
+              select  ISNULL(sum(t2.origCurrentAmount),0) as cxje
+              from SA_SaleDelivery t1,ARAP_StrikeBalance_SecondDetail t2
+              where t1.idclerk = #{idclerk} and t1.code = t2.voucherCode
+              and t1.voucherState = 189 and (t1.isCancel != 180 or t1.isCancel is null)
+              union all
+              select  ISNULL(sum(t2.origCurrentAmount),0) as cxje
+              from SA_SaleDelivery t1,ARAP_StrikeBalance_FirstDetail t2
+              where t1.idclerk = #{idclerk} and t1.code = t2.voucherCode
+              and t1.voucherState = 189 and (t1.isCancel != 180 or t1.isCancel is null)
+         )pp1
+    </select>
+
+    <select id="getCustomerSaleDetails" parameterType="java.lang.String" resultType="java.util.Map">
+        select
+        isnull(t1.saleCreditDays,0) as saleCreditDays,isnull(t2.aRBalance,0) as aRBalance
+        from AA_Partner t1 left join AA_Partner_Receive t2 on t1.id = t2.idPartner
+        where t1.id = #{idcustomer}
+    </select>
+
+    <select id="getCustomerSaleEarliest" parameterType="java.lang.String" resultType="java.lang.String">
+        select top 1
+        ISNULL(voucherdate,GETDATE()) AS  voucherdate
+        from SA_SaleDelivery
+        where idcustomer = #{idcustomer}  and voucherState = 189 and (isCancel != 180 or isCancel is null)
+        order by id asc
+    </select>
+
 </mapper>

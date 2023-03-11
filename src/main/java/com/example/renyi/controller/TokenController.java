@@ -137,6 +137,9 @@ public class TokenController {
         String restr = "";
         try{
             String saorder = request.getParameter("json");
+            LOGGER.info("1.3 红旗接口接收导的 JSON == " + saorder);
+            saorder = saorder.replaceAll(" ","+");
+            LOGGER.info("1.3 红旗接口接收导的 JSON 处理后 == " + saorder);
             String decryptData = Des.desDecrypt("8aue2u3q", saorder);
             LOGGER.info("------------------ 1.3接口 接受到红旗的信息 :  decryptData == " + new String(decryptData.getBytes("GBK"),"UTF-8"));
             JSONObject job = JSONObject.parseObject(new String(decryptData.getBytes("GBK"),"UTF-8"));

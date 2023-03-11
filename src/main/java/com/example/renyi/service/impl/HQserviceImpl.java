@@ -35,10 +35,12 @@ public class HQserviceImpl implements HQservice {
         try{
             String json = MapToJson.getSAparamsJson(jrb,sajrb);
             if(!json.equals("0000")){
-                new Thread(){
-                    public void run(){
+                String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                LOGGER.info("创建差异销货单的 access_token == " + access_token);
+                //new Thread(){
+                    //public void run(){
                         try{
-                            String access_token = orderMapper.getTokenByAppKey("djrUbeB2");//appKey
+                            LOGGER.info("创建差异销货单的JSON == " + json);
                             String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",json,
                                     "djrUbeB2",
                                     "F707B3834D9448B2A81856DE4E42357A",
@@ -86,8 +88,8 @@ public class HQserviceImpl implements HQservice {
                         }catch (Exception e){
                             e.printStackTrace();
                         }
-                    }
-                }.start();
+                    //}
+                //}.start();
             }else{
                 LOGGER.info("-------------- 红旗回调了1.3接口，但是没有差异数量，所以不会再生成 T+ 的销货单了！ --------------");
             }

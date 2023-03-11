@@ -106,56 +106,43 @@ public class TokenServiceImpl implements TokenService {
         resultstr = "本次一共同步："+codelist.size()+"单";
         int successCodes = 0;
         for(String code : codelist){
+            String sacode = "SA-" + Md5.md5(""+Math.random()).substring(0,7)+Md5.md5(""+Math.random()).substring(0,4);
             List<Map<String,Object>> dataList = renyiMapper.getRetailDataListByCode(code);//零售单的DATA
             List<Map<String,Object>> settleList = renyiMapper.getRetailSettleListByCode(code);//零售单的结算明细
             //解析出这个 list 的具体数据，做销货单创建准备。
-            if(dataList != null && dataList.size() != 0
-                    && !"1".equals(dataList.get(0).get("priuserdefnvc6").toString())){//否则 说明 已经传成功了，就不要重复传了。
+            if(dataList != null && dataList.size() != 0 && !"1".equals(dataList.get(0).get("priuserdefnvc6").toString())){//否则 说明 已经传成功了，就不要重复传了。
                 try{
-                    String sajson = MapToJson.getSAJsonByRetailData(dataList,settleList);
+                    String sajson = MapToJson.getSAJsonByRetailData(dataList,settleList,sacode);
                     String access_token = orderMapper.getTokenByAppKey("CfeqWq1g");//appKey
-                    String result = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",sajson,
+                    String result = HttpClient.HttpPost("/tplus/api/v2/saleDelivery/Create",sajson,
                             "CfeqWq1g",
                             "7CF60DFC31365CFB0A1BDA01071FA399",
                             access_token);
                     LOGGER.info("-------------- 调用T+ 创建 销货单的接口后返回：" + result + " --------------");
-                    JSONObject jon = JSONObject.parseObject(result);
-                    if("0".equals(jon.getString("code"))){//如果 销货单 创建 成功！ 再 调用  审核 功能
+                    //JSONObject jon = JSONObject.parseObject(result);
+                    if("".equals(result) || "null".equals(result) || "NULL".equals(result)){//如果 销货单 创建 成功！ 再 调用  审核 功能
                         //如果创建成功，则先把 原账套里面的 A账同步字段 更新成 1,这样下次再传重复的单子 就不会再 重复创建了。
                         renyiMapper.updateReretailAStateByCode(code);
                         successCodes = successCodes + 1;
-                        String data = jon.getString("data");
-                        JSONObject dataJob = JSONObject.parseObject(data);
-                        String auditjson = "{\n" +
-                                "  \"param\": {\n" +
-                                "    \"externalCode\": \" " + Md5.md5(dataJob.getString("ID") + dataJob.getString("Code")) + " \",\n" +
-                                "    \"voucherID\": \" "+ dataJob.getString("ID") +" \",\n" +
-                                "    \"voucherCode\": \" "+ dataJob.getString("Code") +" \"\n" +
-                                "  }\n" +
-                                "}";
+                        String auditjson = "{\"param\":{\"voucherCode\":\""+sacode+"\"}}";
+                        LOGGER.info("-------------- 调用T+ 审核 销货单的参数字符串1：" + auditjson + " --------------");
                         String auditResult = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson,
                                 "CfeqWq1g",
                                 "7CF60DFC31365CFB0A1BDA01071FA399",
                                 access_token);
                     }else{//如果 创建 T+ 销货单 失败！  就再创建 审核 一次!
-                        String result2 = HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Create",sajson,
+                        String result2 = HttpClient.HttpPost("/tplus/api/v2/saleDelivery/Create",sajson,
                                 "CfeqWq1g",
                                 "7CF60DFC31365CFB0A1BDA01071FA399",
                                 access_token);
-                        JSONObject jon2 = JSONObject.parseObject(result2);
-                        if("0".equals(jon2.getString("code"))) {//如果 销货单 创建 成功！ 再调用  审核 功能
+                        //JSONObject jon2 = JSONObject.parseObject(result2);
+                        if("".equals(result2) || "null".equals(result2) || "NULL".equals(result2)) {
+                            //如果 销货单 创建 成功！ 再调用  审核 功能
                             //如果创建成功，则先把 原账套里面的 A账同步字段 更新成 1,这样下次再传重复的单子 就不会再 重复创建了。
                             renyiMapper.updateReretailAStateByCode(code);
                             successCodes = successCodes + 1;
-                            String data2 = jon2.getString("data");
-                            JSONObject dataJob2 = JSONObject.parseObject(data2);
-                            String auditjson2 = "{\n" +
-                                    "  \"param\": {\n" +
-                                    "    \"externalCode\": \" " + Md5.md5(dataJob2.getString("ID") + dataJob2.getString("Code")) + " \",\n" +
-                                    "    \"voucherID\": \" "+ dataJob2.getString("ID") +" \",\n" +
-                                    "    \"voucherCode\": \" "+ dataJob2.getString("Code") +" \"\n" +
-                                    "  }\n" +
-                                    "}";
+                            String auditjson2 = "{\"param\":{\"voucherCode\":\""+sacode+"\"}}";
+                            LOGGER.info("-------------- 调用T+ 审核 销货单的参数字符串2：" + auditjson2 + " --------------");
                             HttpClient.HttpPost("/tplus/api/v2/SaleDeliveryOpenApi/Audit",auditjson2,
                                     "CfeqWq1g",
                                     "7CF60DFC31365CFB0A1BDA01071FA399",
@@ -170,5 +157,12 @@ public class TokenServiceImpl implements TokenService {
         }
         resultstr = resultstr + ",其中 成功了：" + successCodes + "单。";
         return resultstr;
+    }
+
+    public static void main(String[] args) {
+        String sacode = "SA-20230112468f6";
+        String auditjson = "{\"param\":{\"voucherCode\":\""+sacode+"\"}}";
+
+        System.out.println(auditjson);
     }
 }
